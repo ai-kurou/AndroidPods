@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -92,8 +93,8 @@ fun DevicesScreen(modifier: Modifier = Modifier) {
     if (showSettingsDialog) {
         AlertDialog(
             onDismissRequest = { showSettingsDialog = false },
-            title = { Text("Bluetooth権限が必要です") },
-            text = { Text("このアプリはBluetoothデバイスとの接続に権限が必要です。設定画面から権限を許可してください。") },
+            title = { Text(stringResource(R.string.bluetooth_permission_required_title)) },
+            text = { Text(stringResource(R.string.bluetooth_permission_required_message)) },
             confirmButton = {
                 TextButton(onClick = {
                     showSettingsDialog = false
@@ -102,12 +103,12 @@ fun DevicesScreen(modifier: Modifier = Modifier) {
                     }
                     context.startActivity(intent)
                 }) {
-                    Text("設定を開く")
+                    Text(stringResource(R.string.open_settings))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showSettingsDialog = false }) {
-                    Text("キャンセル")
+                    Text(stringResource(R.string.cancel))
                 }
             },
         )
@@ -116,7 +117,7 @@ fun DevicesScreen(modifier: Modifier = Modifier) {
     Column(modifier = modifier.padding(16.dp)) {
         permissionStates.forEach { (permission, granted) ->
             val shortName = permission.substringAfterLast(".")
-            val status = if (granted) "許可済み" else "未許可"
+            val status = if (granted) stringResource(R.string.permission_granted) else stringResource(R.string.permission_not_granted)
             Text(text = "$shortName: $status")
         }
     }

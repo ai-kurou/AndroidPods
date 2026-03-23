@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bluetooth_permission_required_title">Bluetooth Permission Required</string>
+    <string name="bluetooth_permission_required_message">This app requires Bluetooth permissions to connect to devices. Please grant permissions in Settings.</string>
+    <string name="open_settings">Open Settings</string>
+    <string name="cancel">Cancel</string>
+    <string name="permission_granted">Granted</string>
+    <string name="permission_not_granted">Not Granted</string>
+</resources>
