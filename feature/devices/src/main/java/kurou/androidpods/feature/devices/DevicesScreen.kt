@@ -1,10 +1,8 @@
 package kurou.androidpods.feature.devices
 
-import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -28,18 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
-
-private fun requiredPermissions(): List<String> =
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        listOf(
-            Manifest.permission.BLUETOOTH_CONNECT,
-            Manifest.permission.BLUETOOTH_SCAN,
-        )
-    } else {
-        listOf(
-            Manifest.permission.ACCESS_FINE_LOCATION,
-        )
-    }
 
 @Composable
 fun DevicesScreen(modifier: Modifier = Modifier) {
