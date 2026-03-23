@@ -40,6 +40,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":feature:devices"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
