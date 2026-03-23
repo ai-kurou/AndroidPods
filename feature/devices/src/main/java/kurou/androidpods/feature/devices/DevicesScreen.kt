@@ -41,7 +41,7 @@ private fun requiredPermissions(): List<String> =
     }
 
 @Composable
-fun BluetoothPermissionScreen(modifier: Modifier = Modifier) {
+fun DevicesScreen(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val permissions = requiredPermissions()
 
@@ -124,6 +124,6 @@ fun BluetoothPermissionScreen(modifier: Modifier = Modifier) {
 
 @Preview(showBackground = true)
 @Composable
-fun BluetoothPermissionScreenPreview() {
-    BluetoothPermissionScreen()
+fun DevicesScreenPreview() {
+    DevicesScreen()
 }

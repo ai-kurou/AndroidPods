@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import kurou.androidpods.feature.devices.BluetoothPermissionScreen
+import kurou.androidpods.feature.devices.DevicesScreen
 import kurou.androidpods.ui.theme.AndroidPodsTheme
 
 class MainActivity : ComponentActivity() {
@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             AndroidPodsTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    BluetoothPermissionScreen(modifier = Modifier.padding(innerPadding))
+                    DevicesScreen(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
