@@ -6,4 +6,10 @@
     <string name="cancel">Cancel</string>
     <string name="permission_granted">Granted</string>
     <string name="permission_not_granted">Not Granted</string>
+    <string name="bluetooth_adapter_state">Bluetooth Adapter</string>
+    <string name="bluetooth_state_on">On</string>
+    <string name="bluetooth_state_off">Off</string>
+    <string name="bluetooth_state_turning_on">Turning On</string>
+    <string name="bluetooth_state_turning_off">Turning Off</string>
+    <string name="bluetooth_state_not_available">Not Available</string>
 </resources>

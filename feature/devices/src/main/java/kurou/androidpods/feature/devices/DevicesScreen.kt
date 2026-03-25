@@ -1,12 +1,18 @@
 package kurou.androidpods.feature.devices
 
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothManager
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
@@ -24,7 +30,11 @@ fun DevicesScreen(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val permissions = requiredPermissions()
 
+    val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
+    val bluetoothAdapter = bluetoothManager?.adapter
+
     val permissionStates = remember { mutableStateMapOf<String, Boolean>() }
+    var bluetoothAdapterState by remember { mutableStateOf(bluetoothAdapter?.state) }
     var showSettingsDialog by remember { mutableStateOf(false) }
     var initialRequestDone by remember { mutableStateOf(false) }
 
@@ -45,6 +55,23 @@ fun DevicesScreen(modifier: Modifier = Modifier) {
         initialRequestDone = true
     }
 
+    // Bluetoothアダプタの状態変更をリアルタイムに監視
+    DisposableEffect(Unit) {
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                if (intent.action == BluetoothAdapter.ACTION_STATE_CHANGED) {
+                    bluetoothAdapterState = intent.getIntExtra(
+                        BluetoothAdapter.EXTRA_STATE,
+                        BluetoothAdapter.ERROR,
+                    )
+                }
+            }
+        }
+        val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
+        context.registerReceiver(receiver, filter)
+        onDispose { context.unregisterReceiver(receiver) }
+    }
+
     // 起動時に未許可の権限をリクエスト
     LaunchedEffect(Unit) {
         val notGranted = permissions.filter {
@@ -53,12 +80,13 @@ fun DevicesScreen(modifier: Modifier = Modifier) {
         if (notGranted.isNotEmpty()) launcher.launch(notGranted.toTypedArray())
     }
 
-    // アプリ復帰時（ON_RESUME）に権限状態を再チェックし、未許可なら設定画面へ誘導
+    // アプリ復帰時（ON_RESUME）に権限状態とアダプタ状態を再チェック
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         permissions.forEach { permission ->
             permissionStates[permission] =
                 ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
         }
+        bluetoothAdapterState = bluetoothAdapter?.state
         if (initialRequestDone) {
             val hasNotGranted = permissions.any {
                 ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED
@@ -83,6 +111,7 @@ fun DevicesScreen(modifier: Modifier = Modifier) {
 
     DevicesContent(
         permissionStates = permissionStates,
+        bluetoothAdapterState = bluetoothAdapterState,
         modifier = modifier,
     )
 }

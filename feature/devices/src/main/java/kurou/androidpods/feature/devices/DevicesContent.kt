@@ -1,7 +1,9 @@
 package kurou.androidpods.feature.devices
 
+import android.bluetooth.BluetoothAdapter
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -12,6 +14,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 internal fun DevicesContent(
     permissionStates: Map<String, Boolean>,
+    bluetoothAdapterState: Int?,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.padding(16.dp)) {
@@ -20,6 +23,15 @@ internal fun DevicesContent(
             val status = if (granted) stringResource(R.string.permission_granted) else stringResource(R.string.permission_not_granted)
             Text(text = "$shortName: $status")
         }
+        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+        val adapterStateText = when (bluetoothAdapterState) {
+            BluetoothAdapter.STATE_ON -> stringResource(R.string.bluetooth_state_on)
+            BluetoothAdapter.STATE_OFF -> stringResource(R.string.bluetooth_state_off)
+            BluetoothAdapter.STATE_TURNING_ON -> stringResource(R.string.bluetooth_state_turning_on)
+            BluetoothAdapter.STATE_TURNING_OFF -> stringResource(R.string.bluetooth_state_turning_off)
+            else -> stringResource(R.string.bluetooth_state_not_available)
+        }
+        Text(text = "${stringResource(R.string.bluetooth_adapter_state)}: $adapterStateText")
     }
 }
 
@@ -31,6 +43,7 @@ private fun DevicesContentPreviewApi31() {
             android.Manifest.permission.BLUETOOTH_CONNECT to true,
             android.Manifest.permission.BLUETOOTH_SCAN to true,
         ),
+        bluetoothAdapterState = BluetoothAdapter.STATE_ON,
     )
 }
 
@@ -41,5 +54,6 @@ private fun DevicesContentPreviewApi30() {
         permissionStates = mapOf(
             android.Manifest.permission.ACCESS_FINE_LOCATION to true,
         ),
+        bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
     )
 }
