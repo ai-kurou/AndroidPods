@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import kurou.androidpods.feature.devices.DevicesScreen
+import dagger.hilt.android.AndroidEntryPoint
 import kurou.androidpods.ui.theme.AndroidPodsTheme
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
