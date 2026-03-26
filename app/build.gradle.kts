@@ -44,8 +44,7 @@ android {
 dependencies {
     implementation(project(":core:domain"))
     implementation(project(":core:data"))
-    implementation(project(":feature:devices"))
-    implementation(project(":feature:onboarding"))
+    implementation(project(":navigation"))
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.hilt.android)

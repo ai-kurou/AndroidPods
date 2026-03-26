@@ -11,12 +11,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import kurou.androidpods.feature.devices.DevicesScreen
-import kurou.androidpods.feature.onboarding.OnboardingScreen
+import kurou.androidpods.navigation.AppNavHost
+import kurou.androidpods.navigation.Route
 import kurou.androidpods.ui.theme.AndroidPodsTheme
 
 @AndroidEntryPoint
@@ -31,31 +29,18 @@ class MainActivity : ComponentActivity() {
                     val isFirstLaunch by viewModel.isFirstLaunch.collectAsStateWithLifecycle()
 
                     val startDestination = when (isFirstLaunch) {
-                        true -> "onboarding"
-                        false -> "devices"
+                        true -> Route.ONBOARDING
+                        false -> Route.DEVICES
                         null -> return@Scaffold
                     }
 
                     val navController = rememberNavController()
-                    NavHost(
+                    AppNavHost(
                         navController = navController,
                         startDestination = startDestination,
+                        onOnboardingComplete = { viewModel.markAsLaunched() },
                         modifier = Modifier.padding(innerPadding),
-                    ) {
-                        composable("onboarding") {
-                            OnboardingScreen(
-                                onComplete = {
-                                    viewModel.markAsLaunched()
-                                    navController.navigate("devices") {
-                                        popUpTo("onboarding") { inclusive = true }
-                                    }
-                                },
-                            )
-                        }
-                        composable("devices") {
-                            DevicesScreen()
-                        }
-                    }
+                    )
                 }
             }
         }
