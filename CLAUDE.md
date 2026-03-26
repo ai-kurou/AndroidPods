@@ -1,8 +1,57 @@
 # CLAUDE.md
 
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 ## プロジェクト概要
 
 Android モバイルアプリケーションのプロジェクト。**パブリックリポジトリ**のため、コミット・プッシュされた内容はすべて公開される。
+
+## ビルド・テスト
+
+システムにJavaがインストールされていない場合、Android Studio同梱のJBRを使用する:
+```bash
+export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
+```
+
+```bash
+# 全モジュールビルド
+./gradlew assembleDebug
+
+# 特定モジュールのビルド
+./gradlew :core:data:compileDebugKotlin
+
+# 全ユニットテスト実行
+./gradlew testDebugUnitTest
+
+# 特定モジュールのテスト
+./gradlew :feature:devices:testDebugUnitTest
+
+# 特定テストクラスの実行
+./gradlew :app:testDebugUnitTest --tests "kurou.androidpods.MainViewModelTest"
+```
+
+## アーキテクチャ
+
+マルチモジュール構成のクリーンアーキテクチャ。依存方向: `app` → `feature:*` → `core:domain` ← `core:data`
+
+- **`:core:domain`** — リポジトリのインターフェースとUseCase。Android Framework非依存。
+- **`:core:data`** — リポジトリの実装とHilt DIモジュール(`DataModule`)。`@Binds`でインターフェースと実装をバインド。
+- **`:feature:*`** — 各画面のViewModel, Composable, テスト。`:core:domain`のみに依存。
+- **`:app`** — `MainActivity`でNavigation Composeによるルーティング、`MainViewModel`で初回起動判定。`:core:domain`(UseCase利用)と`:core:data`(Hilt DIグラフ構築)の両方に依存。
+
+### DI パターン
+
+Hiltを使用。新しいRepositoryを追加する場合:
+1. `core:domain` にインターフェースを定義
+2. `core:data` に `@Singleton` 実装を作成
+3. `core:data/DataModule.kt` に `@Binds` メソッドを追加
+
+### テストパターン
+
+- **ViewModel テスト**: MockKでUseCaseをモック、`UnconfinedTestDispatcher`で`Dispatchers.Main`を差し替え
+- **Repository テスト**: Robolectric (`@Config(sdk = [34])`) でAndroid APIをシミュレート
+- **Compose UIテスト**: `createComposeRule()` + Robolectricでユニットテストとして実行
+- テスト名は日本語のバッククォート記法 (`` `初期状態はnullを返す`() ``)
 
 ## Security Rules
 
