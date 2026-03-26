@@ -42,6 +42,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:data"))
     implementation(project(":feature:devices"))
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)

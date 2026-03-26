@@ -24,5 +24,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "AndroidPods"
 include(":app")
+include(":core:domain")
+include(":core:data")
 include(":feature:devices")
  

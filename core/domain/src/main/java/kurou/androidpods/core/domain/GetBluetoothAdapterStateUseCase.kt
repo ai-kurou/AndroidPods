@@ -1,6 +1,5 @@
-package kurou.androidpods.feature.devices.domain
+package kurou.androidpods.core.domain
 
-import kurou.androidpods.feature.devices.data.BluetoothAdapterRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

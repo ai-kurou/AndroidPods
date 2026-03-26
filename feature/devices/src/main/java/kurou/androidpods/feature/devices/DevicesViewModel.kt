@@ -3,7 +3,7 @@ package kurou.androidpods.feature.devices
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kurou.androidpods.feature.devices.domain.GetBluetoothAdapterStateUseCase
+import kurou.androidpods.core.domain.GetBluetoothAdapterStateUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

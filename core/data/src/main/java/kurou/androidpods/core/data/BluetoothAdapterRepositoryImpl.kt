@@ -1,4 +1,4 @@
-package kurou.androidpods.feature.devices.data
+package kurou.androidpods.core.data
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kurou.androidpods.core.domain.BluetoothAdapterRepository
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -14,13 +15,13 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class BluetoothAdapterRepository @Inject constructor(
+class BluetoothAdapterRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
-) {
+) : BluetoothAdapterRepository {
     private val bluetoothAdapter: BluetoothAdapter? =
         (context.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager)?.adapter
 
-    fun observeAdapterState(): Flow<Int?> = callbackFlow {
+    override fun observeAdapterState(): Flow<Int?> = callbackFlow {
         trySend(bluetoothAdapter?.state)
 
         val receiver = object : BroadcastReceiver() {
@@ -40,5 +41,5 @@ class BluetoothAdapterRepository @Inject constructor(
         awaitClose { context.unregisterReceiver(receiver) }
     }
 
-    fun getCurrentState(): Int? = bluetoothAdapter?.state
+    override fun getCurrentState(): Int? = bluetoothAdapter?.state
 }

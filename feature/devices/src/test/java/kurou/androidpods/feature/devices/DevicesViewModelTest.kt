@@ -11,7 +11,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kurou.androidpods.feature.devices.domain.GetBluetoothAdapterStateUseCase
+import kurou.androidpods.core.domain.GetBluetoothAdapterStateUseCase
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
