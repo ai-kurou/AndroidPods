@@ -37,6 +37,7 @@ kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-cor
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
 androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+androidx-test-core = { group = "androidx.test", name = "core", version = "1.7.0" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
