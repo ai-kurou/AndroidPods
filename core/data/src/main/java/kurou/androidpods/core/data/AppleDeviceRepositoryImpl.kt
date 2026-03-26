@@ -1,5 +1,6 @@
 package kurou.androidpods.core.data
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanCallback
@@ -31,6 +32,7 @@ private const val AIRPODS_DATA_LENGTH = 27
 private const val DEVICE_TIMEOUT_MS = 5_000L
 private const val CLEANUP_INTERVAL_MS = 1_000L
 
+@SuppressLint("MissingPermission")
 @Singleton
 class AppleDeviceRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
