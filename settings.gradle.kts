@@ -27,4 +27,5 @@ include(":app")
 include(":core:domain")
 include(":core:data")
 include(":feature:devices")
+include(":feature:onboarding")
  
