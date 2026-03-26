@@ -141,42 +141,46 @@ class AppleDeviceRepositoryImpl @Inject constructor(
 
     private fun parseProximityPairing(result: ScanResult): AppleDevice? {
         val data = result.scanRecord?.getManufacturerSpecificData(APPLE_COMPANY_ID) ?: return null
-        if (data.size != AIRPODS_DATA_LENGTH || data[0] != PROXIMITY_PAIRING_TYPE) return null
-
-        val modelCode = ((data[3].toInt() and 0xFF) shl 8) or (data[4].toInt() and 0xFF)
-        val isSingle = modelCode in SINGLE_BATTERY_MODELS
-
-        val batteryByte = data[6].toInt() and 0xFF
-        val leftBattery: Int?
-        val rightBattery: Int?
-        val caseBattery: Int?
-
-        if (isSingle) {
-            // シングルデバイス: OpenPodsと同じくcharAt(13)=byte6下位ニブルのみ使用
-            val singleBattery = (batteryByte and 0x0F).takeUnless { it == 0x0F }
-            leftBattery = singleBattery
-            rightBattery = null
-            caseBattery = null
-        } else {
-            // TWS: data[5]上位ニブルのbit 1でL/Rが入れ替わる（OpenPods: charAt(10) & 0x02）
-            val isFlipped = ((data[5].toInt() shr 4) and 0x02) == 0
-            val upperNibble = (batteryByte shr 4) and 0x0F
-            val lowerNibble = batteryByte and 0x0F
-            leftBattery = (if (isFlipped) upperNibble else lowerNibble).takeUnless { it == 0x0F }
-            rightBattery = (if (isFlipped) lowerNibble else upperNibble).takeUnless { it == 0x0F }
-            // data[7]: 上位ニブル=充電ステータス、下位ニブル=ケースバッテリー
-            caseBattery = (data[7].toInt() and 0x0F).takeUnless { it == 0x0F }
-        }
-
-        return AppleDevice(
-            address = result.device.address,
-            modelName = appleModelName(modelCode),
-            modelCode = modelCode,
-            rssi = result.rssi,
-            leftBattery = leftBattery,
-            rightBattery = rightBattery,
-            caseBattery = caseBattery,
-            isSingle = isSingle,
-        )
+        return parseProximityPairingData(data, result.device.address, result.rssi)
     }
+}
+
+internal fun parseProximityPairingData(data: ByteArray, address: String, rssi: Int): AppleDevice? {
+    if (data.size != AIRPODS_DATA_LENGTH || data[0] != PROXIMITY_PAIRING_TYPE) return null
+
+    val modelCode = ((data[3].toInt() and 0xFF) shl 8) or (data[4].toInt() and 0xFF)
+    val isSingle = modelCode in SINGLE_BATTERY_MODELS
+
+    val batteryByte = data[6].toInt() and 0xFF
+    val leftBattery: Int?
+    val rightBattery: Int?
+    val caseBattery: Int?
+
+    if (isSingle) {
+        // シングルデバイス: OpenPodsと同じくcharAt(13)=byte6下位ニブルのみ使用
+        val singleBattery = (batteryByte and 0x0F).takeUnless { it == 0x0F }
+        leftBattery = singleBattery
+        rightBattery = null
+        caseBattery = null
+    } else {
+        // TWS: data[5]上位ニブルのbit 1でL/Rが入れ替わる（OpenPods: charAt(10) & 0x02）
+        val isFlipped = ((data[5].toInt() shr 4) and 0x02) == 0
+        val upperNibble = (batteryByte shr 4) and 0x0F
+        val lowerNibble = batteryByte and 0x0F
+        leftBattery = (if (isFlipped) upperNibble else lowerNibble).takeUnless { it == 0x0F }
+        rightBattery = (if (isFlipped) lowerNibble else upperNibble).takeUnless { it == 0x0F }
+        // data[7]: 上位ニブル=充電ステータス、下位ニブル=ケースバッテリー
+        caseBattery = (data[7].toInt() and 0x0F).takeUnless { it == 0x0F }
+    }
+
+    return AppleDevice(
+        address = address,
+        modelName = appleModelName(modelCode),
+        modelCode = modelCode,
+        rssi = rssi,
+        leftBattery = leftBattery,
+        rightBattery = rightBattery,
+        caseBattery = caseBattery,
+        isSingle = isSingle,
+    )
 }
