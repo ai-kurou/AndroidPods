@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kurou.androidpods.core.domain.BluetoothAdapterRepository
 import kurou.androidpods.core.domain.FirstLaunchRepository
+import kurou.androidpods.core.domain.AppleDeviceRepository
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -19,4 +20,9 @@ abstract class DataModule {
     abstract fun bindFirstLaunchRepository(
         impl: FirstLaunchRepositoryImpl,
     ): FirstLaunchRepository
+
+    @Binds
+    abstract fun bindAppleDeviceRepository(
+        impl: AppleDeviceRepositoryImpl,
+    ): AppleDeviceRepository
 }

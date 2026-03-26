@@ -12,4 +12,6 @@
     <string name="bluetooth_state_turning_on">Turning On</string>
     <string name="bluetooth_state_turning_off">Turning Off</string>
     <string name="bluetooth_state_not_available">Not Available</string>
+    <string name="apple_devices_title">Apple Devices</string>
+    <string name="no_apple_devices">No Apple devices found</string>
 </resources>

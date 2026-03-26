@@ -31,6 +31,7 @@ fun DevicesScreen(
 
     val permissionStates = remember { mutableStateMapOf<String, Boolean>() }
     val bluetoothAdapterState by viewModel.bluetoothAdapterState.collectAsStateWithLifecycle()
+    val appleDevices by viewModel.appleDevices.collectAsStateWithLifecycle()
     var showSettingsDialog by remember { mutableStateOf(false) }
     var initialRequestDone by remember { mutableStateOf(false) }
 
@@ -59,19 +60,25 @@ fun DevicesScreen(
         if (notGranted.isNotEmpty()) launcher.launch(notGranted.toTypedArray())
     }
 
-    // アプリ復帰時（ON_RESUME）に権限状態とアダプタ状態を再チェック
+    // アプリ復帰時（ON_RESUME）にスキャン開始、権限状態とアダプタ状態を再チェック
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         permissions.forEach { permission ->
             permissionStates[permission] =
                 ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
         }
         viewModel.refreshBluetoothState()
+        viewModel.startScan()
         if (initialRequestDone) {
             val hasNotGranted = permissions.any {
                 ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED
             }
             if (hasNotGranted) showSettingsDialog = true
         }
+    }
+
+    // アプリがバックグラウンドに入ったらスキャン停止
+    LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) {
+        viewModel.stopScan()
     }
 
     // 設定画面への誘導ダイアログ
@@ -91,6 +98,7 @@ fun DevicesScreen(
     DevicesContent(
         permissionStates = permissionStates,
         bluetoothAdapterState = bluetoothAdapterState,
+        appleDevices = appleDevices.values.sortedByDescending { it.rssi },
         modifier = modifier,
     )
 }

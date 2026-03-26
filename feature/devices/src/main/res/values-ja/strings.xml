@@ -12,4 +12,6 @@
     <string name="bluetooth_state_turning_on">オンにしています</string>
     <string name="bluetooth_state_turning_off">オフにしています</string>
     <string name="bluetooth_state_not_available">利用不可</string>
+    <string name="apple_devices_title">Appleデバイス</string>
+    <string name="no_apple_devices">Appleデバイスが見つかりません</string>
 </resources>
