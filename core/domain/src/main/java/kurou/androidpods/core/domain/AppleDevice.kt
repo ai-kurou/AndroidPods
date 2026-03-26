@@ -8,4 +8,5 @@ data class AppleDevice(
     val leftBattery: Int?,
     val rightBattery: Int?,
     val caseBattery: Int?,
+    val isSingle: Boolean = false,
 )

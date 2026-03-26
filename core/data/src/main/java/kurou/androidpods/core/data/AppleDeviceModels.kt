@@ -26,6 +26,18 @@ internal val APPLE_DEVICE_MODELS: Map<Int, String> = mapOf(
     0x1020 to "Beats Flex",
 )
 
+internal val SINGLE_BATTERY_MODELS: Set<Int> = setOf(
+    0x0A20, // AirPods Max
+    0x1F20, // AirPods Max (USB-C)
+    0x0520, // BeatsX
+    0x1020, // Beats Flex
+    0x0620, // Beats Solo3
+    0x0920, // Beats Studio3
+    0x1720, // Beats Studio Pro
+    0x0320, // Powerbeats3
+    0x0C20, // Beats Solo Pro
+)
+
 internal fun appleModelName(modelCode: Int): String =
     APPLE_DEVICE_MODELS[modelCode]
         ?: "Unknown Apple Device (0x${modelCode.toString(16).padStart(4, '0')})"

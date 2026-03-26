@@ -41,12 +41,14 @@ internal fun DevicesContent(
         } else {
             appleDevices.forEach { device ->
                 Text(text = "${device.modelName} (${device.address})")
-                Text(
-                    text = "RSSI: ${device.rssi} dBm / " +
-                        "L: ${batteryText(device.leftBattery)} " +
+                val batteryInfo = if (device.isSingle) {
+                    "Battery: ${batteryText(device.leftBattery)}"
+                } else {
+                    "L: ${batteryText(device.leftBattery)} " +
                         "R: ${batteryText(device.rightBattery)} " +
-                        "Case: ${batteryText(device.caseBattery)}",
-                )
+                        "Case: ${batteryText(device.caseBattery)}"
+                }
+                Text(text = "RSSI: ${device.rssi} dBm / $batteryInfo")
             }
         }
     }

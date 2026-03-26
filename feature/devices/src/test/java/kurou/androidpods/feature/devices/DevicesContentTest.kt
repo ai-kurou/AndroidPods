@@ -93,6 +93,22 @@ class DevicesContentTest {
     }
 
     @Test
+    fun `シングルデバイスはBattery表示になる`() {
+        composeTestRule.setContent {
+            DevicesContent(
+                permissionStates = emptyMap(),
+                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+                appleDevices = listOf(
+                    AppleDevice("11:22:33:44:55:66", "Beats Flex", 0x1020, -50, 9, null, null, isSingle = true),
+                ),
+            )
+        }
+
+        composeTestRule.onNodeWithText("Beats Flex (11:22:33:44:55:66)").assertIsDisplayed()
+        composeTestRule.onNodeWithText("RSSI: -50 dBm / Battery: 95%").assertIsDisplayed()
+    }
+
+    @Test
     fun `Appleデバイスが空のとき案内メッセージが表示される`() {
         composeTestRule.setContent {
             DevicesContent(

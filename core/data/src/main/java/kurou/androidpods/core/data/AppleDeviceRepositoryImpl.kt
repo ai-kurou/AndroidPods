@@ -144,19 +144,29 @@ class AppleDeviceRepositoryImpl @Inject constructor(
         if (data.size != AIRPODS_DATA_LENGTH || data[0] != PROXIMITY_PAIRING_TYPE) return null
 
         val modelCode = ((data[3].toInt() and 0xFF) shl 8) or (data[4].toInt() and 0xFF)
-
-        // data[5]上位ニブルのbit 1でL/Rが入れ替わる（OpenPods: charAt(10) & 0x02）
-        val isFlipped = ((data[5].toInt() shr 4) and 0x02) == 0
+        val isSingle = modelCode in SINGLE_BATTERY_MODELS
 
         val batteryByte = data[6].toInt() and 0xFF
-        val upperNibble = (batteryByte shr 4) and 0x0F
-        val lowerNibble = batteryByte and 0x0F
-        // flip=true → left=upper, flip=false → left=lower
-        val leftBattery = (if (isFlipped) upperNibble else lowerNibble).takeUnless { it == 0x0F }
-        val rightBattery = (if (isFlipped) lowerNibble else upperNibble).takeUnless { it == 0x0F }
+        val leftBattery: Int?
+        val rightBattery: Int?
+        val caseBattery: Int?
 
-        // data[7]: 上位ニブル=充電ステータス、下位ニブル=ケースバッテリー
-        val caseBattery = (data[7].toInt() and 0x0F).takeUnless { it == 0x0F }
+        if (isSingle) {
+            // シングルデバイス: OpenPodsと同じくcharAt(13)=byte6下位ニブルのみ使用
+            val singleBattery = (batteryByte and 0x0F).takeUnless { it == 0x0F }
+            leftBattery = singleBattery
+            rightBattery = null
+            caseBattery = null
+        } else {
+            // TWS: data[5]上位ニブルのbit 1でL/Rが入れ替わる（OpenPods: charAt(10) & 0x02）
+            val isFlipped = ((data[5].toInt() shr 4) and 0x02) == 0
+            val upperNibble = (batteryByte shr 4) and 0x0F
+            val lowerNibble = batteryByte and 0x0F
+            leftBattery = (if (isFlipped) upperNibble else lowerNibble).takeUnless { it == 0x0F }
+            rightBattery = (if (isFlipped) lowerNibble else upperNibble).takeUnless { it == 0x0F }
+            // data[7]: 上位ニブル=充電ステータス、下位ニブル=ケースバッテリー
+            caseBattery = (data[7].toInt() and 0x0F).takeUnless { it == 0x0F }
+        }
 
         return AppleDevice(
             address = result.device.address,
@@ -166,6 +176,7 @@ class AppleDeviceRepositoryImpl @Inject constructor(
             leftBattery = leftBattery,
             rightBattery = rightBattery,
             caseBattery = caseBattery,
+            isSingle = isSingle,
         )
     }
 }
