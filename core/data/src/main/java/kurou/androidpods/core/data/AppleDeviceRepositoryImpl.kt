@@ -145,12 +145,13 @@ class AppleDeviceRepositoryImpl @Inject constructor(
 
         val modelCode = ((data[3].toInt() and 0xFF) shl 8) or (data[4].toInt() and 0xFF)
 
-        // data[5]のbit 1でL/Rが入れ替わる（OpenPods: isFlipped）
-        val isFlipped = (data[5].toInt() and 0x02) == 0
+        // data[5]上位ニブルのbit 1でL/Rが入れ替わる（OpenPods: charAt(10) & 0x02）
+        val isFlipped = ((data[5].toInt() shr 4) and 0x02) == 0
 
         val batteryByte = data[6].toInt() and 0xFF
         val upperNibble = (batteryByte shr 4) and 0x0F
         val lowerNibble = batteryByte and 0x0F
+        // flip=true → left=upper, flip=false → left=lower
         val leftBattery = (if (isFlipped) upperNibble else lowerNibble).takeUnless { it == 0x0F }
         val rightBattery = (if (isFlipped) lowerNibble else upperNibble).takeUnless { it == 0x0F }
 
