@@ -52,8 +52,11 @@ internal fun DevicesContent(
     }
 }
 
-private fun batteryText(level: Int?): String =
-    if (level != null) "${level * 10}%" else "--"
+private fun batteryText(level: Int?): String = when {
+    level == null -> "--"
+    level >= 10 -> "100%"
+    else -> "${level * 10 + 5}%"
+}
 
 @Preview(showBackground = true, name = "API 31+ (Android 12+)")
 @Composable

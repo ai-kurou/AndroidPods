@@ -60,8 +60,16 @@ class AppleDeviceRepositoryImpl @Inject constructor(
 
     private fun handleResult(result: ScanResult) {
         parseProximityPairing(result)?.let { device ->
-            lastSeenAt[device.address] = SystemClock.elapsedRealtime()
-            _devices.value += (device.address to device)
+            val key = device.modelCode.toString()
+            val now = SystemClock.elapsedRealtime()
+            val existing = _devices.value[key]
+            // 同一モデルは最もRSSIが強いビーコンを採用（OpenPodsと同様）
+            if (existing == null || device.rssi >= existing.rssi) {
+                lastSeenAt[key] = now
+                _devices.value += (key to device)
+            } else {
+                lastSeenAt[key] = now
+            }
         }
     }
 
@@ -137,12 +145,17 @@ class AppleDeviceRepositoryImpl @Inject constructor(
 
         val modelCode = ((data[3].toInt() and 0xFF) shl 8) or (data[4].toInt() and 0xFF)
 
-        val batteryByte = data[6].toInt() and 0xFF
-        val rightBattery = ((batteryByte shr 4) and 0x0F).takeIf { it != 0x0F }
-        val leftBattery = (batteryByte and 0x0F).takeIf { it != 0x0F }
+        // data[5]のbit 1でL/Rが入れ替わる（OpenPods: isFlipped）
+        val isFlipped = (data[5].toInt() and 0x02) == 0
 
-        val caseBatteryByte = data[7].toInt() and 0xFF
-        val caseBattery = ((caseBatteryByte shr 4) and 0x0F).takeIf { it != 0x0F }
+        val batteryByte = data[6].toInt() and 0xFF
+        val upperNibble = (batteryByte shr 4) and 0x0F
+        val lowerNibble = batteryByte and 0x0F
+        val leftBattery = (if (isFlipped) upperNibble else lowerNibble).takeUnless { it == 0x0F }
+        val rightBattery = (if (isFlipped) lowerNibble else upperNibble).takeUnless { it == 0x0F }
+
+        // data[7]: 上位ニブル=充電ステータス、下位ニブル=ケースバッテリー
+        val caseBattery = (data[7].toInt() and 0x0F).takeUnless { it == 0x0F }
 
         return AppleDevice(
             address = result.device.address,

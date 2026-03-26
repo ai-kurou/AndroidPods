@@ -89,7 +89,7 @@ class DevicesContentTest {
 
         composeTestRule.onNodeWithText("Apple Devices").assertIsDisplayed()
         composeTestRule.onNodeWithText("AirPods Pro (2nd Gen) (AA:BB:CC:DD:EE:FF)").assertIsDisplayed()
-        composeTestRule.onNodeWithText("RSSI: -45 dBm / L: 80% R: 90% Case: 70%").assertIsDisplayed()
+        composeTestRule.onNodeWithText("RSSI: -45 dBm / L: 85% R: 95% Case: 75%").assertIsDisplayed()
     }
 
     @Test
