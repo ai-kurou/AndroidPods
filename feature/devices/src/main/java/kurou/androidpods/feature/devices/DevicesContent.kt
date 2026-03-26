@@ -78,7 +78,18 @@ private fun DevicesContentPreviewApi31() {
                 leftBattery = 8,
                 rightBattery = 9,
                 caseBattery = 7,
+                isSingle = false
             ),
+            AppleDevice(
+                address = "FF:EE:DD:CC:BB:AA",
+                modelName = "Beats Flex",
+                modelCode = 0x1020,
+                rssi = -40,
+                leftBattery = 6,
+                rightBattery = null,
+                caseBattery = null,
+                isSingle = true
+            )
         ),
     )
 }
@@ -88,7 +99,7 @@ private fun DevicesContentPreviewApi31() {
 private fun DevicesContentPreviewApi30() {
     DevicesContent(
         permissionStates = mapOf(
-            android.Manifest.permission.ACCESS_FINE_LOCATION to true,
+            android.Manifest.permission.ACCESS_FINE_LOCATION to false,
         ),
         bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
         appleDevices = emptyList(),
