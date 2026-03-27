@@ -32,7 +32,6 @@ private const val AIRPODS_DATA_LENGTH = 27
 private const val DEVICE_TIMEOUT_MS = 5_000L
 private const val CLEANUP_INTERVAL_MS = 1_000L
 
-@SuppressLint("MissingPermission")
 @Singleton
 class AppleDeviceRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -77,6 +76,7 @@ class AppleDeviceRepositoryImpl @Inject constructor(
 
     override fun observeDevices(): Flow<Map<String, AppleDevice>> = _devices.asStateFlow()
 
+    @SuppressLint("MissingPermission")
     override fun startScan() {
         // 既存スキャンを停止（二重登録防止）
         try {
@@ -121,6 +121,7 @@ class AppleDeviceRepositoryImpl @Inject constructor(
         }
     }
 
+    @SuppressLint("MissingPermission")
     override fun stopScan() {
         cleanupJob?.cancel()
         try {
