@@ -25,12 +25,21 @@ android {
 }
 
 dependencies {
+    // プロジェクトモジュール
     implementation(project(":core:domain"))
     implementation(project(":core:data"))
-    implementation(libs.androidx.core.ktx)
+
+    // Hilt (DI)
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
+
+    // AndroidX (ServiceCompat)
+    implementation(libs.androidx.core.ktx)
+
+    // Kotlin Coroutines
     implementation(libs.kotlinx.coroutines.core)
+
+    // Unit Test
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     testImplementation(libs.mockk)

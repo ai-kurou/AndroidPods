@@ -17,6 +17,9 @@ android {
 }
 
 dependencies {
+    // Kotlin Coroutines (Flow)
     implementation(libs.kotlinx.coroutines.core)
+
+    // Hilt (@Inject)
     implementation(libs.hilt.android)
 }

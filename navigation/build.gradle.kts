@@ -30,20 +30,31 @@ android {
 }
 
 dependencies {
+    // プロジェクトモジュール
     implementation(project(":feature:devices"))
     implementation(project(":feature:onboarding"))
-    implementation(libs.androidx.navigation.compose)
+
+    // Hilt (DI)
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.compose)
     ksp(libs.hilt.android.compiler)
+
+    // Jetpack Compose
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.material3)
+
+    // Navigation
+    implementation(libs.androidx.navigation.compose)
+
+    // Unit Test
     testImplementation(project(":core:domain"))
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     testImplementation(libs.hilt.android.testing)
     testImplementation(libs.androidx.compose.ui.test.junit4)
     kspTest(libs.hilt.android.compiler)
+
+    // Debug
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }

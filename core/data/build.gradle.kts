@@ -25,11 +25,20 @@ android {
 }
 
 dependencies {
+    // プロジェクトモジュール
     implementation(project(":core:domain"))
+
+    // Hilt (DI)
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
+
+    // Kotlin Coroutines
     implementation(libs.kotlinx.coroutines.core)
+
+    // DataStore (永続化)
     implementation(libs.androidx.datastore.preferences)
+
+    // Unit Test
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     testImplementation(libs.kotlinx.coroutines.test)
