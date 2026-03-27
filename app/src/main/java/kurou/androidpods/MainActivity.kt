@@ -13,6 +13,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import kurou.androidpods.core.service.DeviceScanService
 import kurou.androidpods.navigation.AppNavHost
 import kurou.androidpods.navigation.Route
 import kurou.androidpods.ui.theme.AndroidPodsTheme
@@ -39,6 +40,8 @@ class MainActivity : ComponentActivity() {
                         navController = navController,
                         startDestination = startDestination,
                         onOnboardingComplete = { viewModel.markAsLaunched() },
+                        onStartScanService = { DeviceScanService.start(this@MainActivity) },
+                        onStopScanService = { DeviceScanService.stop(this@MainActivity) },
                         modifier = Modifier.padding(innerPadding),
                     )
                 }

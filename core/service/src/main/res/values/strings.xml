@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notification_channel_name">Device Scan</string>
+    <string name="notification_title">AndroidPods</string>
+    <string name="notification_scanning">Scanning for Apple devices…</string>
+
+</resources>

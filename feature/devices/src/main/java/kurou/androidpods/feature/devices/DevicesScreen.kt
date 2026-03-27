@@ -23,6 +23,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
 fun DevicesScreen(
+    onStartScanService: () -> Unit,
+    onStopScanService: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DevicesViewModel = hiltViewModel(),
 ) {
@@ -67,18 +69,13 @@ fun DevicesScreen(
                 ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
         }
         viewModel.refreshBluetoothState()
-        viewModel.startScan()
+        onStartScanService()
         if (initialRequestDone) {
             val hasNotGranted = permissions.any {
                 ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED
             }
             if (hasNotGranted) showSettingsDialog = true
         }
-    }
-
-    // アプリがバックグラウンドに入ったらスキャン停止
-    LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) {
-        viewModel.stopScan()
     }
 
     // 設定画面への誘導ダイアログ

@@ -13,6 +13,8 @@ fun AppNavHost(
     navController: NavHostController,
     startDestination: String,
     onOnboardingComplete: () -> Unit,
+    onStartScanService: () -> Unit,
+    onStopScanService: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     NavHost(
@@ -31,7 +33,10 @@ fun AppNavHost(
             )
         }
         composable(Route.DEVICES) {
-            DevicesScreen()
+            DevicesScreen(
+                onStartScanService = onStartScanService,
+                onStopScanService = onStopScanService,
+            )
         }
     }
 }

@@ -35,6 +35,8 @@ class AppNavHostTest {
                 navController = rememberNavController(),
                 startDestination = Route.ONBOARDING,
                 onOnboardingComplete = {},
+                onStartScanService = {},
+                onStopScanService = {},
             )
         }
 
@@ -53,6 +55,8 @@ class AppNavHostTest {
                 navController = navController,
                 startDestination = Route.ONBOARDING,
                 onOnboardingComplete = { completeCalled = true },
+                onStartScanService = {},
+                onStopScanService = {},
             )
         }
 
