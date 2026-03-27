@@ -50,7 +50,7 @@ private const val CLEANUP_INTERVAL_MS = 1_000L
  * 5. [stopScan] でスキャンを停止し、蓄積データをクリア
  */
 @Singleton
-class AppleDeviceRepositoryImpl @Inject constructor(
+internal class AppleDeviceRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : AppleDeviceRepository {
 

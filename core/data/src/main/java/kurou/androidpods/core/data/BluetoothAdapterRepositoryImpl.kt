@@ -15,7 +15,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class BluetoothAdapterRepositoryImpl @Inject constructor(
+internal class BluetoothAdapterRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : BluetoothAdapterRepository {
     private val bluetoothAdapter: BluetoothAdapter? =

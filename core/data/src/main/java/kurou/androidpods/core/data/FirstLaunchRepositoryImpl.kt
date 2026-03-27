@@ -14,7 +14,7 @@ import javax.inject.Singleton
 private val Context.dataStore by preferencesDataStore(name = "first_launch")
 
 @Singleton
-class FirstLaunchRepositoryImpl @Inject constructor(
+internal class FirstLaunchRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : FirstLaunchRepository {
 

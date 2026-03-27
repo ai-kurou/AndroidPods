@@ -12,17 +12,17 @@ import kurou.androidpods.core.domain.AppleDeviceRepository
 @InstallIn(SingletonComponent::class)
 abstract class DataModule {
     @Binds
-    abstract fun bindBluetoothAdapterRepository(
+    internal abstract fun bindBluetoothAdapterRepository(
         impl: BluetoothAdapterRepositoryImpl,
     ): BluetoothAdapterRepository
 
     @Binds
-    abstract fun bindFirstLaunchRepository(
+    internal abstract fun bindFirstLaunchRepository(
         impl: FirstLaunchRepositoryImpl,
     ): FirstLaunchRepository
 
     @Binds
-    abstract fun bindAppleDeviceRepository(
+    internal abstract fun bindAppleDeviceRepository(
         impl: AppleDeviceRepositoryImpl,
     ): AppleDeviceRepository
 }
