@@ -93,6 +93,24 @@ class DevicesContentTest {
     }
 
     @Test
+    fun `充電中のデバイスにはアイコンが表示される`() {
+        composeTestRule.setContent {
+            DevicesContent(
+                permissionStates = emptyMap(),
+                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+                appleDevices = listOf(
+                    AppleDevice(
+                        "AA:BB:CC:DD:EE:FF", "AirPods Pro (2nd Gen)", 0x1420, -45, 8, 9, 7,
+                        leftCharging = true, rightCharging = false, caseCharging = true,
+                    ),
+                ),
+            )
+        }
+
+        composeTestRule.onNodeWithText("RSSI: -45 dBm / L: 85%⚡ R: 95% Case: 75%⚡").assertIsDisplayed()
+    }
+
+    @Test
     fun `シングルデバイスはBattery表示になる`() {
         composeTestRule.setContent {
             DevicesContent(

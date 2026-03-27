@@ -100,6 +100,60 @@ class AppleDeviceRepositoryImplTest {
     }
 
     @Test
+    fun `充電ステータスはbyte7の上位ニブルから取得できる`() {
+        // byte7=0x37 → 上位ニブル=0x3=0b0011 → bit0=左充電中, bit1=右充電中, bit2=ケース充電なし
+        // byte5=0x20 → flipped=false なので bit0=右, bit1=左 に入れ替わらない
+        // ただし flipped=false のとき: left=lowerCharging(bit1), right=upperCharging(bit0)
+        val data = buildData(byte5 = 0x20, byte7 = 0x37)
+        val device = parseProximityPairingData(data, testAddress, testRssi)!!
+        assertTrue(device.leftCharging)   // bit1=1
+        assertTrue(device.rightCharging)  // bit0=1
+        assertFalse(device.caseCharging)  // bit2=0
+        assertEquals(7, device.caseBattery) // 下位ニブル=7
+    }
+
+    @Test
+    fun `充電ステータスのケース充電中`() {
+        // byte7=0x47 → 上位ニブル=0x4=0b0100 → bit2=ケース充電中
+        val data = buildData(byte7 = 0x47)
+        val device = parseProximityPairingData(data, testAddress, testRssi)!!
+        assertTrue(device.caseCharging)
+        assertEquals(7, device.caseBattery)
+    }
+
+    @Test
+    fun `充電ステータスなし`() {
+        // byte7=0x07 → 上位ニブル=0x0 → 全て充電なし
+        val data = buildData(byte7 = 0x07)
+        val device = parseProximityPairingData(data, testAddress, testRssi)!!
+        assertFalse(device.leftCharging)
+        assertFalse(device.rightCharging)
+        assertFalse(device.caseCharging)
+    }
+
+    @Test
+    fun `充電ステータスのフリップ`() {
+        // byte5=0x00 → flipped=true
+        // byte7=0x17 → 上位ニブル=0x1=0b0001 → bit0=1
+        // flipped=true → left=upperCharging(bit0)=true, right=lowerCharging(bit1)=false
+        val data = buildData(byte5 = 0x00, byte7 = 0x17)
+        val device = parseProximityPairingData(data, testAddress, testRssi)!!
+        assertTrue(device.leftCharging)
+        assertFalse(device.rightCharging)
+    }
+
+    @Test
+    fun `シングルデバイスの充電ステータス`() {
+        // Beats Flex (0x1020), byte7=0x17 → 上位ニブル=0x1 → bit0=充電中
+        val data = buildData(modelHigh = 0x10, modelLow = 0x20, byte7 = 0x17)
+        val device = parseProximityPairingData(data, testAddress, testRssi)!!
+        assertTrue(device.isSingle)
+        assertTrue(device.leftCharging)
+        assertFalse(device.rightCharging)
+        assertFalse(device.caseCharging)
+    }
+
+    @Test
     fun `シングルデバイスはbyte6の下位ニブルのみ使用`() {
         // Beats Flex (0x1020), byte6=0xF9 → lower=9
         val data = buildData(modelHigh = 0x10, modelLow = 0x20, byte6 = 0xF9.toByte())

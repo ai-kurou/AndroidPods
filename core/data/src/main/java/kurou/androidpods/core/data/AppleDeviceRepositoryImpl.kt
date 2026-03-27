@@ -203,7 +203,7 @@ class AppleDeviceRepositoryImpl @Inject constructor(
  * [3..4] : モデルコード（上位バイト先行）— デバイスの機種を識別する
  * [5]    : ステータスバイト — 上位ニブルの bit1 で左右のバッテリー値が入れ替わる
  * [6]    : バッテリーバイト — 上位ニブル=片耳、下位ニブル=もう片耳（0x0F は不明を意味する）
- * [7]    : 上位ニブル=充電ステータス、下位ニブル=ケースのバッテリー
+ * [7]    : 上位ニブル=充電ステータス(bit0=左, bit1=右, bit2=ケース)、下位ニブル=ケースのバッテリー
  * [8..26]: (その他のデータ)
  * ```
  *
@@ -218,9 +218,14 @@ internal fun parseProximityPairingData(data: ByteArray, address: String, rssi: I
     val isSingle = modelCode in SINGLE_BATTERY_MODELS
 
     val batteryByte = data[6].toInt() and 0xFF
+    // data[7] の上位ニブル: 各ビットが充電中かどうかを示す
+    val chargingBits = (data[7].toInt() shr 4) and 0x0F
     val leftBattery: Int?
     val rightBattery: Int?
     val caseBattery: Int?
+    val leftCharging: Boolean
+    val rightCharging: Boolean
+    val caseCharging: Boolean
 
     if (isSingle) {
         // シングルデバイス: 下位ニブル（0〜14）のみがバッテリー値。0x0F は「不明」
@@ -228,6 +233,9 @@ internal fun parseProximityPairingData(data: ByteArray, address: String, rssi: I
         leftBattery = singleBattery
         rightBattery = null
         caseBattery = null
+        leftCharging = (chargingBits and 0x01) != 0
+        rightCharging = false
+        caseCharging = false
     } else {
         // TWS（左右独立）デバイスの場合:
         // data[5] の上位ニブルの bit1 が 0 のとき、上位/下位ニブルの左右が入れ替わる
@@ -238,6 +246,12 @@ internal fun parseProximityPairingData(data: ByteArray, address: String, rssi: I
         leftBattery = (if (isFlipped) upperNibble else lowerNibble).takeUnless { it == 0x0F }
         rightBattery = (if (isFlipped) lowerNibble else upperNibble).takeUnless { it == 0x0F }
         caseBattery = (data[7].toInt() and 0x0F).takeUnless { it == 0x0F }
+        // 充電ビットもバッテリーと同様に左右の入れ替えが適用される
+        val upperCharging = (chargingBits and 0x01) != 0
+        val lowerCharging = (chargingBits and 0x02) != 0
+        leftCharging = if (isFlipped) upperCharging else lowerCharging
+        rightCharging = if (isFlipped) lowerCharging else upperCharging
+        caseCharging = (chargingBits and 0x04) != 0
     }
 
     return AppleDevice(
@@ -249,5 +263,8 @@ internal fun parseProximityPairingData(data: ByteArray, address: String, rssi: I
         rightBattery = rightBattery,
         caseBattery = caseBattery,
         isSingle = isSingle,
+        leftCharging = leftCharging,
+        rightCharging = rightCharging,
+        caseCharging = caseCharging,
     )
 }

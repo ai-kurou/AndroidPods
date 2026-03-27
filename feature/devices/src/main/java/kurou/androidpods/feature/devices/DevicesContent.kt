@@ -42,11 +42,11 @@ internal fun DevicesContent(
             appleDevices.forEach { device ->
                 Text(text = "${device.modelName} (${device.address})")
                 val batteryInfo = if (device.isSingle) {
-                    "Battery: ${batteryText(device.leftBattery)}"
+                    "Battery: ${batteryText(device.leftBattery, device.leftCharging)}"
                 } else {
-                    "L: ${batteryText(device.leftBattery)} " +
-                        "R: ${batteryText(device.rightBattery)} " +
-                        "Case: ${batteryText(device.caseBattery)}"
+                    "L: ${batteryText(device.leftBattery, device.leftCharging)} " +
+                        "R: ${batteryText(device.rightBattery, device.rightCharging)} " +
+                        "Case: ${batteryText(device.caseBattery, device.caseCharging)}"
                 }
                 Text(text = "RSSI: ${device.rssi} dBm / $batteryInfo")
             }
@@ -54,10 +54,13 @@ internal fun DevicesContent(
     }
 }
 
-private fun batteryText(level: Int?): String = when {
-    level == null -> "--"
-    level >= 10 -> "100%"
-    else -> "${level * 10 + 5}%"
+private fun batteryText(level: Int?, charging: Boolean = false): String {
+    val pct = when {
+        level == null -> "--"
+        level >= 10 -> "100%"
+        else -> "${level * 10 + 5}%"
+    }
+    return if (charging) "$pct⚡" else pct
 }
 
 @Preview(showBackground = true, name = "API 31+ (Android 12+)")
@@ -78,7 +81,10 @@ private fun DevicesContentPreviewApi31() {
                 leftBattery = 8,
                 rightBattery = 9,
                 caseBattery = 7,
-                isSingle = false
+                isSingle = false,
+                leftCharging = true,
+                rightCharging = true,
+                caseCharging = false,
             ),
             AppleDevice(
                 address = "FF:EE:DD:CC:BB:AA",
@@ -88,7 +94,8 @@ private fun DevicesContentPreviewApi31() {
                 leftBattery = 6,
                 rightBattery = null,
                 caseBattery = null,
-                isSingle = true
+                isSingle = true,
+                leftCharging = true,
             )
         ),
     )
