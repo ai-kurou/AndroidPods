@@ -10,6 +10,7 @@ kotlin = "2.3.20"
 composeBom = "2026.03.00"
 robolectric = "4.16.1"
 hilt = "2.59.2"
+kover = "0.9.8"
 ksp = "2.3.6"
 kotlinxCoroutines = "1.10.2"
 mockk = "1.14.9"
@@ -48,5 +49,6 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 

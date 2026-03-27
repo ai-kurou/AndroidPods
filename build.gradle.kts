@@ -5,4 +5,15 @@ plugins {
     alias(libs.plugins.kotlin.compose) apply false
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.ksp) apply false
+    alias(libs.plugins.kover)
+}
+
+dependencies {
+    kover(project(":app"))
+    kover(project(":core:domain"))
+    kover(project(":core:data"))
+    kover(project(":core:service"))
+    kover(project(":feature:devices"))
+    kover(project(":feature:onboarding"))
+    kover(project(":navigation"))
 }
