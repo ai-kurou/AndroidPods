@@ -127,6 +127,39 @@ class DevicesContentTest {
     }
 
     @Test
+    fun `デバイスカラーとLid状態が表示される`() {
+        composeTestRule.setContent {
+            DevicesContent(
+                permissionStates = emptyMap(),
+                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+                appleDevices = listOf(
+                    AppleDevice(
+                        "AA:BB:CC:DD:EE:FF", "AirPods Pro (2nd Gen)", 0x1420, -45, 8, 9, 7,
+                        lidOpen = true, colorName = "White",
+                    ),
+                ),
+            )
+        }
+
+        composeTestRule.onNodeWithText("Color: White / Lid: Open").assertIsDisplayed()
+    }
+
+    @Test
+    fun `シングルデバイスはLid状態が表示されない`() {
+        composeTestRule.setContent {
+            DevicesContent(
+                permissionStates = emptyMap(),
+                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+                appleDevices = listOf(
+                    AppleDevice("11:22:33:44:55:66", "Beats Flex", 0x1020, -50, 9, null, null, isSingle = true, colorName = "Black"),
+                ),
+            )
+        }
+
+        composeTestRule.onNodeWithText("Color: Black").assertIsDisplayed()
+    }
+
+    @Test
     fun `Appleデバイスが空のとき案内メッセージが表示される`() {
         composeTestRule.setContent {
             DevicesContent(

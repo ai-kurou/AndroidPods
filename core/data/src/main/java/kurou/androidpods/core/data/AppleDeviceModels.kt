@@ -41,3 +41,22 @@ internal val SINGLE_BATTERY_MODELS: Set<Int> = setOf(
 internal fun appleModelName(modelCode: Int): String =
     APPLE_DEVICE_MODELS[modelCode]
         ?: "Unknown Apple Device (0x${modelCode.toString(16).padStart(4, '0')})"
+
+private val APPLE_DEVICE_COLORS: Map<Int, String> = mapOf(
+    0x00 to "White",
+    0x01 to "Black",
+    0x02 to "Red",
+    0x03 to "Blue",
+    0x04 to "Pink",
+    0x05 to "Gray",
+    0x06 to "Silver",
+    0x07 to "Gold",
+    0x08 to "Rose Gold",
+    0x09 to "Space Gray",
+    0x0A to "Dark Blue",
+    0x0B to "Light Blue",
+    0x0C to "Yellow",
+)
+
+internal fun appleDeviceColorName(colorCode: Int): String =
+    APPLE_DEVICE_COLORS[colorCode] ?: "Unknown (0x${colorCode.toString(16).padStart(2, '0')})"

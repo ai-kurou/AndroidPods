@@ -178,6 +178,40 @@ class AppleDeviceRepositoryImplTest {
     }
 
     @Test
+    fun `Lid状態がパースできる_蓋が開いている`() {
+        // byte8=0x02 → bit3=0(開)、bits0-2=2(カウンター)
+        val data = buildData().apply { this[8] = 0x02 }
+        val device = parseProximityPairingData(data, testAddress, testRssi)!!
+        assertTrue(device.lidOpen)
+        assertEquals(2, device.lidOpenCounter)
+    }
+
+    @Test
+    fun `Lid状態がパースできる_蓋が閉じている`() {
+        // byte8=0x0D → bit3=1(閉)、bits0-2=5(カウンター)
+        val data = buildData().apply { this[8] = 0x0D }
+        val device = parseProximityPairingData(data, testAddress, testRssi)!!
+        assertFalse(device.lidOpen)
+        assertEquals(5, device.lidOpenCounter)
+    }
+
+    @Test
+    fun `デバイスカラーがパースできる`() {
+        // byte9=0x09 → Space Gray
+        val data = buildData().apply { this[9] = 0x09 }
+        val device = parseProximityPairingData(data, testAddress, testRssi)!!
+        assertEquals(0x09, device.deviceColor)
+        assertEquals("Space Gray", device.colorName)
+    }
+
+    @Test
+    fun `未知のデバイスカラーコード`() {
+        val data = buildData().apply { this[9] = 0x7F }
+        val device = parseProximityPairingData(data, testAddress, testRssi)!!
+        assertEquals("Unknown (0x7f)", device.colorName)
+    }
+
+    @Test
     fun `未知のモデルコードはTWSとして扱う`() {
         val data = buildData(modelHigh = 0x00, modelLow = 0x01)
         val device = parseProximityPairingData(data, testAddress, testRssi)!!

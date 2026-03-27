@@ -49,6 +49,11 @@ internal fun DevicesContent(
                         "Case: ${batteryText(device.caseBattery, device.caseCharging)}"
                 }
                 Text(text = "RSSI: ${device.rssi} dBm / $batteryInfo")
+                val lidInfo = if (!device.isSingle) {
+                    val lidState = if (device.lidOpen) "Open" else "Closed"
+                    " / Lid: $lidState"
+                } else ""
+                Text(text = "Color: ${device.colorName}$lidInfo")
             }
         }
     }
@@ -85,6 +90,8 @@ private fun DevicesContentPreviewApi31() {
                 leftCharging = true,
                 rightCharging = true,
                 caseCharging = false,
+                lidOpen = true,
+                colorName = "White",
             ),
             AppleDevice(
                 address = "FF:EE:DD:CC:BB:AA",
@@ -96,6 +103,7 @@ private fun DevicesContentPreviewApi31() {
                 caseBattery = null,
                 isSingle = true,
                 leftCharging = true,
+                colorName = "Black",
             )
         ),
     )

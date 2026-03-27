@@ -199,12 +199,15 @@ class AppleDeviceRepositoryImpl @Inject constructor(
  * ```
  * [0]    : type (0x07 = Proximity Pairing)
  * [1]    : length (0x19 = 25)
- * [2]    : (未使用)
+ * [2]    : Pairing Mode（0x01=ペアリング済み、0x00=ペアリングモード中）
  * [3..4] : モデルコード（上位バイト先行）— デバイスの機種を識別する
  * [5]    : ステータスバイト — 上位ニブルの bit1 で左右のバッテリー値が入れ替わる
  * [6]    : バッテリーバイト — 上位ニブル=片耳、下位ニブル=もう片耳（0x0F は不明を意味する）
  * [7]    : 上位ニブル=充電ステータス(bit0=左, bit1=右, bit2=ケース)、下位ニブル=ケースのバッテリー
- * [8..26]: (その他のデータ)
+ * [8]    : Lid状態 — bit3=蓋の開閉(0=開,1=閉)、bits 0-2=開閉カウンター(0〜7で循環)
+ * [9]    : デバイスカラーコード
+ * [10]   : 接続状態
+ * [11..26]: 暗号化ペイロード
  * ```
  *
  * @return パース成功時は [AppleDevice]、データが Proximity Pairing 形式でなければ null
@@ -254,6 +257,13 @@ internal fun parseProximityPairingData(data: ByteArray, address: String, rssi: I
         caseCharging = (chargingBits and 0x04) != 0
     }
 
+    // data[8]: Lid状態 — bit3で蓋の開閉、bits 0-2で開閉カウンター
+    val lidByte = data[8].toInt() and 0xFF
+    val lidOpen = (lidByte and 0x08) == 0
+    val lidOpenCounter = lidByte and 0x07
+    // data[9]: デバイスカラーコード
+    val deviceColor = data[9].toInt() and 0xFF
+
     return AppleDevice(
         address = address,
         modelName = appleModelName(modelCode),
@@ -266,5 +276,9 @@ internal fun parseProximityPairingData(data: ByteArray, address: String, rssi: I
         leftCharging = leftCharging,
         rightCharging = rightCharging,
         caseCharging = caseCharging,
+        lidOpen = lidOpen,
+        lidOpenCounter = lidOpenCounter,
+        deviceColor = deviceColor,
+        colorName = appleDeviceColorName(deviceColor),
     )
 }

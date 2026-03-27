@@ -12,4 +12,8 @@ data class AppleDevice(
     val leftCharging: Boolean = false,
     val rightCharging: Boolean = false,
     val caseCharging: Boolean = false,
+    val lidOpen: Boolean = false,
+    val lidOpenCounter: Int = 0,
+    val deviceColor: Int = 0,
+    val colorName: String = "",
 )
