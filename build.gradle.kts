@@ -17,3 +17,13 @@ dependencies {
     kover(project(":feature:onboarding"))
     kover(project(":navigation"))
 }
+
+kover {
+    reports {
+        filters {
+            excludes {
+                annotatedBy("androidx.compose.ui.tooling.preview.Preview")
+            }
+        }
+    }
+}
