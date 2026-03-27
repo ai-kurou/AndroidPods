@@ -97,7 +97,7 @@ class DeviceScanService : Service() {
     }
 }
 
-private fun formatDevicesSummary(devices: List<AppleDevice>): String {
+internal fun formatDevicesSummary(devices: List<AppleDevice>): String {
     if (devices.isEmpty()) return "No Apple devices found"
     return devices.joinToString("\n") { device ->
         val battery = if (device.isSingle) {
@@ -111,7 +111,7 @@ private fun formatDevicesSummary(devices: List<AppleDevice>): String {
     }
 }
 
-private fun batteryText(level: Int?, charging: Boolean): String {
+internal fun batteryText(level: Int?, charging: Boolean): String {
     val pct = when {
         level == null -> "--"
         level >= 10 -> "100%"
