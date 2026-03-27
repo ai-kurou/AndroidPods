@@ -7,7 +7,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Assert.assertFalse
 import org.junit.Test
 
-class ParseProximityPairingDataTest {
+class AppleDeviceRepositoryImplTest {
 
     private val testAddress = "AA:BB:CC:DD:EE:FF"
     private val testRssi = -45
