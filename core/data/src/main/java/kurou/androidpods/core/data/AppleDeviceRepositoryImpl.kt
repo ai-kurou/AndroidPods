@@ -25,13 +25,30 @@ import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 
+// --- BLE Manufacturer Specific Data の定数 ---
+// Apple の Bluetooth SIG 登録企業ID
 private const val APPLE_COMPANY_ID = 0x004C
+// AirPods等が発信する「Proximity Pairing」プロトコルの識別子とデータ長
 private const val PROXIMITY_PAIRING_TYPE: Byte = 0x07
 private const val PROXIMITY_PAIRING_LENGTH: Byte = 0x19
 private const val AIRPODS_DATA_LENGTH = 27
+
+// --- デバイス管理の定数 ---
+// この時間(ms)ビーコンを受信しなかったデバイスは「範囲外」として一覧から除去する
 private const val DEVICE_TIMEOUT_MS = 5_000L
+// 範囲外デバイスの除去処理を実行する間隔(ms)
 private const val CLEANUP_INTERVAL_MS = 1_000L
 
+/**
+ * BLE スキャンで周囲の Apple デバイス（AirPods 等）を検出し、バッテリー残量などの情報を提供する。
+ *
+ * 動作の流れ:
+ * 1. [startScan] で BLE スキャンを開始し、Apple の Proximity Pairing ビーコンだけをフィルタして受信
+ * 2. 受信したビーコンのバイト列をパースして [AppleDevice] に変換し、[_devices] に蓄積
+ * 3. 同一モデルのデバイスが複数ビーコンを飛ばす場合、電波強度(RSSI)が最も強いものを採用
+ * 4. 一定時間ビーコンを受信しなかったデバイスは自動的に一覧から除去（[removeStaleDevices]）
+ * 5. [stopScan] でスキャンを停止し、蓄積データをクリア
+ */
 @Singleton
 class AppleDeviceRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -41,17 +58,24 @@ class AppleDeviceRepositoryImpl @Inject constructor(
         context.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
 
     private var scanner: BluetoothLeScanner? = null
+    /** 検出中のデバイス一覧。キーはモデルコードの文字列表現 */
     private val _devices = MutableStateFlow<Map<String, AppleDevice>>(emptyMap())
+    /** 各デバイスのビーコンを最後に受信した時刻（SystemClock.elapsedRealtime ベース） */
     private val lastSeenAt = ConcurrentHashMap<String, Long>()
+    /** 範囲外デバイスの定期クリーンアップ用スコープ */
     private val scope = CoroutineScope(Dispatchers.Default)
     private var cleanupJob: Job? = null
 
+    /**
+     * BLE スキャン結果のコールバック。
+     * reportDelay > 0 に設定しているため通常は [onBatchScanResults] が呼ばれるが、
+     * 端末によっては [onScanResult] が呼ばれるケースもあるため両方をハンドルする。
+     */
     private val scanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             handleResult(result)
         }
 
-        // reportDelay > 0 ではこちらが呼ばれる
         override fun onBatchScanResults(results: MutableList<ScanResult>) {
             for (result in results) {
                 handleResult(result)
@@ -59,16 +83,21 @@ class AppleDeviceRepositoryImpl @Inject constructor(
         }
     }
 
+    /**
+     * スキャン結果1件を処理する。
+     * ビーコンのバイト列をパースし、Apple デバイスとして認識できた場合にデバイス一覧を更新する。
+     * 同一モデルコードのデバイスが既に存在する場合は、RSSI（電波強度）が強い方を保持する。
+     */
     private fun handleResult(result: ScanResult) {
         parseProximityPairing(result)?.let { device ->
             val key = device.modelCode.toString()
             val now = SystemClock.elapsedRealtime()
             val existing = _devices.value[key]
-            // 同一モデルは最もRSSIが強いビーコンを採用（OpenPodsと同様）
             if (existing == null || device.rssi >= existing.rssi) {
                 lastSeenAt[key] = now
                 _devices.value += (key to device)
             } else {
+                // RSSIが弱くても「まだ範囲内にいる」ことを記録して除去を防ぐ
                 lastSeenAt[key] = now
             }
         }
@@ -76,32 +105,40 @@ class AppleDeviceRepositoryImpl @Inject constructor(
 
     override fun observeDevices(): Flow<Map<String, AppleDevice>> = _devices.asStateFlow()
 
+    /**
+     * BLE スキャンを開始して周囲の Apple デバイスの検出を始める。
+     *
+     * スキャンフィルタにより Apple の Proximity Pairing ビーコンのみを受信対象にしている。
+     * 同時に、範囲外デバイスの定期クリーンアップを開始する。
+     */
     @SuppressLint("MissingPermission")
     override fun startScan() {
-        // 既存スキャンを停止（二重登録防止）
+        // 既にスキャン中の場合は先に停止する（コールバックの二重登録を防止）
         try {
             scanner?.stopScan(scanCallback)
         } catch (_: SecurityException) {
         }
 
-        // BT OFF時はnullになるためキャッシュせず毎回取得
+        // Bluetooth OFF 時は bluetoothLeScanner が null になるため、毎回取得する
         val btScanner = bluetoothManager?.adapter?.bluetoothLeScanner ?: return
         scanner = btScanner
 
-        // OpenPodsと同じフィルタ: 27バイト配列の先頭2バイト(type=0x07, length=0x19)をマスク
+        // --- スキャンフィルタの構築 ---
+        // 27バイトの Manufacturer Specific Data のうち先頭2バイト（type と length）だけを
+        // マスクで比較し、Proximity Pairing プロトコルのビーコンのみを通す
         val manufacturerData = ByteArray(AIRPODS_DATA_LENGTH).apply {
-            this[0] = PROXIMITY_PAIRING_TYPE
-            this[1] = PROXIMITY_PAIRING_LENGTH
+            this[0] = PROXIMITY_PAIRING_TYPE  // 0x07
+            this[1] = PROXIMITY_PAIRING_LENGTH // 0x19
         }
         val manufacturerDataMask = ByteArray(AIRPODS_DATA_LENGTH).apply {
-            this[0] = 0xFF.toByte()
+            this[0] = 0xFF.toByte() // 先頭2バイトのみ完全一致で比較
             this[1] = 0xFF.toByte()
         }
         val filter = ScanFilter.Builder()
             .setManufacturerData(APPLE_COMPANY_ID, manufacturerData, manufacturerDataMask)
             .build()
 
-        // OpenPods: "DON'T USE 0" — reportDelay=0 だと一部端末でビーコンを取りこぼす
+        // reportDelay=1ms に設定。0 だと一部端末でビーコンを取りこぼす問題がある
         val settings = ScanSettings.Builder()
             .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
             .setReportDelay(1)
@@ -112,6 +149,7 @@ class AppleDeviceRepositoryImpl @Inject constructor(
         } catch (_: SecurityException) {
         }
 
+        // 一定間隔で、ビーコンが途絶えたデバイスを一覧から除去するジョブを起動
         cleanupJob?.cancel()
         cleanupJob = scope.launch {
             while (isActive) {
@@ -121,6 +159,7 @@ class AppleDeviceRepositoryImpl @Inject constructor(
         }
     }
 
+    /** BLE スキャンを停止し、検出済みデバイスの一覧をクリアする。 */
     @SuppressLint("MissingPermission")
     override fun stopScan() {
         cleanupJob?.cancel()
@@ -133,6 +172,10 @@ class AppleDeviceRepositoryImpl @Inject constructor(
         lastSeenAt.clear()
     }
 
+    /**
+     * 最終受信時刻から [DEVICE_TIMEOUT_MS] 以上経過したデバイスを一覧から除去する。
+     * ユーザーが離れた・電源を切った等でビーコンが届かなくなったデバイスを反映するための処理。
+     */
     private fun removeStaleDevices() {
         val now = SystemClock.elapsedRealtime()
         val staleAddresses = lastSeenAt.filter { now - it.value > DEVICE_TIMEOUT_MS }.keys
@@ -142,16 +185,36 @@ class AppleDeviceRepositoryImpl @Inject constructor(
         }
     }
 
+    /** ScanResult から Apple の Manufacturer Specific Data を取り出してパースする。 */
     private fun parseProximityPairing(result: ScanResult): AppleDevice? {
         val data = result.scanRecord?.getManufacturerSpecificData(APPLE_COMPANY_ID) ?: return null
         return parseProximityPairingData(data, result.device.address, result.rssi)
     }
 }
 
+/**
+ * Apple Proximity Pairing プロトコルのバイト列をパースして [AppleDevice] を生成する。
+ *
+ * バイト列のレイアウト（27バイト）:
+ * ```
+ * [0]    : type (0x07 = Proximity Pairing)
+ * [1]    : length (0x19 = 25)
+ * [2]    : (未使用)
+ * [3..4] : モデルコード（上位バイト先行）— デバイスの機種を識別する
+ * [5]    : ステータスバイト — 上位ニブルの bit1 で左右のバッテリー値が入れ替わる
+ * [6]    : バッテリーバイト — 上位ニブル=片耳、下位ニブル=もう片耳（0x0F は不明を意味する）
+ * [7]    : 上位ニブル=充電ステータス、下位ニブル=ケースのバッテリー
+ * [8..26]: (その他のデータ)
+ * ```
+ *
+ * @return パース成功時は [AppleDevice]、データが Proximity Pairing 形式でなければ null
+ */
 internal fun parseProximityPairingData(data: ByteArray, address: String, rssi: Int): AppleDevice? {
     if (data.size != AIRPODS_DATA_LENGTH || data[0] != PROXIMITY_PAIRING_TYPE) return null
 
+    // data[3..4] からモデルコード（16bit）を組み立てる
     val modelCode = ((data[3].toInt() and 0xFF) shl 8) or (data[4].toInt() and 0xFF)
+    // AirPods Max のようにバッテリーが1つだけのモデルかどうか
     val isSingle = modelCode in SINGLE_BATTERY_MODELS
 
     val batteryByte = data[6].toInt() and 0xFF
@@ -160,19 +223,20 @@ internal fun parseProximityPairingData(data: ByteArray, address: String, rssi: I
     val caseBattery: Int?
 
     if (isSingle) {
-        // シングルデバイス: OpenPodsと同じくcharAt(13)=byte6下位ニブルのみ使用
+        // シングルデバイス: 下位ニブル（0〜14）のみがバッテリー値。0x0F は「不明」
         val singleBattery = (batteryByte and 0x0F).takeUnless { it == 0x0F }
         leftBattery = singleBattery
         rightBattery = null
         caseBattery = null
     } else {
-        // TWS: data[5]上位ニブルのbit 1でL/Rが入れ替わる（OpenPods: charAt(10) & 0x02）
+        // TWS（左右独立）デバイスの場合:
+        // data[5] の上位ニブルの bit1 が 0 のとき、上位/下位ニブルの左右が入れ替わる
         val isFlipped = ((data[5].toInt() shr 4) and 0x02) == 0
         val upperNibble = (batteryByte shr 4) and 0x0F
         val lowerNibble = batteryByte and 0x0F
+        // 0x0F は「バッテリー情報なし」を意味するため null に変換
         leftBattery = (if (isFlipped) upperNibble else lowerNibble).takeUnless { it == 0x0F }
         rightBattery = (if (isFlipped) lowerNibble else upperNibble).takeUnless { it == 0x0F }
-        // data[7]: 上位ニブル=充電ステータス、下位ニブル=ケースバッテリー
         caseBattery = (data[7].toInt() and 0x0F).takeUnless { it == 0x0F }
     }
 
