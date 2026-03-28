@@ -34,6 +34,6 @@ fun OnboardingScreen(
 
 @Preview(showBackground = true)
 @Composable
-private fun OnboardingScreenPreview() {
+fun OnboardingScreenPreview() {
     OnboardingScreen(onComplete = {})
 }
