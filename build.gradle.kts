@@ -19,6 +19,7 @@ dependencies {
 }
 
 kover {
+    useJacoco("0.8.14") // カバレッジ除外が動作しないのでjacocoを使うように変更
     reports {
         filters {
             excludes {
