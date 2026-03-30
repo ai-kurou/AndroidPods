@@ -92,4 +92,10 @@ private val APPLE_DEVICE_IMAGES: Map<Int, DeviceImages> = mapOf(
         right = R.mipmap.airpods_4th_gen_anc_right,
         case = R.mipmap.airpods_4th_gen_anc_case,
     ),
+    0x0A20 to DeviceImages.Single(
+        body = R.mipmap.airpods_max_1st_gen,
+    ),
+    0x1F20 to DeviceImages.Single(
+        body = R.mipmap.airpods_max_1st_gen_usb_c,
+    ),
 )
