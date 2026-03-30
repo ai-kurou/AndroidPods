@@ -280,5 +280,6 @@ internal fun parseProximityPairingData(data: ByteArray, address: String, rssi: I
         lidOpenCounter = lidOpenCounter,
         deviceColor = deviceColor,
         colorName = appleDeviceColorName(deviceColor),
+        images = appleDeviceImages(modelCode),
     )
 }

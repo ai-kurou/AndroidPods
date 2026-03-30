@@ -1,5 +1,7 @@
 package kurou.androidpods.core.data
 
+import kurou.androidpods.core.domain.DeviceImages
+
 internal val APPLE_DEVICE_MODELS: Map<Int, String> = mapOf(
     // AirPods
     0x0220 to "AirPods (1st Gen)",
@@ -60,3 +62,34 @@ private val APPLE_DEVICE_COLORS: Map<Int, String> = mapOf(
 
 internal fun appleDeviceColorName(colorCode: Int): String =
     APPLE_DEVICE_COLORS[colorCode] ?: "Unknown (0x${colorCode.toString(16).padStart(2, '0')})"
+
+internal fun appleDeviceImages(modelCode: Int): DeviceImages? =
+    APPLE_DEVICE_IMAGES[modelCode]
+
+private val APPLE_DEVICE_IMAGES: Map<Int, DeviceImages> = mapOf(
+    0x0220 to DeviceImages.Tws(
+        left = R.mipmap.airpods_1st_gen_left,
+        right = R.mipmap.airpods_1st_gen_right,
+        case = R.mipmap.airpods_1st_gen_case,
+    ),
+    0x0F20 to DeviceImages.Tws(
+        left = R.mipmap.airpods_2nd_gen_left,
+        right = R.mipmap.airpods_2nd_gen_right,
+        case = R.mipmap.airpods_2nd_gen_case,
+    ),
+    0x1320 to DeviceImages.Tws(
+        left = R.mipmap.airpods_3rd_gen_left,
+        right = R.mipmap.airpods_3rd_gen_right,
+        case = R.mipmap.airpods_3rd_gen_case,
+    ),
+    0x1920 to DeviceImages.Tws(
+        left = R.mipmap.airpods_4th_gen_left,
+        right = R.mipmap.airpods_4th_gen_right,
+        case = R.mipmap.airpods_4th_gen_case,
+    ),
+    0x1B20 to DeviceImages.Tws(
+        left = R.mipmap.airpods_4th_gen_anc_left,
+        right = R.mipmap.airpods_4th_gen_anc_right,
+        case = R.mipmap.airpods_4th_gen_anc_case,
+    ),
+)

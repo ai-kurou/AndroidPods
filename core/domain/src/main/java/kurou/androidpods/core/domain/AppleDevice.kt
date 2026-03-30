@@ -16,4 +16,5 @@ data class AppleDevice(
     val lidOpenCounter: Int = 0,
     val deviceColor: Int = 0,
     val colorName: String = "",
+    val images: DeviceImages? = null,
 )
