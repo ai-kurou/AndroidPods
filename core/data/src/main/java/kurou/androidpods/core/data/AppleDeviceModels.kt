@@ -14,6 +14,7 @@ internal val APPLE_DEVICE_MODELS: Map<Int, String> = mapOf(
     0x0E20 to "AirPods Pro",
     0x1420 to "AirPods Pro (2nd Gen)",
     0x2420 to "AirPods Pro (2nd Gen, USB-C)",
+    0x2720 to "AirPods Pro (3rd Gen)",
     // Beats
     0x0520 to "BeatsX",
     0x0620 to "Beats Solo3",
