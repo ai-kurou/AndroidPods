@@ -42,29 +42,14 @@ class DeviceScanServiceTest {
     private val testDispatcher = UnconfinedTestDispatcher()
     private lateinit var controller: ServiceController<DeviceScanService>
 
-    private fun device(
-        modelName: String = "AirPods Pro",
-        leftBattery: Int? = 5,
-        rightBattery: Int? = 5,
-        caseBattery: Int? = 5,
-        isSingle: Boolean = false,
-        leftCharging: Boolean = false,
-        rightCharging: Boolean = false,
-        caseCharging: Boolean = false,
-        images: DeviceImages? = null,
-    ) = AppleDevice(
+    private val baseDevice = AppleDevice(
         address = "00:00:00:00:00:00",
-        modelName = modelName,
+        modelName = "AirPods Pro",
         modelCode = 0,
         rssi = -50,
-        leftBattery = leftBattery,
-        rightBattery = rightBattery,
-        caseBattery = caseBattery,
-        isSingle = isSingle,
-        leftCharging = leftCharging,
-        rightCharging = rightCharging,
-        caseCharging = caseCharging,
-        images = images,
+        leftBattery = 5,
+        rightBattery = 5,
+        caseBattery = 5,
     )
 
     @Before
@@ -111,11 +96,8 @@ class DeviceScanServiceTest {
     fun `デバイス更新時に通知テキストが更新される`() {
         controller.create().startCommand(0, 0)
 
-        val device = AppleDevice(
+        val device = baseDevice.copy(
             address = "AA:BB:CC:DD:EE:FF",
-            modelName = "AirPods Pro",
-            modelCode = 0,
-            rssi = -50,
             leftBattery = 8,
             rightBattery = 7,
             caseBattery = 5,
@@ -140,14 +122,14 @@ class DeviceScanServiceTest {
 
     @Test
     fun `singleデバイスはleftBatteryのみ表示する`() {
-        val result = formatDevicesSummary(listOf(device(isSingle = true, leftBattery = 5)))
+        val result = formatDevicesSummary(listOf(baseDevice.copy(isSingle = true)))
         assertEquals("AirPods Pro — 55%", result)
     }
 
     @Test
     fun `非singleデバイスはL R Caseを表示する`() {
         val result = formatDevicesSummary(
-            listOf(device(leftBattery = 5, rightBattery = 7, caseBattery = 3)),
+            listOf(baseDevice.copy(leftBattery = 5, rightBattery = 7, caseBattery = 3)),
         )
         assertEquals("AirPods Pro — L:55% R:75% Case:35%", result)
     }
@@ -155,7 +137,7 @@ class DeviceScanServiceTest {
     @Test
     fun `バッテリーがnullの場合はハイフンを表示する`() {
         val result = formatDevicesSummary(
-            listOf(device(leftBattery = null, rightBattery = null, caseBattery = null)),
+            listOf(baseDevice.copy(leftBattery = null, rightBattery = null, caseBattery = null)),
         )
         assertEquals("AirPods Pro — L:-- R:-- Case:--", result)
     }
@@ -175,8 +157,8 @@ class DeviceScanServiceTest {
     @Test
     fun `複数デバイスは改行区切りで表示する`() {
         val devices = listOf(
-            device(modelName = "AirPods Pro", isSingle = false, leftBattery = 5, rightBattery = 7, caseBattery = 3),
-            device(modelName = "AirPods Max", isSingle = true, leftBattery = 8),
+            baseDevice.copy(leftBattery = 5, rightBattery = 7, caseBattery = 3),
+            baseDevice.copy(modelName = "AirPods Max", isSingle = true, leftBattery = 8),
         )
         val result = formatDevicesSummary(devices)
         assertEquals("AirPods Pro — L:55% R:75% Case:35%\nAirPods Max — 85%", result)
@@ -188,7 +170,7 @@ class DeviceScanServiceTest {
 
     @Test
     fun `TWSデバイスのRemoteViewsが正しいレイアウトを使用する`() {
-        val tws = device(
+        val tws = baseDevice.copy(
             images = DeviceImages.Tws(
                 left = android.R.drawable.ic_menu_gallery,
                 right = android.R.drawable.ic_menu_gallery,
@@ -201,7 +183,7 @@ class DeviceScanServiceTest {
 
     @Test
     fun `SingleデバイスのRemoteViewsが正しいレイアウトを使用する`() {
-        val single = device(
+        val single = baseDevice.copy(
             isSingle = true,
             images = DeviceImages.Single(
                 body = android.R.drawable.ic_menu_gallery,
@@ -213,17 +195,16 @@ class DeviceScanServiceTest {
 
     @Test
     fun `画像なしデバイスのRemoteViewsがテキストのみレイアウトを使用する`() {
-        val noImage = device(images = null)
-        val remoteViews = buildDeviceRemoteViews(testPackageName, noImage)
+        val remoteViews = buildDeviceRemoteViews(testPackageName, baseDevice)
         assertEquals(R.layout.notification_device_text_only, remoteViews.layoutId)
     }
 
     @Test
     fun `展開ビューが全デバイス分の子ビューを含む`() {
         val devices = listOf(
-            device(modelName = "Device A", images = null),
-            device(modelName = "Device B", images = null),
-            device(modelName = "Device C", images = null),
+            baseDevice.copy(modelName = "Device A"),
+            baseDevice.copy(modelName = "Device B"),
+            baseDevice.copy(modelName = "Device C"),
         )
         val expandedView = buildExpandedRemoteViews(testPackageName, devices)
         assertEquals(R.layout.notification_expanded, expandedView.layoutId)
@@ -233,11 +214,8 @@ class DeviceScanServiceTest {
     fun `デバイス更新時に展開ビューが通知に設定される`() {
         controller.create().startCommand(0, 0)
 
-        val tws = AppleDevice(
+        val tws = baseDevice.copy(
             address = "AA:BB:CC:DD:EE:FF",
-            modelName = "AirPods Pro",
-            modelCode = 0,
-            rssi = -50,
             leftBattery = 8,
             rightBattery = 7,
             caseBattery = 5,
