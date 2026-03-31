@@ -24,6 +24,7 @@ internal val APPLE_DEVICE_MODELS: Map<Int, String> = mapOf(
     0x1620 to "Beats Studio Buds+",
     0x1220 to "Beats Fit Pro",
     0x0320 to "Powerbeats3",
+    0x0D20 to "Powerbeats4",
     0x0B20 to "Powerbeats Pro",
     0x0C20 to "Beats Solo Pro",
     0x1020 to "Beats Flex",
@@ -38,6 +39,7 @@ internal val SINGLE_BATTERY_MODELS: Set<Int> = setOf(
     0x0920, // Beats Studio3
     0x1720, // Beats Studio Pro
     0x0320, // Powerbeats3
+    0x0D20, // Powerbeats4
     0x0C20, // Beats Solo Pro
 )
 
