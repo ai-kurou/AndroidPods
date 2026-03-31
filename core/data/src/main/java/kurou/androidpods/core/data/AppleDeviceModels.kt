@@ -104,4 +104,19 @@ private val APPLE_DEVICE_IMAGES: Map<Int, DeviceImages> = mapOf(
         right = R.mipmap.airpods_pro_1st_gen_right,
         case = R.mipmap.airpods_pro_1st_gen_case,
     ),
+    0x1420 to DeviceImages.Tws(
+        left = R.mipmap.airpods_pro_2nd_gen_left,
+        right = R.mipmap.airpods_pro_2nd_gen_right,
+        case = R.mipmap.airpods_pro_2nd_gen_case,
+    ),
+    0x2420 to DeviceImages.Tws(
+        left = R.mipmap.airpods_pro_2nd_gen_usb_c_left,
+        right = R.mipmap.airpods_pro_2nd_gen_usb_c_right,
+        case = R.mipmap.airpods_pro_2nd_gen_usb_c_case,
+    ),
+    0x2720 to DeviceImages.Tws(
+        left = R.mipmap.airpods_pro_3rd_gen_left,
+        right = R.mipmap.airpods_pro_3rd_gen_right,
+        case = R.mipmap.airpods_pro_3rd_gen_case,
+    ),
 )
