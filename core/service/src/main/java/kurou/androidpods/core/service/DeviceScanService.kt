@@ -84,6 +84,11 @@ class DeviceScanService : Service() {
             .setOngoing(true)
 
         if (devices.isNotEmpty()) {
+            val collapsedText = formatDevicesSummary(listOf(devices.first()))
+            val collapsedView = RemoteViews(packageName, R.layout.notification_collapsed)
+            collapsedView.setTextViewText(R.id.notification_text, collapsedText)
+            builder.setCustomContentView(collapsedView)
+
             val expandedView = RemoteViews(packageName, R.layout.notification_expanded)
             expandedView.removeAllViews(R.id.notification_device_container)
             for (device in devices) {
