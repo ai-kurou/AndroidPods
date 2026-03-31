@@ -121,4 +121,50 @@ private val APPLE_DEVICE_IMAGES: Map<Int, DeviceImages> = mapOf(
         right = R.mipmap.airpods_pro_3rd_gen_right,
         case = R.mipmap.airpods_pro_3rd_gen_case,
     ),
+    // Beats - Single
+    0x0520 to DeviceImages.Single(
+        body = R.mipmap.beats_x,
+    ),
+    0x0620 to DeviceImages.Single(
+        body = R.mipmap.beats_solo_3,
+    ),
+    0x0920 to DeviceImages.Single(
+        body = R.mipmap.beats_studio_3,
+    ),
+    0x1720 to DeviceImages.Single(
+        body = R.mipmap.beats_studio_pro,
+    ),
+    0x0320 to DeviceImages.Single(
+        body = R.mipmap.power_beats_3,
+    ),
+    0x0D20 to DeviceImages.Single(
+        body = R.mipmap.power_beats_4,
+    ),
+    0x0C20 to DeviceImages.Single(
+        body = R.mipmap.beats_solo_pro,
+    ),
+    0x1020 to DeviceImages.Single(
+        body = R.mipmap.beats_flex,
+    ),
+    // Beats - Tws
+    0x1120 to DeviceImages.Tws(
+        left = R.mipmap.beats_studio_buds_left,
+        right = R.mipmap.beats_studio_buds_right,
+        case = R.mipmap.beats_studio_buds_case,
+    ),
+    0x1620 to DeviceImages.Tws(
+        left = R.mipmap.beats_studio_buds_plus_left,
+        right = R.mipmap.beats_studio_buds_plus_right,
+        case = R.mipmap.beats_studio_buds_plus_case,
+    ),
+    0x1220 to DeviceImages.Tws(
+        left = R.mipmap.beats_fit_pro_left,
+        right = R.mipmap.beats_fit_pro_right,
+        case = R.mipmap.beats_fit_pro_case,
+    ),
+    0x0B20 to DeviceImages.Tws(
+        left = R.mipmap.power_beats_pro_left,
+        right = R.mipmap.power_beats_pro_right,
+        case = R.mipmap.power_beats_pro_case,
+    ),
 )
