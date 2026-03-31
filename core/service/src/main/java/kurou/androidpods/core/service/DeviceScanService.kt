@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.app.PendingIntent
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
@@ -83,6 +84,11 @@ class DeviceScanService : Service() {
             .setContentText(contentText)
             .setOngoing(true)
 
+        val contentIntent = createLaunchPendingIntent(this)
+        if (contentIntent != null) {
+            builder.setContentIntent(contentIntent)
+        }
+
         if (devices.isNotEmpty()) {
             val collapsedText = formatDevicesSummary(listOf(devices.first()))
             val collapsedView = RemoteViews(packageName, R.layout.notification_collapsed)
@@ -108,6 +114,17 @@ class DeviceScanService : Service() {
             context.stopService(Intent(context, DeviceScanService::class.java))
         }
     }
+}
+
+internal fun createLaunchPendingIntent(context: Context): PendingIntent? {
+    val launchIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
+        ?: return null
+    return PendingIntent.getActivity(
+        context,
+        0,
+        launchIntent,
+        PendingIntent.FLAG_IMMUTABLE,
+    )
 }
 
 internal fun buildExpandedRemoteViews(

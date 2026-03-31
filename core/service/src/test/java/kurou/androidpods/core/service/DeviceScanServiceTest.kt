@@ -2,7 +2,6 @@ package kurou.androidpods.core.service
 
 import android.app.NotificationManager
 import android.content.Context
-import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -111,6 +110,32 @@ class DeviceScanServiceTest {
         val text = extras.getCharSequence("android.text")?.toString()
 
         assertTrue(text?.contains("AirPods Pro") == true)
+    }
+
+    // --- createLaunchPendingIntent ---
+
+    @Test
+    fun `ランチャーActivity未登録の場合はnullを返す`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val result = createLaunchPendingIntent(context)
+        assertEquals(null, result)
+    }
+
+    @Test
+    fun `ランチャーActivityが登録済みの場合はPendingIntentを返す`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val shadowPm = org.robolectric.Shadows.shadowOf(context.packageManager)
+        val component = android.content.ComponentName(context.packageName, "kurou.androidpods.MainActivity")
+        shadowPm.addActivityIfNotPresent(component)
+        shadowPm.addIntentFilterForActivity(
+            component,
+            android.content.IntentFilter(android.content.Intent.ACTION_MAIN).apply {
+                addCategory(android.content.Intent.CATEGORY_LAUNCHER)
+            },
+        )
+
+        val result = createLaunchPendingIntent(context)
+        assertNotNull(result)
     }
 
     // --- formatDevicesSummary / batteryText ---
