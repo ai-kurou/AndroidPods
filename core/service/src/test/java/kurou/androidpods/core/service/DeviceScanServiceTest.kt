@@ -15,6 +15,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import kurou.androidpods.core.data.DataModule
 import kurou.androidpods.core.domain.AppleDevice
+import kurou.androidpods.core.domain.DeviceImages
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -40,6 +41,31 @@ class DeviceScanServiceTest {
 
     private val testDispatcher = UnconfinedTestDispatcher()
     private lateinit var controller: ServiceController<DeviceScanService>
+
+    private fun device(
+        modelName: String = "AirPods Pro",
+        leftBattery: Int? = 5,
+        rightBattery: Int? = 5,
+        caseBattery: Int? = 5,
+        isSingle: Boolean = false,
+        leftCharging: Boolean = false,
+        rightCharging: Boolean = false,
+        caseCharging: Boolean = false,
+        images: DeviceImages? = null,
+    ) = AppleDevice(
+        address = "00:00:00:00:00:00",
+        modelName = modelName,
+        modelCode = 0,
+        rssi = -50,
+        leftBattery = leftBattery,
+        rightBattery = rightBattery,
+        caseBattery = caseBattery,
+        isSingle = isSingle,
+        leftCharging = leftCharging,
+        rightCharging = rightCharging,
+        caseCharging = caseCharging,
+        images = images,
+    )
 
     @Before
     fun setUp() {
@@ -107,29 +133,6 @@ class DeviceScanServiceTest {
 
     // --- formatDevicesSummary / batteryText ---
 
-    private fun device(
-        modelName: String = "AirPods Pro",
-        leftBattery: Int? = 5,
-        rightBattery: Int? = 5,
-        caseBattery: Int? = 5,
-        isSingle: Boolean = false,
-        leftCharging: Boolean = false,
-        rightCharging: Boolean = false,
-        caseCharging: Boolean = false,
-    ) = AppleDevice(
-        address = "00:00:00:00:00:00",
-        modelName = modelName,
-        modelCode = 0,
-        rssi = -50,
-        leftBattery = leftBattery,
-        rightBattery = rightBattery,
-        caseBattery = caseBattery,
-        isSingle = isSingle,
-        leftCharging = leftCharging,
-        rightCharging = rightCharging,
-        caseCharging = caseCharging,
-    )
-
     @Test
     fun `デバイスが空の場合はNo Apple devices foundを返す`() {
         assertEquals("No Apple devices found", formatDevicesSummary(emptyList()))
@@ -177,5 +180,81 @@ class DeviceScanServiceTest {
         )
         val result = formatDevicesSummary(devices)
         assertEquals("AirPods Pro — L:55% R:75% Case:35%\nAirPods Max — 85%", result)
+    }
+
+    // --- buildDeviceRemoteViews / buildExpandedRemoteViews ---
+
+    private val testPackageName = "kurou.androidpods.core.service.test"
+
+    @Test
+    fun `TWSデバイスのRemoteViewsが正しいレイアウトを使用する`() {
+        val tws = device(
+            images = DeviceImages.Tws(
+                left = android.R.drawable.ic_menu_gallery,
+                right = android.R.drawable.ic_menu_gallery,
+                case = android.R.drawable.ic_menu_gallery,
+            ),
+        )
+        val remoteViews = buildDeviceRemoteViews(testPackageName, tws)
+        assertEquals(R.layout.notification_device_tws, remoteViews.layoutId)
+    }
+
+    @Test
+    fun `SingleデバイスのRemoteViewsが正しいレイアウトを使用する`() {
+        val single = device(
+            isSingle = true,
+            images = DeviceImages.Single(
+                body = android.R.drawable.ic_menu_gallery,
+            ),
+        )
+        val remoteViews = buildDeviceRemoteViews(testPackageName, single)
+        assertEquals(R.layout.notification_device_single, remoteViews.layoutId)
+    }
+
+    @Test
+    fun `画像なしデバイスのRemoteViewsがテキストのみレイアウトを使用する`() {
+        val noImage = device(images = null)
+        val remoteViews = buildDeviceRemoteViews(testPackageName, noImage)
+        assertEquals(R.layout.notification_device_text_only, remoteViews.layoutId)
+    }
+
+    @Test
+    fun `展開ビューが全デバイス分の子ビューを含む`() {
+        val devices = listOf(
+            device(modelName = "Device A", images = null),
+            device(modelName = "Device B", images = null),
+            device(modelName = "Device C", images = null),
+        )
+        val expandedView = buildExpandedRemoteViews(testPackageName, devices)
+        assertEquals(R.layout.notification_expanded, expandedView.layoutId)
+    }
+
+    @Test
+    fun `デバイス更新時に展開ビューが通知に設定される`() {
+        controller.create().startCommand(0, 0)
+
+        val tws = AppleDevice(
+            address = "AA:BB:CC:DD:EE:FF",
+            modelName = "AirPods Pro",
+            modelCode = 0,
+            rssi = -50,
+            leftBattery = 8,
+            rightBattery = 7,
+            caseBattery = 5,
+            images = DeviceImages.Tws(
+                left = android.R.drawable.ic_menu_gallery,
+                right = android.R.drawable.ic_menu_gallery,
+                case = android.R.drawable.ic_menu_gallery,
+            ),
+        )
+        fakeDevicesFlow.tryEmit(mapOf(tws.address to tws))
+
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val nm = context.getSystemService(NotificationManager::class.java)
+        val notification = nm.activeNotifications.first().notification
+
+        @Suppress("DEPRECATION")
+        val bigContentView = notification.bigContentView
+        assertNotNull(bigContentView)
     }
 }

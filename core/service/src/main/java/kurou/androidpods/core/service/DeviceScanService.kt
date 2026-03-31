@@ -89,67 +89,12 @@ class DeviceScanService : Service() {
             collapsedView.setTextViewText(R.id.notification_text, collapsedText)
             builder.setCustomContentView(collapsedView)
 
-            val expandedView = RemoteViews(packageName, R.layout.notification_expanded)
-            expandedView.removeAllViews(R.id.notification_device_container)
-            for (device in devices) {
-                expandedView.addView(
-                    R.id.notification_device_container,
-                    buildDeviceRemoteViews(device),
-                )
-            }
+            val expandedView = buildExpandedRemoteViews(packageName, devices)
             builder.setCustomBigContentView(expandedView)
             builder.setStyle(Notification.DecoratedCustomViewStyle())
         }
 
         return builder.build()
-    }
-
-    private fun buildDeviceRemoteViews(device: AppleDevice): RemoteViews {
-        return when (val images = device.images) {
-            is DeviceImages.Tws -> {
-                RemoteViews(packageName, R.layout.notification_device_tws).apply {
-                    setTextViewText(R.id.device_model_name, device.modelName)
-                    setImageViewResource(R.id.img_left, images.left)
-                    setImageViewResource(R.id.img_right, images.right)
-                    setImageViewResource(R.id.img_case, images.case)
-                    setTextViewText(
-                        R.id.text_left_battery,
-                        batteryText(device.leftBattery, device.leftCharging),
-                    )
-                    setTextViewText(
-                        R.id.text_right_battery,
-                        batteryText(device.rightBattery, device.rightCharging),
-                    )
-                    setTextViewText(
-                        R.id.text_case_battery,
-                        batteryText(device.caseBattery, device.caseCharging),
-                    )
-                }
-            }
-            is DeviceImages.Single -> {
-                RemoteViews(packageName, R.layout.notification_device_single).apply {
-                    setTextViewText(R.id.device_model_name, device.modelName)
-                    setImageViewResource(R.id.img_body, images.body)
-                    setTextViewText(
-                        R.id.text_body_battery,
-                        batteryText(device.leftBattery, device.leftCharging),
-                    )
-                }
-            }
-            null -> {
-                RemoteViews(packageName, R.layout.notification_device_text_only).apply {
-                    setTextViewText(R.id.device_model_name, device.modelName)
-                    val batteryStr = if (device.isSingle) {
-                        batteryText(device.leftBattery, device.leftCharging)
-                    } else {
-                        "L:${batteryText(device.leftBattery, device.leftCharging)} " +
-                            "R:${batteryText(device.rightBattery, device.rightCharging)} " +
-                            "Case:${batteryText(device.caseBattery, device.caseCharging)}"
-                    }
-                    setTextViewText(R.id.text_battery_summary, batteryStr)
-                }
-            }
-        }
     }
 
     companion object {
@@ -161,6 +106,69 @@ class DeviceScanService : Service() {
 
         fun stop(context: Context) {
             context.stopService(Intent(context, DeviceScanService::class.java))
+        }
+    }
+}
+
+internal fun buildExpandedRemoteViews(
+    packageName: String,
+    devices: List<AppleDevice>,
+): RemoteViews {
+    val expandedView = RemoteViews(packageName, R.layout.notification_expanded)
+    expandedView.removeAllViews(R.id.notification_device_container)
+    for (device in devices) {
+        expandedView.addView(
+            R.id.notification_device_container,
+            buildDeviceRemoteViews(packageName, device),
+        )
+    }
+    return expandedView
+}
+
+internal fun buildDeviceRemoteViews(packageName: String, device: AppleDevice): RemoteViews {
+    return when (val images = device.images) {
+        is DeviceImages.Tws -> {
+            RemoteViews(packageName, R.layout.notification_device_tws).apply {
+                setTextViewText(R.id.device_model_name, device.modelName)
+                setImageViewResource(R.id.img_left, images.left)
+                setImageViewResource(R.id.img_right, images.right)
+                setImageViewResource(R.id.img_case, images.case)
+                setTextViewText(
+                    R.id.text_left_battery,
+                    batteryText(device.leftBattery, device.leftCharging),
+                )
+                setTextViewText(
+                    R.id.text_right_battery,
+                    batteryText(device.rightBattery, device.rightCharging),
+                )
+                setTextViewText(
+                    R.id.text_case_battery,
+                    batteryText(device.caseBattery, device.caseCharging),
+                )
+            }
+        }
+        is DeviceImages.Single -> {
+            RemoteViews(packageName, R.layout.notification_device_single).apply {
+                setTextViewText(R.id.device_model_name, device.modelName)
+                setImageViewResource(R.id.img_body, images.body)
+                setTextViewText(
+                    R.id.text_body_battery,
+                    batteryText(device.leftBattery, device.leftCharging),
+                )
+            }
+        }
+        null -> {
+            RemoteViews(packageName, R.layout.notification_device_text_only).apply {
+                setTextViewText(R.id.device_model_name, device.modelName)
+                val batteryStr = if (device.isSingle) {
+                    batteryText(device.leftBattery, device.leftCharging)
+                } else {
+                    "L:${batteryText(device.leftBattery, device.leftCharging)} " +
+                        "R:${batteryText(device.rightBattery, device.rightCharging)} " +
+                        "Case:${batteryText(device.caseBattery, device.caseCharging)}"
+                }
+                setTextViewText(R.id.text_battery_summary, batteryStr)
+            }
         }
     }
 }
