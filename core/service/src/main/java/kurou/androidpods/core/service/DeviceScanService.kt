@@ -90,10 +90,7 @@ class DeviceScanService : Service() {
         }
 
         if (devices.isNotEmpty()) {
-            val collapsedText = formatDevicesSummary(listOf(devices.first()))
-            val collapsedView = RemoteViews(packageName, R.layout.notification_collapsed)
-            collapsedView.setTextViewText(R.id.notification_text, collapsedText)
-            builder.setCustomContentView(collapsedView)
+            builder.setCustomContentView(buildCollapsedRemoteViews(packageName, devices))
 
             val expandedView = buildExpandedRemoteViews(packageName, devices)
             builder.setCustomBigContentView(expandedView)
@@ -127,6 +124,16 @@ internal fun createLaunchPendingIntent(context: Context): PendingIntent? {
     )
 }
 
+internal fun buildCollapsedRemoteViews(
+    packageName: String,
+    devices: List<AppleDevice>,
+): RemoteViews {
+    val collapsedText = formatDevicesSummary(listOf(devices.first()), showCharging = true)
+    val collapsedView = RemoteViews(packageName, R.layout.notification_collapsed)
+    collapsedView.setTextViewText(R.id.notification_text, collapsedText)
+    return collapsedView
+}
+
 internal fun buildExpandedRemoteViews(
     packageName: String,
     devices: List<AppleDevice>,
@@ -150,17 +157,29 @@ internal fun buildDeviceRemoteViews(packageName: String, device: AppleDevice): R
                 setImageViewResource(R.id.img_left, images.left)
                 setImageViewResource(R.id.img_right, images.right)
                 setImageViewResource(R.id.img_case, images.case)
+                setImageViewResource(
+                    R.id.img_left_battery,
+                    batteryIconRes(device.leftBattery, device.leftCharging),
+                )
                 setTextViewText(
                     R.id.text_left_battery,
-                    batteryText(device.leftBattery, device.leftCharging),
+                    batteryText(device.leftBattery),
+                )
+                setImageViewResource(
+                    R.id.img_right_battery,
+                    batteryIconRes(device.rightBattery, device.rightCharging),
                 )
                 setTextViewText(
                     R.id.text_right_battery,
-                    batteryText(device.rightBattery, device.rightCharging),
+                    batteryText(device.rightBattery),
+                )
+                setImageViewResource(
+                    R.id.img_case_battery,
+                    batteryIconRes(device.caseBattery, device.caseCharging),
                 )
                 setTextViewText(
                     R.id.text_case_battery,
-                    batteryText(device.caseBattery, device.caseCharging),
+                    batteryText(device.caseBattery),
                 )
             }
         }
@@ -168,9 +187,13 @@ internal fun buildDeviceRemoteViews(packageName: String, device: AppleDevice): R
             RemoteViews(packageName, R.layout.notification_device_single).apply {
                 setTextViewText(R.id.device_model_name, device.modelName)
                 setImageViewResource(R.id.img_body, images.body)
+                setImageViewResource(
+                    R.id.img_body_battery,
+                    batteryIconRes(device.leftBattery, device.leftCharging),
+                )
                 setTextViewText(
                     R.id.text_body_battery,
-                    batteryText(device.leftBattery, device.leftCharging),
+                    batteryText(device.leftBattery),
                 )
             }
         }
@@ -178,11 +201,11 @@ internal fun buildDeviceRemoteViews(packageName: String, device: AppleDevice): R
             RemoteViews(packageName, R.layout.notification_device_text_only).apply {
                 setTextViewText(R.id.device_model_name, device.modelName)
                 val batteryStr = if (device.isSingle) {
-                    batteryText(device.leftBattery, device.leftCharging)
+                    batteryText(device.leftBattery)
                 } else {
-                    "L:${batteryText(device.leftBattery, device.leftCharging)} " +
-                        "R:${batteryText(device.rightBattery, device.rightCharging)} " +
-                        "Case:${batteryText(device.caseBattery, device.caseCharging)}"
+                    "L:${batteryText(device.leftBattery)} " +
+                        "R:${batteryText(device.rightBattery)} " +
+                        "Case:${batteryText(device.caseBattery)}"
                 }
                 setTextViewText(R.id.text_battery_summary, batteryStr)
             }
@@ -190,21 +213,53 @@ internal fun buildDeviceRemoteViews(packageName: String, device: AppleDevice): R
     }
 }
 
-internal fun formatDevicesSummary(devices: List<AppleDevice>): String {
+internal fun formatDevicesSummary(
+    devices: List<AppleDevice>,
+    showCharging: Boolean = false,
+): String {
     if (devices.isEmpty()) return "No Apple devices found"
     return devices.joinToString("\n") { device ->
         val battery = if (device.isSingle) {
-            batteryText(device.leftBattery, device.leftCharging)
+            batteryText(device.leftBattery, showCharging && device.leftCharging)
         } else {
-            "L:${batteryText(device.leftBattery, device.leftCharging)} " +
-                "R:${batteryText(device.rightBattery, device.rightCharging)} " +
-                "Case:${batteryText(device.caseBattery, device.caseCharging)}"
+            "L:${batteryText(device.leftBattery, showCharging && device.leftCharging)} " +
+                "R:${batteryText(device.rightBattery, showCharging && device.rightCharging)} " +
+                "Case:${batteryText(device.caseBattery, showCharging && device.caseCharging)}"
         }
         "${device.modelName} — $battery"
     }
 }
 
-internal fun batteryText(level: Int?, charging: Boolean): String {
+internal fun batteryIconRes(level: Int?, charging: Boolean): Int {
+    if (level == null) return R.drawable.icon_battery_null
+    if (level >= 10) {
+        return if (charging) R.drawable.icon_battery_charging_100
+        else R.drawable.icon_battery_95_100
+    }
+    val pct = level * 10 + 5
+    return if (charging) {
+        when {
+            pct < 20 -> R.drawable.icon_battery_charging_0_19
+            pct < 40 -> R.drawable.icon_battery_charging_20_39
+            pct < 60 -> R.drawable.icon_battery_charging_40_59
+            pct < 80 -> R.drawable.icon_battery_charging_60_79
+            pct < 95 -> R.drawable.icon_battery_charging_80_94
+            else -> R.drawable.icon_battery_charging_95_99
+        }
+    } else {
+        when {
+            pct < 5 -> R.drawable.icon_battery_0_4
+            pct < 20 -> R.drawable.icon_battery_5_19
+            pct < 40 -> R.drawable.icon_battery_20_39
+            pct < 60 -> R.drawable.icon_battery_40_59
+            pct < 80 -> R.drawable.icon_battery_60_79
+            pct < 95 -> R.drawable.icon_battery_80_94
+            else -> R.drawable.icon_battery_95_100
+        }
+    }
+}
+
+internal fun batteryText(level: Int?, charging: Boolean = false): String {
     val pct = when {
         level == null -> "--"
         level >= 10 -> "100%"

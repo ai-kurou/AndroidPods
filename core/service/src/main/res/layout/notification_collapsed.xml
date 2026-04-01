@@ -9,6 +9,6 @@
         android:id="@+id/notification_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="?android:attr/textColorPrimary"
+        android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
         android:textSize="13sp" />
 </LinearLayout>

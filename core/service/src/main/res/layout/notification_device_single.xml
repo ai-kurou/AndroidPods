@@ -10,7 +10,7 @@
         android:id="@+id/device_model_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="?android:attr/textColorPrimary"
+        android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
         android:textSize="13sp"
         android:paddingBottom="8dp" />
 
@@ -26,12 +26,19 @@
             android:layout_height="40dp"
             android:scaleType="fitCenter" />
 
+        <ImageView
+            android:id="@+id/img_body_battery"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="8dp"
+            android:scaleType="fitCenter" />
+
         <TextView
             android:id="@+id/text_body_battery"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:textColor="?android:attr/textColorSecondary"
-            android:textSize="12sp" />
+            android:textAppearance="@style/TextAppearance.Compat.Notification.Info"
+            android:textSize="11sp"
+            android:layout_marginStart="2dp" />
     </LinearLayout>
 </LinearLayout>
