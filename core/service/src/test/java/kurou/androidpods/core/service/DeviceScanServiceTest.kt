@@ -85,6 +85,7 @@ class DeviceScanServiceTest {
         controller.startCommand(0, 0)
         assertEquals(1, nm.activeNotifications.size)
         assertTrue(startScanCalled)
+        assertEquals(1, startScanCount)
     }
 
     @Test
