@@ -1,5 +1,6 @@
 package kurou.androidpods.core.service
 
+import android.bluetooth.BluetoothAdapter
 import android.app.NotificationManager
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
@@ -69,6 +70,31 @@ class DeviceScanServiceTest {
         controller.create().startCommand(0, 0)
 
         assertTrue(startScanCalled)
+    }
+
+    @Test
+    fun `onStartCommandを複数回呼んでも通知は初回のみ作成される`() {
+        controller.create().startCommand(0, 0)
+
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val nm = context.getSystemService(NotificationManager::class.java)
+        assertEquals(1, nm.activeNotifications.size)
+
+        // 2回目以降のstartCommandでは通知が再作成されない（startScanは呼ばれる）
+        startScanCount = 0
+        controller.startCommand(0, 0)
+        assertEquals(1, nm.activeNotifications.size)
+        assertTrue(startScanCalled)
+    }
+
+    @Test
+    fun `BluetoothがSTATE_ONになるとstartScanが再実行される`() {
+        controller.create().startCommand(0, 0)
+        startScanCount = 0
+
+        fakeBluetoothStateFlow.tryEmit(BluetoothAdapter.STATE_ON)
+
+        assertTrue(startScanCount > 0)
     }
 
     @Test
