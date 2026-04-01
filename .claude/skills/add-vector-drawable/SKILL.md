@@ -47,7 +47,7 @@ $ARGUMENTS にSVGファイルのパスと配置先モジュールを指定する
 
 ### 3. ファイルの配置
 
-パス: `{module}/src/main/res/drawable/{filename}.xml`
+パス: `src/main/res/drawable/{filename}.xml`
 
 - ファイル名はスネークケース（例: `icon_battery_null.xml`）
 - PNGではなくVector Drawableなので`drawable`ディレクトリに配置（`mipmap`や`drawable-nodpi`ではない）
