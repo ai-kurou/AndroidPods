@@ -4,6 +4,7 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
+import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.Intent
 import android.app.PendingIntent
@@ -15,6 +16,7 @@ import androidx.core.app.ServiceCompat
 import dagger.hilt.android.AndroidEntryPoint
 import kurou.androidpods.core.domain.AppleDevice
 import kurou.androidpods.core.domain.AppleDeviceRepository
+import kurou.androidpods.core.domain.BluetoothAdapterRepository
 import kurou.androidpods.core.domain.DeviceImages
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -29,7 +31,11 @@ class DeviceScanService : Service() {
     @Inject
     lateinit var appleDeviceRepository: AppleDeviceRepository
 
+    @Inject
+    lateinit var bluetoothAdapterRepository: BluetoothAdapterRepository
+
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    private var isForeground = false
 
     override fun onCreate() {
         super.onCreate()
@@ -37,14 +43,18 @@ class DeviceScanService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val notification = buildNotification(getString(R.string.notification_scanning), emptyList())
-        val foregroundServiceType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-            ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
-        else
-            0
-        ServiceCompat.startForeground(this, NOTIFICATION_ID, notification, foregroundServiceType)
+        if (!isForeground) {
+            isForeground = true
+            val notification = buildNotification(getString(R.string.notification_scanning), emptyList())
+            val foregroundServiceType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
+            else
+                0
+            ServiceCompat.startForeground(this, NOTIFICATION_ID, notification, foregroundServiceType)
+            observeDevices()
+            observeBluetoothState()
+        }
         appleDeviceRepository.startScan()
-        observeDevices()
         return START_STICKY
     }
 
@@ -64,6 +74,16 @@ class DeviceScanService : Service() {
                 val notification = buildNotification(text, deviceList)
                 getSystemService(NotificationManager::class.java)
                     .notify(NOTIFICATION_ID, notification)
+            }
+        }
+    }
+
+    private fun observeBluetoothState() {
+        scope.launch {
+            bluetoothAdapterRepository.observeAdapterState().collect { state ->
+                if (state == BluetoothAdapter.STATE_ON) {
+                    appleDeviceRepository.startScan()
+                }
             }
         }
     }
