@@ -30,6 +30,7 @@ class DeviceScanService : Service() {
     lateinit var appleDeviceRepository: AppleDeviceRepository
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    private var isRunning = false
 
     override fun onCreate() {
         super.onCreate()
@@ -37,6 +38,8 @@ class DeviceScanService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (isRunning) return START_STICKY
+        isRunning = true
         val notification = buildNotification(getString(R.string.notification_scanning), emptyList())
         val foregroundServiceType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
             ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE

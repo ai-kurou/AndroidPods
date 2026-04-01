@@ -72,6 +72,15 @@ class DeviceScanServiceTest {
     }
 
     @Test
+    fun `onStartCommandを複数回呼んでもstartScanは1回だけ呼ばれる`() {
+        controller.create().startCommand(0, 0)
+        controller.startCommand(0, 0)
+        controller.startCommand(0, 0)
+
+        assertEquals(1, startScanCount)
+    }
+
+    @Test
     fun `onDestroyでstopScanが呼ばれる`() {
         controller.create().startCommand(0, 0)
         controller.destroy()

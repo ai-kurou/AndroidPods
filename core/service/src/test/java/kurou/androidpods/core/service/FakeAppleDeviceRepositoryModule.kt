@@ -16,10 +16,12 @@ import javax.inject.Singleton
 val fakeDevicesFlow = MutableSharedFlow<Map<String, AppleDevice>>(extraBufferCapacity = 1)
 var startScanCalled = false
 var stopScanCalled = false
+var startScanCount = 0
 
 fun resetFakeRepository() {
     startScanCalled = false
     stopScanCalled = false
+    startScanCount = 0
 }
 
 @Module
@@ -31,7 +33,7 @@ object FakeRepositoryModule {
     fun provideAppleDeviceRepository(): AppleDeviceRepository =
         object : AppleDeviceRepository {
             override fun observeDevices(): Flow<Map<String, AppleDevice>> = fakeDevicesFlow
-            override fun startScan() { startScanCalled = true }
+            override fun startScan() { startScanCalled = true; startScanCount++ }
             override fun stopScan() { stopScanCalled = true }
         }
 
