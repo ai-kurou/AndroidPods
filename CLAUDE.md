@@ -36,7 +36,8 @@ export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
 
 - **`:core:domain`** — リポジトリのインターフェースとUseCase。Android Framework非依存。
 - **`:core:data`** — リポジトリの実装とHilt DIモジュール(`DataModule`)。`@Binds`でインターフェースと実装をバインド。
-- **`:feature:*`** — 各画面のViewModel, Composable, テスト。`:core:domain`のみに依存。
+- **`:core:service`** — `DeviceScanService`（Foreground Service）でBLEスキャンとカスタム通知を管理。`:core:domain`に依存。通知はRemoteViewsで構築（Composeは使用不可）。
+- **`:feature:*`** — 各画面のViewModel, Composable, テスト。`:core:domain`(`:core:data`含む)に依存。
 - **`:app`** — `MainActivity`でNavigation Composeによるルーティング、`MainViewModel`で初回起動判定。`:core:domain`(UseCase利用)と`:core:data`(Hilt DIグラフ構築)の両方に依存。
 
 ### DI パターン
@@ -50,6 +51,7 @@ Hiltを使用。新しいRepositoryを追加する場合:
 
 - **ViewModel テスト**: MockKでUseCaseをモック、`UnconfinedTestDispatcher`で`Dispatchers.Main`を差し替え
 - **Repository テスト**: Robolectric (`@Config(sdk = [34])`) でAndroid APIをシミュレート
+- **Service テスト**: Hilt + Robolectric。`@UninstallModules(DataModule::class)`でFakeモジュールに差し替え、`Robolectric.buildService()`でServiceControllerを取得。ロジックは`internal fun`として抽出しユニットテスト可能にする
 - **Compose UIテスト**: `createComposeRule()` + Robolectricでユニットテストとして実行
 - テスト名は日本語のバッククォート記法 (`` `初期状態はnullを返す`() ``)
 
