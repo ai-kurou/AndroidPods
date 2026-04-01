@@ -269,6 +269,30 @@ class DeviceScanServiceTest {
     }
 
     @Test
+    fun `折りたたみビューが正しいレイアウトを使用する`() {
+        val devices = listOf(
+            baseDevice.copy(modelName = "Device A"),
+            baseDevice.copy(modelName = "Device B"),
+        )
+        val collapsedView = buildCollapsedRemoteViews(testPackageName, devices)
+        assertEquals(R.layout.notification_collapsed, collapsedView.layoutId)
+    }
+
+    @Test
+    fun `showChargingがtrueの場合は充電中マークが付く`() {
+        val device = baseDevice.copy(leftBattery = 5, leftCharging = true)
+        val result = formatDevicesSummary(listOf(device), showCharging = true)
+        assertTrue(result.contains("⚡"))
+    }
+
+    @Test
+    fun `showChargingがfalseの場合は充電中マークが付かない`() {
+        val device = baseDevice.copy(leftBattery = 5, leftCharging = true)
+        val result = formatDevicesSummary(listOf(device), showCharging = false)
+        assertTrue(!result.contains("⚡"))
+    }
+
+    @Test
     fun `展開ビューが全デバイス分の子ビューを含む`() {
         val devices = listOf(
             baseDevice.copy(modelName = "Device A"),
