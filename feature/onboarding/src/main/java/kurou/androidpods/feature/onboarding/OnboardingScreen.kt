@@ -33,6 +33,7 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
+import androidx.activity.compose.BackHandler
 import kotlinx.coroutines.launch
 
 private const val PAGE_COUNT = 3
@@ -64,6 +65,12 @@ fun OnboardingScreen(
 ) {
     val pagerState = rememberPagerState(pageCount = { PAGE_COUNT })
     val coroutineScope = rememberCoroutineScope()
+
+    BackHandler(enabled = pagerState.currentPage > 0) {
+        coroutineScope.launch {
+            pagerState.animateScrollToPage(pagerState.currentPage - 1)
+        }
+    }
 
     Column(
         modifier = modifier.fillMaxSize().padding(16.dp),
