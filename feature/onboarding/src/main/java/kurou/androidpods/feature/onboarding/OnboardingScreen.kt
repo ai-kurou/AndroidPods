@@ -34,12 +34,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import android.app.Activity
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import android.app.Activity
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -96,6 +98,10 @@ fun OnboardingScreen(
     val coroutineScope = rememberCoroutineScope()
     var showPermissionDeniedDialog by remember { mutableStateOf(false) }
     var showBluetoothDeniedDialog by remember { mutableStateOf(false) }
+    var showBluetoothUnavailableDialog by remember { mutableStateOf(false) }
+    val bluetoothAdapter = remember {
+        context.getSystemService<BluetoothManager>()?.adapter
+    }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions(),
@@ -116,6 +122,14 @@ fun OnboardingScreen(
         else showBluetoothDeniedDialog = true
     }
 
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.currentPage }.collect { page ->
+            if (page == BLUETOOTH_PAGE && bluetoothAdapter == null) {
+                showBluetoothUnavailableDialog = true
+            }
+        }
+    }
+
     BackHandler(enabled = pagerState.currentPage > 0) {
         coroutineScope.launch {
             pagerState.animateScrollToPage(pagerState.currentPage - 1)
@@ -132,6 +146,12 @@ fun OnboardingScreen(
                 }
                 context.startActivity(intent)
             },
+        )
+    }
+
+    if (showBluetoothUnavailableDialog) {
+        BluetoothUnavailableDialog(
+            onDismiss = { showBluetoothUnavailableDialog = false },
         )
     }
 
@@ -169,14 +189,15 @@ fun OnboardingScreen(
                         permissionLauncher.launch(requiredPermissions())
                     }
                     pagerState.currentPage == BLUETOOTH_PAGE -> {
-                        val bluetoothAdapter =
-                            context.getSystemService<BluetoothManager>()?.adapter
-                        if (bluetoothAdapter?.isEnabled == true)
-                            onComplete()
-                        else
-                            bluetoothEnableLauncher.launch(
+                        when {
+                            bluetoothAdapter == null -> {
+                                showBluetoothUnavailableDialog = true
+                            }
+                            bluetoothAdapter.isEnabled -> onComplete()
+                            else -> bluetoothEnableLauncher.launch(
                                 Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE),
                             )
+                        }
                     }
                     pagerState.currentPage < PAGE_COUNT - 1 -> {
                         coroutineScope.launch {
@@ -273,6 +294,22 @@ private fun PermissionDeniedDialog(
         dismissButton = {
             TextButton(onClick = onDismiss) {
                 Text(stringResource(R.string.onboarding_permission_dialog_dismiss))
+            }
+        },
+    )
+}
+
+@Composable
+private fun BluetoothUnavailableDialog(
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.onboarding_bluetooth_unavailable_dialog_title)) },
+        text = { Text(stringResource(R.string.onboarding_bluetooth_unavailable_dialog_message)) },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.onboarding_bluetooth_unavailable_dialog_dismiss))
             }
         },
     )
