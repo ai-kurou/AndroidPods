@@ -1,4 +1,4 @@
-package kurou.androidpods.feature.devices
+package kurou.androidpods.feature.settings
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule

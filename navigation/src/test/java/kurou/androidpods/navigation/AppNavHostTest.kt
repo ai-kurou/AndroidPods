@@ -45,7 +45,7 @@ class AppNavHostTest {
     }
 
     @Test
-    fun `オンボーディング完了でコールバックが呼ばれてdevicesに遷移する`() {
+    fun `オンボーディング完了でコールバックが呼ばれてsettingsに遷移する`() {
         var completeCalled = false
         lateinit var navController: NavHostController
 
@@ -64,6 +64,6 @@ class AppNavHostTest {
         composeTestRule.waitForIdle()
 
         assertTrue(completeCalled)
-        assertEquals(Route.DEVICES, navController.currentDestination?.route)
+        assertEquals(Route.SETTINGS, navController.currentDestination?.route)
     }
 }

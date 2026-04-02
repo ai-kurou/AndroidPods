@@ -1,4 +1,4 @@
-package kurou.androidpods.feature.devices
+package kurou.androidpods.feature.settings
 
 import android.bluetooth.BluetoothAdapter
 import io.mockk.every
@@ -21,7 +21,7 @@ import org.junit.Before
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DevicesViewModelTest {
+class SettingsViewModelTest {
 
     private val testDispatcher = UnconfinedTestDispatcher()
     private val fakeFlow = MutableSharedFlow<Int?>()
@@ -45,7 +45,7 @@ class DevicesViewModelTest {
     fun `初期状態にcurrentの値が反映される`() {
         every { useCase.current() } returns BluetoothAdapter.STATE_ON
 
-        val viewModel = DevicesViewModel(useCase, appleDevicesUseCase)
+        val viewModel = SettingsViewModel(useCase, appleDevicesUseCase)
 
         assertEquals(BluetoothAdapter.STATE_ON, viewModel.bluetoothAdapterState.value)
     }
@@ -54,7 +54,7 @@ class DevicesViewModelTest {
     fun `observeのFlowに値を流すとbluetoothAdapterStateが更新される`() = runTest {
         every { useCase.current() } returns BluetoothAdapter.STATE_OFF
 
-        val viewModel = DevicesViewModel(useCase, appleDevicesUseCase)
+        val viewModel = SettingsViewModel(useCase, appleDevicesUseCase)
 
         fakeFlow.emit(BluetoothAdapter.STATE_ON)
         assertEquals(BluetoothAdapter.STATE_ON, viewModel.bluetoothAdapterState.value)
@@ -67,7 +67,7 @@ class DevicesViewModelTest {
     fun `refreshBluetoothStateでcurrentの最新値が反映される`() {
         every { useCase.current() } returns BluetoothAdapter.STATE_OFF
 
-        val viewModel = DevicesViewModel(useCase, appleDevicesUseCase)
+        val viewModel = SettingsViewModel(useCase, appleDevicesUseCase)
         assertEquals(BluetoothAdapter.STATE_OFF, viewModel.bluetoothAdapterState.value)
 
         every { useCase.current() } returns BluetoothAdapter.STATE_ON
@@ -79,7 +79,7 @@ class DevicesViewModelTest {
     fun `アダプタ非対応時はnullが設定される`() {
         every { useCase.current() } returns null
 
-        val viewModel = DevicesViewModel(useCase, appleDevicesUseCase)
+        val viewModel = SettingsViewModel(useCase, appleDevicesUseCase)
 
         assertNull(viewModel.bluetoothAdapterState.value)
     }
@@ -88,7 +88,7 @@ class DevicesViewModelTest {
     fun `初期状態ではAppleデバイスが空`() {
         every { useCase.current() } returns BluetoothAdapter.STATE_ON
 
-        val viewModel = DevicesViewModel(useCase, appleDevicesUseCase)
+        val viewModel = SettingsViewModel(useCase, appleDevicesUseCase)
 
         assertEquals(emptyMap<String, AppleDevice>(), viewModel.appleDevices.value)
     }
@@ -97,7 +97,7 @@ class DevicesViewModelTest {
     fun `observeのFlowに値を流すとappleDevicesが更新される`() = runTest {
         every { useCase.current() } returns BluetoothAdapter.STATE_ON
 
-        val viewModel = DevicesViewModel(useCase, appleDevicesUseCase)
+        val viewModel = SettingsViewModel(useCase, appleDevicesUseCase)
 
         val device = AppleDevice("AA:BB:CC:DD:EE:FF", "AirPods Pro (2nd Gen)", 0x1420, -45, 8, 9, 7)
         val devices = mapOf(device.address to device)
@@ -109,7 +109,7 @@ class DevicesViewModelTest {
     fun `startScanでUseCaseのstartScanが呼ばれる`() {
         every { useCase.current() } returns BluetoothAdapter.STATE_ON
 
-        val viewModel = DevicesViewModel(useCase, appleDevicesUseCase)
+        val viewModel = SettingsViewModel(useCase, appleDevicesUseCase)
         viewModel.startScan()
 
         verify(exactly = 1) { appleDevicesUseCase.startScan() }
@@ -119,7 +119,7 @@ class DevicesViewModelTest {
     fun `stopScanでUseCaseのstopScanが呼ばれる`() {
         every { useCase.current() } returns BluetoothAdapter.STATE_ON
 
-        val viewModel = DevicesViewModel(useCase, appleDevicesUseCase)
+        val viewModel = SettingsViewModel(useCase, appleDevicesUseCase)
         viewModel.stopScan()
 
         verify(exactly = 1) { appleDevicesUseCase.stopScan() }

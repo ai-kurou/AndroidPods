@@ -11,7 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import kurou.androidpods.feature.devices.DevicesScreen
+import kurou.androidpods.feature.settings.SettingsScreen
 
 @Composable
 fun AppScaffold(
@@ -24,7 +24,7 @@ fun AppScaffold(
         navigationSuiteItems = {
             TopLevelDestination.entries.forEach { destination ->
                 item(
-                    selected = destination == TopLevelDestination.DEVICES,
+                    selected = destination == TopLevelDestination.SETTINGS,
                     onClick = {},
                     icon = {
                         Icon(
@@ -37,7 +37,7 @@ fun AppScaffold(
             }
         },
     ) {
-        DevicesScreen(
+        SettingsScreen(
             onStartScanService = onStartScanService,
             onStopScanService = onStopScanService,
         )
@@ -46,14 +46,14 @@ fun AppScaffold(
 
 @Composable
 private fun AppScaffoldPreviewContent(layoutType: NavigationSuiteType) {
-    // AppScaffoldにしてしまうと実際のDevicesScreenが表示されてしまう(DevicesScreenに何が表示されるかはAppScaffoldの責務ではない)
+    // AppScaffoldにしてしまうと実際のSettingsScreenが表示されてしまう(SettingsScreenに何が表示されるかはAppScaffoldの責務ではない)
     // ここではNavigationBar、NavigationRail、NavigationDrawerが表示されるだけを確認する。
     NavigationSuiteScaffold(
         layoutType = layoutType,
         navigationSuiteItems = {
             TopLevelDestination.entries.forEach { destination ->
                 item(
-                    selected = destination == TopLevelDestination.DEVICES,
+                    selected = destination == TopLevelDestination.SETTINGS,
                     onClick = {},
                     icon = {
                         Icon(

@@ -1,4 +1,4 @@
-package kurou.androidpods.feature.devices
+package kurou.androidpods.feature.settings
 
 import android.bluetooth.BluetoothAdapter
 import androidx.compose.foundation.layout.Column
@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import kurou.androidpods.core.domain.AppleDevice
 
 @Composable
-internal fun DevicesContent(
+internal fun SettingsContent(
     permissionStates: Map<String, Boolean>,
     bluetoothAdapterState: Int?,
     appleDevices: List<AppleDevice>,
@@ -70,8 +70,8 @@ private fun batteryText(level: Int?, charging: Boolean = false): String {
 
 @Preview(showBackground = true, name = "API 31+ (Android 12+)")
 @Composable
-private fun DevicesContentPreviewApi31() {
-    DevicesContent(
+private fun SettingsContentPreviewApi31() {
+    SettingsContent(
         permissionStates = mapOf(
             android.Manifest.permission.BLUETOOTH_CONNECT to true,
             android.Manifest.permission.BLUETOOTH_SCAN to true,
@@ -111,8 +111,8 @@ private fun DevicesContentPreviewApi31() {
 
 @Preview(showBackground = true, name = "API 30以下")
 @Composable
-private fun DevicesContentPreviewApi30() {
-    DevicesContent(
+private fun SettingsContentPreviewApi30() {
+    SettingsContent(
         permissionStates = mapOf(
             android.Manifest.permission.ACCESS_FINE_LOCATION to false,
         ),

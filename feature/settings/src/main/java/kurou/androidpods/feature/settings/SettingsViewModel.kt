@@ -1,4 +1,4 @@
-package kurou.androidpods.feature.devices
+package kurou.androidpods.feature.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class DevicesViewModel @Inject constructor(
+class SettingsViewModel @Inject constructor(
     private val getBluetoothAdapterStateUseCase: GetBluetoothAdapterStateUseCase,
     private val getAppleDevicesUseCase: GetAppleDevicesUseCase,
 ) : ViewModel() {

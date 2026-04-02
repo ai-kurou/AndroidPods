@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "kurou.androidpods.feature.devices"
+    namespace = "kurou.androidpods.feature.settings"
     compileSdk = 36
 
     defaultConfig {

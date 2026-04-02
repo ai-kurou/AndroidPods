@@ -1,4 +1,4 @@
-package kurou.androidpods.feature.devices
+package kurou.androidpods.feature.settings
 
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -22,11 +22,11 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
-fun DevicesScreen(
+fun SettingsScreen(
     onStartScanService: () -> Unit,
     onStopScanService: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: DevicesViewModel = hiltViewModel(),
+    viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
     val permissions = requiredPermissions()
@@ -92,7 +92,7 @@ fun DevicesScreen(
         )
     }
 
-    DevicesContent(
+    SettingsContent(
         permissionStates = permissionStates,
         bluetoothAdapterState = bluetoothAdapterState,
         appleDevices = appleDevices.values.sortedByDescending { it.rssi },
