@@ -29,23 +29,7 @@ class AppNavHostTest {
     val composeTestRule = createAndroidComposeRule<HiltTestActivity>()
 
     @Test
-    fun `startDestinationがonboardingのときオンボーディング画面が表示される`() {
-        composeTestRule.setContent {
-            AppNavHost(
-                navController = rememberNavController(),
-                startDestination = Route.ONBOARDING,
-                onOnboardingComplete = {},
-                onStartScanService = {},
-                onStopScanService = {},
-            )
-        }
-
-        composeTestRule.onNodeWithText("Welcome to AndroidPods").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Get Started").assertIsDisplayed()
-    }
-
-    @Test
-    fun `オンボーディング完了でコールバックが呼ばれてsettingsに遷移する`() {
+    fun `オンボーディングを進めて完了するとコールバックが呼ばれてsettingsに遷移する`() {
         var completeCalled = false
         lateinit var navController: NavHostController
 
@@ -60,6 +44,16 @@ class AppNavHostTest {
             )
         }
 
+        // ページ1 → ページ2
+        composeTestRule.onNodeWithText("Page 1").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Next").performClick()
+        composeTestRule.waitForIdle()
+        // ページ2 → ページ3
+        composeTestRule.onNodeWithText("Page 2").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Next").performClick()
+        composeTestRule.waitForIdle()
+        // ページ3で完了
+        composeTestRule.onNodeWithText("Page 3").assertIsDisplayed()
         composeTestRule.onNodeWithText("Get Started").performClick()
         composeTestRule.waitForIdle()
 
