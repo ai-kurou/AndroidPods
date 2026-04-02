@@ -26,13 +26,13 @@ fun AppNavHost(
             OnboardingScreen(
                 onComplete = {
                     onOnboardingComplete()
-                    navController.navigate(Route.DEVICES) {
+                    navController.navigate(Route.SETTINGS) {
                         popUpTo(Route.ONBOARDING) { inclusive = true }
                     }
                 },
             )
         }
-        composable(Route.DEVICES) {
+        composable(Route.SETTINGS) {
             DevicesScreen(
                 onStartScanService = onStartScanService,
                 onStopScanService = onStopScanService,

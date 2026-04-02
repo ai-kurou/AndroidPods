@@ -24,7 +24,7 @@ fun AppScaffold(
         navigationSuiteItems = {
             TopLevelDestination.entries.forEach { destination ->
                 item(
-                    selected = destination == TopLevelDestination.DEVICES,
+                    selected = destination == TopLevelDestination.SETTINGS,
                     onClick = {},
                     icon = {
                         Icon(
@@ -53,7 +53,7 @@ private fun AppScaffoldPreviewContent(layoutType: NavigationSuiteType) {
         navigationSuiteItems = {
             TopLevelDestination.entries.forEach { destination ->
                 item(
-                    selected = destination == TopLevelDestination.DEVICES,
+                    selected = destination == TopLevelDestination.SETTINGS,
                     onClick = {},
                     icon = {
                         Icon(

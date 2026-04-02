@@ -2,7 +2,7 @@ package kurou.androidpods.navigation
 
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 
 enum class TopLevelDestination(
@@ -10,9 +10,9 @@ enum class TopLevelDestination(
     val icon: ImageVector,
     @StringRes val labelResId: Int,
 ) {
-    DEVICES(
-        route = Route.DEVICES,
-        icon = Icons.Default.Search,
-        labelResId = R.string.nav_label_devices,
+    SETTINGS(
+        route = Route.SETTINGS,
+        icon = Icons.Default.Settings,
+        labelResId = R.string.nav_label_settings,
     ),
 }
