@@ -1,5 +1,13 @@
 package kurou.androidpods.feature.onboarding
 
+import android.Manifest
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RawRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
@@ -17,28 +25,41 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
-import androidx.activity.compose.BackHandler
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import kotlinx.coroutines.launch
 
 private const val PAGE_COUNT = 3
+private const val PERMISSION_PAGE = 1
+
+private fun requiredPermissions(): Array<String> =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        arrayOf(Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN)
+    } else {
+        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+    }
 
 private data class OnboardingPageData(
     @RawRes val lottieResId: Int,
@@ -65,13 +86,40 @@ fun OnboardingScreen(
     onComplete: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     val pagerState = rememberPagerState(pageCount = { PAGE_COUNT })
     val coroutineScope = rememberCoroutineScope()
+    var showPermissionDeniedDialog by remember { mutableStateOf(false) }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions(),
+    ) { results ->
+        if (results.values.all { it }) {
+            coroutineScope.launch {
+                pagerState.animateScrollToPage(pagerState.currentPage + 1)
+            }
+        } else {
+            showPermissionDeniedDialog = true
+        }
+    }
 
     BackHandler(enabled = pagerState.currentPage > 0) {
         coroutineScope.launch {
             pagerState.animateScrollToPage(pagerState.currentPage - 1)
         }
+    }
+
+    if (showPermissionDeniedDialog) {
+        PermissionDeniedDialog(
+            onDismiss = { showPermissionDeniedDialog = false },
+            onConfirm = {
+                showPermissionDeniedDialog = false
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.fromParts("package", context.packageName, null)
+                }
+                context.startActivity(intent)
+            },
+        )
     }
 
     Column(
@@ -93,12 +141,16 @@ fun OnboardingScreen(
 
         Button(
             onClick = {
-                if (pagerState.currentPage < PAGE_COUNT - 1) {
-                    coroutineScope.launch {
-                        pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                when {
+                    pagerState.currentPage == PERMISSION_PAGE -> {
+                        permissionLauncher.launch(requiredPermissions())
                     }
-                } else {
-                    onComplete()
+                    pagerState.currentPage < PAGE_COUNT - 1 -> {
+                        coroutineScope.launch {
+                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                        }
+                    }
+                    else -> onComplete()
                 }
             },
             modifier = Modifier
@@ -107,8 +159,11 @@ fun OnboardingScreen(
         ) {
             Text(
                 text = stringResource(
-                    if (pagerState.currentPage < PAGE_COUNT - 1) R.string.onboarding_button_next
-                    else R.string.onboarding_button_get_started,
+                    when {
+                        pagerState.currentPage == PERMISSION_PAGE -> R.string.onboarding_button_grant_permission
+                        pagerState.currentPage < PAGE_COUNT - 1 -> R.string.onboarding_button_next
+                        else -> R.string.onboarding_button_get_started
+                    },
                 ),
             )
         }
@@ -164,6 +219,28 @@ private fun LottieContent(@RawRes lottieResId: Int, modifier: Modifier = Modifie
         composition = composition,
         iterations = LottieConstants.IterateForever,
         modifier = modifier,
+    )
+}
+
+@Composable
+private fun PermissionDeniedDialog(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.onboarding_permission_dialog_title)) },
+        text = { Text(stringResource(R.string.onboarding_permission_dialog_message)) },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text(stringResource(R.string.onboarding_permission_dialog_confirm))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.onboarding_permission_dialog_dismiss))
+            }
+        },
     )
 }
 
