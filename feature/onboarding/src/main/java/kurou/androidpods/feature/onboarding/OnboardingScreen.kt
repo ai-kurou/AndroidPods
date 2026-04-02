@@ -309,7 +309,7 @@ private fun BluetoothUnavailableDialog(
         text = { Text(stringResource(R.string.onboarding_bluetooth_unavailable_dialog_message)) },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.onboarding_bluetooth_unavailable_dialog_dismiss))
+                Text(stringResource(android.R.string.ok))
             }
         },
     )

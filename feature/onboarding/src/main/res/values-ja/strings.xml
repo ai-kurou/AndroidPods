@@ -12,8 +12,7 @@
     <string name="onboarding_permission_dialog_dismiss">キャンセル</string>
     <string name="onboarding_bluetooth_unavailable_dialog_title">Bluetoothが利用できません</string>
     <string name="onboarding_bluetooth_unavailable_dialog_message">端末にBluetoothが搭載されていないため、このアプリは利用できません。</string>
-    <string name="onboarding_bluetooth_unavailable_dialog_dismiss">OK</string>
-    <string name="onboarding_bluetooth_dialog_title">BluetoothがOFFです</string>
+<string name="onboarding_bluetooth_dialog_title">BluetoothがOFFです</string>
     <string name="onboarding_bluetooth_dialog_message">Bluetoothが有効になりませんでした。設定から有効にしてください。</string>
     <string name="onboarding_bluetooth_dialog_confirm">設定を開く</string>
     <string name="onboarding_bluetooth_dialog_dismiss">キャンセル</string>
