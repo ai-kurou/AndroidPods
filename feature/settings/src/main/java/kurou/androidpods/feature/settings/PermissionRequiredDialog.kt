@@ -1,4 +1,4 @@
-package kurou.androidpods.feature.devices
+package kurou.androidpods.feature.settings
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text

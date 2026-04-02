@@ -13,7 +13,7 @@ dependencies {
     kover(project(":core:domain"))
     kover(project(":core:data"))
     kover(project(":core:service"))
-    kover(project(":feature:devices"))
+    kover(project(":feature:settings"))
     kover(project(":feature:onboarding"))
     kover(project(":navigation"))
 }

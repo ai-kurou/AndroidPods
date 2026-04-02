@@ -1,4 +1,4 @@
-package kurou.androidpods.feature.devices
+package kurou.androidpods.feature.settings
 
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
@@ -14,7 +14,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
-class DevicesContentTest {
+class SettingsContentTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -22,7 +22,7 @@ class DevicesContentTest {
     @Test
     fun `BluetoothがONのとき「On」が表示される`() {
         composeTestRule.setContent {
-            DevicesContent(
+            SettingsContent(
                 permissionStates = emptyMap(),
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 appleDevices = emptyList(),
@@ -35,7 +35,7 @@ class DevicesContentTest {
     @Test
     fun `BluetoothがOFFのとき「Off」が表示される`() {
         composeTestRule.setContent {
-            DevicesContent(
+            SettingsContent(
                 permissionStates = emptyMap(),
                 bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
                 appleDevices = emptyList(),
@@ -48,7 +48,7 @@ class DevicesContentTest {
     @Test
     fun `Bluetoothがnullのとき「Not Available」が表示される`() {
         composeTestRule.setContent {
-            DevicesContent(
+            SettingsContent(
                 permissionStates = emptyMap(),
                 bluetoothAdapterState = null,
                 appleDevices = emptyList(),
@@ -61,7 +61,7 @@ class DevicesContentTest {
     @Test
     fun `パーミッションの許可状態が表示される`() {
         composeTestRule.setContent {
-            DevicesContent(
+            SettingsContent(
                 permissionStates = mapOf(
                     Manifest.permission.BLUETOOTH_CONNECT to true,
                     Manifest.permission.BLUETOOTH_SCAN to false,
@@ -78,7 +78,7 @@ class DevicesContentTest {
     @Test
     fun `Appleデバイスが表示される`() {
         composeTestRule.setContent {
-            DevicesContent(
+            SettingsContent(
                 permissionStates = emptyMap(),
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 appleDevices = listOf(
@@ -95,7 +95,7 @@ class DevicesContentTest {
     @Test
     fun `充電中のデバイスにはアイコンが表示される`() {
         composeTestRule.setContent {
-            DevicesContent(
+            SettingsContent(
                 permissionStates = emptyMap(),
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 appleDevices = listOf(
@@ -113,7 +113,7 @@ class DevicesContentTest {
     @Test
     fun `シングルデバイスはBattery表示になる`() {
         composeTestRule.setContent {
-            DevicesContent(
+            SettingsContent(
                 permissionStates = emptyMap(),
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 appleDevices = listOf(
@@ -129,7 +129,7 @@ class DevicesContentTest {
     @Test
     fun `デバイスカラーとLid状態が表示される`() {
         composeTestRule.setContent {
-            DevicesContent(
+            SettingsContent(
                 permissionStates = emptyMap(),
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 appleDevices = listOf(
@@ -147,7 +147,7 @@ class DevicesContentTest {
     @Test
     fun `シングルデバイスはLid状態が表示されない`() {
         composeTestRule.setContent {
-            DevicesContent(
+            SettingsContent(
                 permissionStates = emptyMap(),
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 appleDevices = listOf(
@@ -162,7 +162,7 @@ class DevicesContentTest {
     @Test
     fun `Appleデバイスが空のとき案内メッセージが表示される`() {
         composeTestRule.setContent {
-            DevicesContent(
+            SettingsContent(
                 permissionStates = emptyMap(),
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 appleDevices = emptyList(),

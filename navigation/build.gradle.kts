@@ -32,7 +32,7 @@ android {
 
 dependencies {
     // プロジェクトモジュール
-    implementation(project(":feature:devices"))
+    implementation(project(":feature:settings"))
     implementation(project(":feature:onboarding"))
 
     // Hilt (DI)

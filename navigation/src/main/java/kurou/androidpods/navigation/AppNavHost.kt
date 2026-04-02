@@ -5,7 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import kurou.androidpods.feature.devices.DevicesScreen
+import kurou.androidpods.feature.settings.SettingsScreen
 import kurou.androidpods.feature.onboarding.OnboardingScreen
 
 @Composable
@@ -33,7 +33,7 @@ fun AppNavHost(
             )
         }
         composable(Route.SETTINGS) {
-            DevicesScreen(
+            SettingsScreen(
                 onStartScanService = onStartScanService,
                 onStopScanService = onStopScanService,
             )

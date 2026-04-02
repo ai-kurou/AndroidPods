@@ -28,6 +28,6 @@ include(":navigation")
 include(":core:domain")
 include(":core:data")
 include(":core:service")
-include(":feature:devices")
+include(":feature:settings")
 include(":feature:onboarding")
  
