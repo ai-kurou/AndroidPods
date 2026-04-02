@@ -1,13 +1,13 @@
 package kurou.androidpods.feature.onboarding
 
 import androidx.annotation.RawRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -34,27 +34,29 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import androidx.activity.compose.BackHandler
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import kotlinx.coroutines.launch
 
 private const val PAGE_COUNT = 3
 
 private data class OnboardingPageData(
     @RawRes val lottieResId: Int,
-    val text: String,
+    @StringRes val textResId: Int,
 )
 
 private val pages = listOf(
     OnboardingPageData(
-        lottieResId = R.raw.onboarding_page1,
-        text = "Page 1",
+        lottieResId = R.raw.charging,
+        textResId = R.string.onboarding_page1_text,
     ),
     OnboardingPageData(
         lottieResId = R.raw.onboarding_page2,
-        text = "Page 2",
+        textResId = R.string.onboarding_page2_text,
     ),
     OnboardingPageData(
         lottieResId = R.raw.onboarding_page3,
-        text = "Page 3",
+        textResId = R.string.onboarding_page3_text,
     ),
 )
 
@@ -103,7 +105,12 @@ fun OnboardingScreen(
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
         ) {
-            Text(text = if (pagerState.currentPage < PAGE_COUNT - 1) "Next" else "Get Started")
+            Text(
+                text = stringResource(
+                    if (pagerState.currentPage < PAGE_COUNT - 1) R.string.onboarding_button_next
+                    else R.string.onboarding_button_get_started,
+                ),
+            )
         }
     }
 }
@@ -115,7 +122,7 @@ private fun OnboardingPage(pageData: OnboardingPageData, modifier: Modifier = Mo
 
     if (isPortrait) {
         Column(
-            modifier = modifier.fillMaxSize(),
+            modifier = modifier.fillMaxSize().padding(36.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -123,21 +130,29 @@ private fun OnboardingPage(pageData: OnboardingPageData, modifier: Modifier = Mo
                 lottieResId = pageData.lottieResId,
                 modifier = Modifier.size(200.dp),
             )
-            Spacer(modifier = Modifier.height(24.dp))
-            Text(text = pageData.text, style = MaterialTheme.typography.titleLarge)
+            Spacer(modifier = Modifier.height(64.dp))
+            Text(
+                text = stringResource(pageData.textResId),
+                style = MaterialTheme.typography.titleLarge,
+                textAlign = TextAlign.Center
+            )
         }
     } else {
         Row(
-            modifier = modifier.fillMaxSize(),
+            modifier = modifier.fillMaxSize().padding(36.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             LottieContent(
                 lottieResId = pageData.lottieResId,
-                modifier = Modifier.fillMaxHeight(0.6f),
+                modifier = Modifier.size(200.dp),
             )
-            Spacer(modifier = Modifier.width(32.dp))
-            Text(text = pageData.text, style = MaterialTheme.typography.titleLarge)
+            Spacer(modifier = Modifier.width(64.dp))
+            Text(
+                text = stringResource(pageData.textResId),
+                style = MaterialTheme.typography.titleLarge,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }

@@ -1,0 +1,7 @@
+<resources>
+    <string name="onboarding_page1_text">Check the remaining battery level of your AirPods.</string>
+    <string name="onboarding_page2_text">Page 2</string>
+    <string name="onboarding_page3_text">Page 3</string>
+    <string name="onboarding_button_next">Next</string>
+    <string name="onboarding_button_get_started">Get Started</string>
+</resources>

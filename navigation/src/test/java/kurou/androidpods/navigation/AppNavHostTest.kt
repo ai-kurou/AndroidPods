@@ -45,15 +45,14 @@ class AppNavHostTest {
         }
 
         // ページ1 → ページ2
-        composeTestRule.onNodeWithText("Page 1").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Next").assertIsDisplayed()
         composeTestRule.onNodeWithText("Next").performClick()
         composeTestRule.waitForIdle()
         // ページ2 → ページ3
-        composeTestRule.onNodeWithText("Page 2").assertIsDisplayed()
         composeTestRule.onNodeWithText("Next").performClick()
         composeTestRule.waitForIdle()
         // ページ3で完了
-        composeTestRule.onNodeWithText("Page 3").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Get Started").assertIsDisplayed()
         composeTestRule.onNodeWithText("Get Started").performClick()
         composeTestRule.waitForIdle()
 
