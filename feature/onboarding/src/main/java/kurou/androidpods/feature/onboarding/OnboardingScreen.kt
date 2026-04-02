@@ -51,7 +51,7 @@ private val pages = listOf(
         textResId = R.string.onboarding_page1_text,
     ),
     OnboardingPageData(
-        lottieResId = R.raw.onboarding_page2,
+        lottieResId = R.raw.location,
         textResId = R.string.onboarding_page2_text,
     ),
     OnboardingPageData(

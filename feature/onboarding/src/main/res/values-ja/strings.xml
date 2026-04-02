@@ -1,6 +1,6 @@
 <resources>
     <string name="onboarding_page1_text">AirPodsのバッテリー残量を確認できます。</string>
-    <string name="onboarding_page2_text">ページ2</string>
+    <string name="onboarding_page2_text">Bluetoothを使うには位置情報権限が必要です。</string>
     <string name="onboarding_page3_text">ページ3</string>
     <string name="onboarding_button_next">次へ</string>
     <string name="onboarding_button_get_started">はじめる</string>
