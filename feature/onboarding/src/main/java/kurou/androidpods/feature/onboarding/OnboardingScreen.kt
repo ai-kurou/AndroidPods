@@ -1,6 +1,8 @@
 package kurou.androidpods.feature.onboarding
 
 import android.Manifest
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothManager
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -8,6 +10,7 @@ import android.provider.Settings
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.getSystemService
 import androidx.annotation.RawRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
@@ -36,6 +39,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import android.app.Activity
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,6 +57,7 @@ import kotlinx.coroutines.launch
 
 private const val PAGE_COUNT = 3
 private const val PERMISSION_PAGE = 1
+private const val BLUETOOTH_PAGE = 2
 
 private fun requiredPermissions(): Array<String> =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -76,7 +81,7 @@ private val pages = listOf(
         textResId = R.string.onboarding_page2_text,
     ),
     OnboardingPageData(
-        lottieResId = R.raw.onboarding_page3,
+        lottieResId = R.raw.bluetooth,
         textResId = R.string.onboarding_page3_text,
     ),
 )
@@ -90,6 +95,7 @@ fun OnboardingScreen(
     val pagerState = rememberPagerState(pageCount = { PAGE_COUNT })
     val coroutineScope = rememberCoroutineScope()
     var showPermissionDeniedDialog by remember { mutableStateOf(false) }
+    var showBluetoothDeniedDialog by remember { mutableStateOf(false) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions(),
@@ -101,6 +107,13 @@ fun OnboardingScreen(
         } else {
             showPermissionDeniedDialog = true
         }
+    }
+
+    val bluetoothEnableLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) onComplete()
+        else showBluetoothDeniedDialog = true
     }
 
     BackHandler(enabled = pagerState.currentPage > 0) {
@@ -118,6 +131,16 @@ fun OnboardingScreen(
                     data = Uri.fromParts("package", context.packageName, null)
                 }
                 context.startActivity(intent)
+            },
+        )
+    }
+
+    if (showBluetoothDeniedDialog) {
+        BluetoothDeniedDialog(
+            onDismiss = { showBluetoothDeniedDialog = false },
+            onConfirm = {
+                showBluetoothDeniedDialog = false
+                context.startActivity(Intent(Settings.ACTION_BLUETOOTH_SETTINGS))
             },
         )
     }
@@ -145,6 +168,16 @@ fun OnboardingScreen(
                     pagerState.currentPage == PERMISSION_PAGE -> {
                         permissionLauncher.launch(requiredPermissions())
                     }
+                    pagerState.currentPage == BLUETOOTH_PAGE -> {
+                        val bluetoothAdapter =
+                            context.getSystemService<BluetoothManager>()?.adapter
+                        if (bluetoothAdapter?.isEnabled == true)
+                            onComplete()
+                        else
+                            bluetoothEnableLauncher.launch(
+                                Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE),
+                            )
+                    }
                     pagerState.currentPage < PAGE_COUNT - 1 -> {
                         coroutineScope.launch {
                             pagerState.animateScrollToPage(pagerState.currentPage + 1)
@@ -161,6 +194,7 @@ fun OnboardingScreen(
                 text = stringResource(
                     when {
                         pagerState.currentPage == PERMISSION_PAGE -> R.string.onboarding_button_grant_permission
+                        pagerState.currentPage == BLUETOOTH_PAGE -> R.string.onboarding_button_enable_bluetooth
                         pagerState.currentPage < PAGE_COUNT - 1 -> R.string.onboarding_button_next
                         else -> R.string.onboarding_button_get_started
                     },
@@ -239,6 +273,28 @@ private fun PermissionDeniedDialog(
         dismissButton = {
             TextButton(onClick = onDismiss) {
                 Text(stringResource(R.string.onboarding_permission_dialog_dismiss))
+            }
+        },
+    )
+}
+
+@Composable
+private fun BluetoothDeniedDialog(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.onboarding_bluetooth_dialog_title)) },
+        text = { Text(stringResource(R.string.onboarding_bluetooth_dialog_message)) },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text(stringResource(R.string.onboarding_bluetooth_dialog_confirm))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.onboarding_bluetooth_dialog_dismiss))
             }
         },
     )

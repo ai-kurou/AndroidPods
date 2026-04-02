@@ -1,6 +1,7 @@
 package kurou.androidpods.navigation
 
 import android.Manifest
+import android.bluetooth.BluetoothAdapter
 import android.os.Build
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -34,15 +35,16 @@ class AppNavHostTest {
     val composeTestRule = createAndroidComposeRule<HiltTestActivity>()
 
     @Before
-    fun grantPermissions() {
+    fun setUp() {
         val app = ApplicationProvider.getApplicationContext<android.app.Application>()
         val shadowApp = Shadows.shadowOf(app)
-        val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
             listOf(Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN)
-        } else {
+        else
             listOf(Manifest.permission.ACCESS_FINE_LOCATION)
-        }
         permissions.forEach { shadowApp.grantPermissions(it) }
+
+        Shadows.shadowOf(BluetoothAdapter.getDefaultAdapter()).setEnabled(true)
     }
 
     @Test
@@ -69,9 +71,9 @@ class AppNavHostTest {
         composeTestRule.onNodeWithText("Grant Permission").assertIsDisplayed()
         composeTestRule.onNodeWithText("Grant Permission").performClick()
         composeTestRule.waitForIdle()
-        // ページ3で完了
-        composeTestRule.onNodeWithText("Get Started").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Get Started").performClick()
+        // ページ3: Bluetooth ONボタンを押す（テスト環境ではBluetoothが有効のため直接完了する）
+        composeTestRule.onNodeWithText("Enable Bluetooth").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Enable Bluetooth").performClick()
         composeTestRule.waitForIdle()
 
         assertTrue(completeCalled)
