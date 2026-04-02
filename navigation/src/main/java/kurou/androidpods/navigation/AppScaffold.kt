@@ -46,8 +46,8 @@ fun AppScaffold(
 
 @Composable
 private fun AppScaffoldPreviewContent(layoutType: NavigationSuiteType) {
-    // AppScaffoldにしてしまうと実際のDevicesScreenが表示されてしまうのと
-    // ここではNavigationBar、NavigationRail、NavigationDrawerが表示されるだけを確認したい。
+    // AppScaffoldにしてしまうと実際のDevicesScreenが表示されてしまう(DevicesScreenに何が表示されるかはAppScaffoldの責務ではない)
+    // ここではNavigationBar、NavigationRail、NavigationDrawerが表示されるだけを確認する。
     NavigationSuiteScaffold(
         layoutType = layoutType,
         navigationSuiteItems = {
