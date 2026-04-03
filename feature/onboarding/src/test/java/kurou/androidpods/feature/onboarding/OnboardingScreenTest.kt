@@ -1,0 +1,74 @@
+package kurou.androidpods.feature.onboarding
+
+import android.Manifest
+import android.app.Application
+import android.bluetooth.BluetoothManager
+import android.content.Context
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeLeft
+import androidx.test.core.app.ApplicationProvider
+import org.junit.Assert.assertTrue
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.Shadows.shadowOf
+import org.robolectric.annotation.Config
+
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [34])
+class OnboardingScreenTest {
+
+    @get:Rule
+    val composeTestRule = createComposeRule()
+
+    private fun btAdapter(context: Context) =
+        context.getSystemService(BluetoothManager::class.java).adapter
+
+    @Test
+    fun `ボタンを押してページ1からページ3へ遷移してonCompleteが呼ばれる`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        shadowOf(btAdapter(context)).setEnabled(true)
+        shadowOf(context as Application).grantPermissions(
+            Manifest.permission.BLUETOOTH_CONNECT,
+            Manifest.permission.BLUETOOTH_SCAN,
+        )
+
+        var completed = false
+        composeTestRule.setContent {
+            OnboardingScreen(onComplete = { completed = true })
+        }
+
+        composeTestRule.onNodeWithText("Next").performClick()           // page 0 → 1
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Grant Permission").performClick() // page 1 → 2
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Enable Bluetooth").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Enable Bluetooth").performClick() // onComplete
+        assertTrue(completed)
+    }
+
+    @Test
+    fun `スワイプしてページ1からページ3へ遷移してボタンを押すとonCompleteが呼ばれる`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        shadowOf(btAdapter(context)).setEnabled(true)
+
+        var completed = false
+        composeTestRule.setContent {
+            OnboardingScreen(onComplete = { completed = true })
+        }
+
+        composeTestRule.onRoot().performTouchInput { swipeLeft() }    // page 0 → 1
+        composeTestRule.waitForIdle()
+        composeTestRule.onRoot().performTouchInput { swipeLeft() }    // page 1 → 2
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Enable Bluetooth").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Enable Bluetooth").performClick() // onComplete
+        assertTrue(completed)
+    }
+}
