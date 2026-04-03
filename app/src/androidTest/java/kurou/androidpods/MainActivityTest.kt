@@ -13,7 +13,6 @@ import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kurou.androidpods.feature.onboarding.R as OnboardingR
 import kurou.androidpods.feature.settings.R as SettingsR
-import org.junit.Assume
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -44,6 +43,7 @@ class MainActivityTest {
     @Test
     fun `MainActivityが起動してボタンを3回押してDevicesScreenが表示される`() {
         val activity = composeTestRule.activity
+        val bluetoothAdapter = activity.getSystemService(BluetoothManager::class.java)?.adapter
         val nextText = activity.getString(OnboardingR.string.onboarding_button_next)
         val grantPermissionText = activity.getString(OnboardingR.string.onboarding_button_grant_permission)
         val enableBluetoothText = activity.getString(OnboardingR.string.onboarding_button_enable_bluetooth)
@@ -60,12 +60,21 @@ class MainActivityTest {
         }
         composeTestRule.onNodeWithText(grantPermissionText).performClick()
 
-        // Page 2: 「BluetoothをONにする」ボタンを押してオンボーディング完了
-        composeTestRule.waitUntil(timeoutMillis = 5_000) {
-            composeTestRule.onAllNodesWithText(enableBluetoothText)
-                .fetchSemanticsNodes().isNotEmpty()
+        if (bluetoothAdapter == null) {
+            // Bluetoothアダプタなし（エミュレータ等）: ダイアログが表示されるのでOKを押してオンボーディング完了
+            val okText = activity.getString(android.R.string.ok)
+            composeTestRule.waitUntil(timeoutMillis = 5_000) {
+                composeTestRule.onAllNodesWithText(okText).fetchSemanticsNodes().isNotEmpty()
+            }
+            composeTestRule.onNodeWithText(okText).performClick()
+        } else {
+            // Page 2: 「BluetoothをONにする」ボタンを押してオンボーディング完了
+            composeTestRule.waitUntil(timeoutMillis = 5_000) {
+                composeTestRule.onAllNodesWithText(enableBluetoothText)
+                    .fetchSemanticsNodes().isNotEmpty()
+            }
+            composeTestRule.onNodeWithText(enableBluetoothText).performClick()
         }
-        composeTestRule.onNodeWithText(enableBluetoothText).performClick()
 
         // DevicesScreen（SettingsScreen）が表示されることを確認
         composeTestRule.waitUntil(timeoutMillis = 10_000) {
