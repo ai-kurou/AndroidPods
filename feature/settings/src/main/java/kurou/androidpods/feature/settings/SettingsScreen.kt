@@ -33,7 +33,6 @@ fun SettingsScreen(
 
     val permissionStates = remember { mutableStateMapOf<String, Boolean>() }
     val bluetoothAdapterState by viewModel.bluetoothAdapterState.collectAsStateWithLifecycle()
-    val appleDevices by viewModel.appleDevices.collectAsStateWithLifecycle()
     var showSettingsDialog by remember { mutableStateOf(false) }
     var initialRequestDone by remember { mutableStateOf(false) }
 
@@ -95,7 +94,6 @@ fun SettingsScreen(
     SettingsContent(
         permissionStates = permissionStates,
         bluetoothAdapterState = bluetoothAdapterState,
-        appleDevices = appleDevices.values.sortedByDescending { it.rssi },
         modifier = modifier,
     )
 }
