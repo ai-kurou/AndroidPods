@@ -6,6 +6,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -77,29 +78,12 @@ class SettingsContentTest {
     }
 
     @Test
-    fun `未許可の権限があるとき警告が表示される`() {
-        composeTestRule.setContent {
-            SettingsContent(
-                permissionStates = mapOf(
-                    Manifest.permission.BLUETOOTH_CONNECT to true,
-                    Manifest.permission.BLUETOOTH_SCAN to false,
-                ),
-                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
-                onPermissionWarningClick = {},
-            )
-        }
-
-        composeTestRule.onNodeWithText(
-            "Some required permissions are not granted. Please grant all permissions."
-        ).assertIsDisplayed()
-    }
-
-    @Test
-    fun `警告をタップするとコールバックが呼ばれる`() {
+    fun `未許可の権限があるとき警告が表示され、タップするとコールバックが呼ばれる`() {
         var clicked = false
         composeTestRule.setContent {
             SettingsContent(
                 permissionStates = mapOf(
+                    Manifest.permission.BLUETOOTH_CONNECT to true,
                     Manifest.permission.BLUETOOTH_SCAN to false,
                 ),
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
@@ -111,6 +95,6 @@ class SettingsContentTest {
             "Some required permissions are not granted. Please grant all permissions."
         ).performClick()
 
-        assert(clicked)
+        assertTrue(clicked)
     }
 }
