@@ -181,6 +181,7 @@ fun OnboardingScreen(
     ) {
         HorizontalPager(
             state = pagerState,
+            userScrollEnabled = false,
             modifier = Modifier.weight(1f).fillMaxWidth(),
         ) { page ->
             OnboardingPage(pageData = pages[page])

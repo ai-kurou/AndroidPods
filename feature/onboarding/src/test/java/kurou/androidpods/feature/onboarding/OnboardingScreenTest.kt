@@ -60,21 +60,14 @@ class OnboardingScreenTest {
     }
 
     @Test
-    fun `スワイプしてページ1からページ3へ遷移してボタンを押すとonCompleteが呼ばれる`() {
-        val context = ApplicationProvider.getApplicationContext<Context>()
-        shadowOf(btAdapter(context)).setEnabled(true)
-
-        var completed = false
+    fun `スワイプしてもページが遷移しない`() {
         composeTestRule.setContent {
-            OnboardingScreen(onComplete = { completed = true })
+            OnboardingScreen(onComplete = {})
         }
 
-        composeTestRule.onRoot().performTouchInput { swipeLeft() }    // page 0 → 1
+        composeTestRule.onRoot().performTouchInput { swipeLeft() }
         composeTestRule.waitForIdle()
-        composeTestRule.onRoot().performTouchInput { swipeLeft() }    // page 1 → 2
-        composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithText("Enable Bluetooth").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Enable Bluetooth").performClick() // onComplete
-        assertTrue(completed)
+
+        composeTestRule.onNodeWithText("Next").assertIsDisplayed()
     }
 }
