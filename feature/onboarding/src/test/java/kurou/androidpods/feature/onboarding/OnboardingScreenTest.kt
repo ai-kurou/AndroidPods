@@ -41,6 +41,7 @@ class OnboardingScreenTest {
     }
 
     @Test
+    @Config(qualifiers = "port")
     fun `縦向きでボタンを押してページ1からページ3へ遷移してonCompleteが呼ばれる`() {
         assertNavigationAndComplete()
     }
@@ -52,6 +53,7 @@ class OnboardingScreenTest {
     }
 
     @Test
+    @Config(qualifiers = "port")
     fun `縦向きでスワイプしてもページが遷移しない`() {
         assertSwipeDoesNotNavigate()
     }
