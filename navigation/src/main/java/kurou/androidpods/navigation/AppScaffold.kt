@@ -47,7 +47,6 @@ fun AppScaffold(
 @Composable
 private fun AppScaffoldPreviewContent(layoutType: NavigationSuiteType) {
     // AppScaffoldにしてしまうと実際のSettingsScreenが表示されてしまう(SettingsScreenに何が表示されるかはAppScaffoldの責務ではない)
-    // ここではNavigationBar、NavigationRail、NavigationDrawerが表示されるだけを確認する。
     NavigationSuiteScaffold(
         layoutType = layoutType,
         navigationSuiteItems = {
@@ -75,6 +74,9 @@ private fun AppScaffoldPreviewContent(layoutType: NavigationSuiteType) {
     }
 }
 
+/**
+ * PreviewではNavigationBar、NavigationRail、NavigationDrawerが表示されるだけを確認する。
+ */
 @Preview(showBackground = true, name = "NavigationBar")
 @Composable
 private fun AppScaffoldPreviewNavigationBar() {
