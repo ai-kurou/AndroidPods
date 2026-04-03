@@ -24,7 +24,7 @@ export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
 ./gradlew testDebugUnitTest
 
 # 特定モジュールのテスト
-./gradlew :feature:devices:testDebugUnitTest
+./gradlew :feature:settings:testDebugUnitTest
 
 # 特定テストクラスの実行
 ./gradlew :app:testDebugUnitTest --tests "kurou.androidpods.MainViewModelTest"
@@ -37,8 +37,16 @@ export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
 - **`:core:domain`** — リポジトリのインターフェースとUseCase。Android Framework非依存。
 - **`:core:data`** — リポジトリの実装とHilt DIモジュール(`DataModule`)。`@Binds`でインターフェースと実装をバインド。
 - **`:core:service`** — `DeviceScanService`（Foreground Service）でBLEスキャンとカスタム通知を管理。`:core:domain`に依存。通知はRemoteViewsで構築（Composeは使用不可）。
+- **`:navigation`** — ルート定数（`Route.ONBOARDING`、`Route.SETTINGS`）と`TopLevelDestination`を定義。`:feature:*`と`:app`が参照する。
 - **`:feature:*`** — 各画面のViewModel, Composable, テスト。`:core:domain`(`:core:data`含む)に依存。
 - **`:app`** — `MainActivity`でNavigation Composeによるルーティング、`MainViewModel`で初回起動判定。`:core:domain`(UseCase利用)と`:core:data`(Hilt DIグラフ構築)の両方に依存。
+
+### ナビゲーションフロー
+
+```
+初回起動: OnboardingScreen → (完了後) SettingsScreen
+2回目以降: SettingsScreen (直接表示)
+```
 
 ### DI パターン
 
@@ -52,8 +60,15 @@ Hiltを使用。新しいRepositoryを追加する場合:
 - **ViewModel テスト**: MockKでUseCaseをモック、`UnconfinedTestDispatcher`で`Dispatchers.Main`を差し替え
 - **Repository テスト**: Robolectric (`@Config(sdk = [34])`) でAndroid APIをシミュレート
 - **Service テスト**: Hilt + Robolectric。`@UninstallModules(DataModule::class)`でFakeモジュールに差し替え、`Robolectric.buildService()`でServiceControllerを取得。ロジックは`internal fun`として抽出しユニットテスト可能にする
-- **Compose UIテスト**: `createComposeRule()` + Robolectricでユニットテストとして実行
+- **Compose UIテスト**: `createAndroidComposeRule<ComponentActivity>()` + Robolectricでユニットテストとして実行。Activityへのアクセス（`activityRule.scenario`、`onBackPressedDispatcher`など）が不要な場合は`createComposeRule()`でも可
 - テスト名は日本語のバッククォート記法 (`` `初期状態はnullを返す`() ``)
+- 画面の向きは`@Config(qualifiers = "port")`または`@Config(qualifiers = "land")`で指定
+
+#### Robolectric + Compose テストの注意点
+
+- `HorizontalPager`内のノードは`assertIsDisplayed()`が失敗することがある（boundsチェックの問題）。代わりに`assertExists()`を使う
+- 戻るボタンのシミュレーションは`composeTestRule.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }`で行う
+- `RequestMultiplePermissions`ランチャーはRobolectricで自動的にコールバックを呼ばないため、権限拒否のシミュレーションは複雑になる
 
 ## Security Rules
 
