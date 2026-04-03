@@ -5,8 +5,9 @@ import android.app.Application
 import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.os.Build
+import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
@@ -27,7 +28,7 @@ import org.robolectric.annotation.Config
 class OnboardingScreenTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
     private fun btAdapter(context: Context) =
         context.getSystemService(BluetoothManager::class.java).adapter
@@ -62,6 +63,40 @@ class OnboardingScreenTest {
     @Config(qualifiers = "land")
     fun `横向きでスワイプしてもページが遷移しない`() {
         assertSwipeDoesNotNavigate()
+    }
+
+    @Test
+    @Config(qualifiers = "port")
+    fun `ページ3まで遷移して戻るボタンを3回押して画面が終了する`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        shadowOf(btAdapter(context)).setEnabled(true)
+        grantRequiredPermissions(context)
+
+        composeTestRule.setContent {
+            OnboardingScreen(onComplete = {})
+        }
+
+        composeTestRule.onNodeWithText("Next").performClick()           // page 0 → 1
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Grant Permission").performClick() // page 1 → 2
+        composeTestRule.waitForIdle()
+
+        composeTestRule.activityRule.scenario.onActivity {
+            it.onBackPressedDispatcher.onBackPressed()                   // page 2 → 1
+        }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Grant Permission").assertIsDisplayed()
+
+        composeTestRule.activityRule.scenario.onActivity {
+            it.onBackPressedDispatcher.onBackPressed()                   // page 1 → 0
+        }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Next").assertIsDisplayed()
+
+        composeTestRule.activityRule.scenario.onActivity {
+            it.onBackPressedDispatcher.onBackPressed()                   // page 0 → 終了
+        }
+        assertTrue(composeTestRule.activity.isFinishing)
     }
 
     private fun assertNavigationAndComplete() {
