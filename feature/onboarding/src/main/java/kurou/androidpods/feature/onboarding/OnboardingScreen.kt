@@ -163,7 +163,10 @@ fun OnboardingScreen(
 
     if (showBluetoothUnavailableDialog) {
         BluetoothUnavailableDialog(
-            onDismiss = { showBluetoothUnavailableDialog = false },
+            onDismiss = {
+                showBluetoothUnavailableDialog = false
+                onComplete()
+            },
         )
     }
 

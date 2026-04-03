@@ -59,6 +59,9 @@ dependencies {
     testImplementation(libs.androidx.compose.ui.test.junit4)
     kspTest(libs.hilt.android.compiler)
 
+    // Instrumented Test
+    androidTestImplementation(libs.androidx.test.runner)
+
     // Debug
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
