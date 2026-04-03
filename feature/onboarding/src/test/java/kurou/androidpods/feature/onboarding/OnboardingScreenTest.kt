@@ -7,6 +7,7 @@ import android.content.Context
 import android.os.Build
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
@@ -50,11 +51,22 @@ class OnboardingScreenTest {
             OnboardingScreen(onComplete = { completed = true })
         }
 
+        composeTestRule.onNodeWithTag("lottie_animation").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Check the remaining battery level of your AirPods.").assertExists()
+
         composeTestRule.onNodeWithText("Next").performClick()           // page 0 → 1
         composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag("lottie_animation").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Location permission is required to use Bluetooth.").assertExists()
+
         composeTestRule.onNodeWithText("Grant Permission").performClick() // page 1 → 2
         composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag("lottie_animation").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Please enable Bluetooth to connect to your AirPods.").assertExists()
         composeTestRule.onNodeWithText("Enable Bluetooth").assertIsDisplayed()
+
         composeTestRule.onNodeWithText("Enable Bluetooth").performClick() // onComplete
         assertTrue(completed)
     }
@@ -65,9 +77,14 @@ class OnboardingScreenTest {
             OnboardingScreen(onComplete = {})
         }
 
+        composeTestRule.onNodeWithTag("lottie_animation").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Check the remaining battery level of your AirPods.").assertExists()
+
         composeTestRule.onRoot().performTouchInput { swipeLeft() }
         composeTestRule.waitForIdle()
 
+        composeTestRule.onNodeWithTag("lottie_animation").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Check the remaining battery level of your AirPods.").assertExists()
         composeTestRule.onNodeWithText("Next").assertIsDisplayed()
     }
 }
