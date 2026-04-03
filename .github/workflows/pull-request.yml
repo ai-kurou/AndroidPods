@@ -20,4 +20,8 @@ jobs:
 
       - run: ./gradlew assembleDebug
 
-      - run: ./gradlew testDebugUnitTest
+      - run: ./gradlew koverXmlReport
+
+      - uses: codecov/codecov-action@v5
+        with:
+          files: build/reports/kover/report.xml
