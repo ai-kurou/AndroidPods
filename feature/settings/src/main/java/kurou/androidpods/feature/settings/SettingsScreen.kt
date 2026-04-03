@@ -94,6 +94,12 @@ fun SettingsScreen(
     SettingsContent(
         permissionStates = permissionStates,
         bluetoothAdapterState = bluetoothAdapterState,
+        onPermissionWarningClick = {
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                data = Uri.fromParts("package", context.packageName, null)
+            }
+            context.startActivity(intent)
+        },
         modifier = modifier,
     )
 }

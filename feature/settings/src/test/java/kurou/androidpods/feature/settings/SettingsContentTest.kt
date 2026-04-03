@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -24,6 +25,7 @@ class SettingsContentTest {
             SettingsContent(
                 permissionStates = emptyMap(),
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+                onPermissionWarningClick = {},
             )
         }
 
@@ -36,6 +38,7 @@ class SettingsContentTest {
             SettingsContent(
                 permissionStates = emptyMap(),
                 bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
+                onPermissionWarningClick = {},
             )
         }
 
@@ -48,6 +51,7 @@ class SettingsContentTest {
             SettingsContent(
                 permissionStates = emptyMap(),
                 bluetoothAdapterState = null,
+                onPermissionWarningClick = {},
             )
         }
 
@@ -63,6 +67,7 @@ class SettingsContentTest {
                     Manifest.permission.BLUETOOTH_SCAN to true,
                 ),
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+                onPermissionWarningClick = {},
             )
         }
 
@@ -80,11 +85,32 @@ class SettingsContentTest {
                     Manifest.permission.BLUETOOTH_SCAN to false,
                 ),
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+                onPermissionWarningClick = {},
             )
         }
 
         composeTestRule.onNodeWithText(
             "Some required permissions are not granted. Please grant all permissions."
         ).assertIsDisplayed()
+    }
+
+    @Test
+    fun `警告をタップするとコールバックが呼ばれる`() {
+        var clicked = false
+        composeTestRule.setContent {
+            SettingsContent(
+                permissionStates = mapOf(
+                    Manifest.permission.BLUETOOTH_SCAN to false,
+                ),
+                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+                onPermissionWarningClick = { clicked = true },
+            )
+        }
+
+        composeTestRule.onNodeWithText(
+            "Some required permissions are not granted. Please grant all permissions."
+        ).performClick()
+
+        assert(clicked)
     }
 }
