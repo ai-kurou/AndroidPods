@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Application
 import android.bluetooth.BluetoothManager
 import android.content.Context
+import android.os.Build
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -21,7 +22,7 @@ import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [34])
+@Config(sdk = [30, 31])
 class OnboardingScreenTest {
 
     @get:Rule
@@ -30,14 +31,19 @@ class OnboardingScreenTest {
     private fun btAdapter(context: Context) =
         context.getSystemService(BluetoothManager::class.java).adapter
 
+    private fun grantRequiredPermissions(context: Context) {
+        val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+            arrayOf(Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN)
+        else
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+        shadowOf(context as Application).grantPermissions(*permissions)
+    }
+
     @Test
     fun `ボタンを押してページ1からページ3へ遷移してonCompleteが呼ばれる`() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         shadowOf(btAdapter(context)).setEnabled(true)
-        shadowOf(context as Application).grantPermissions(
-            Manifest.permission.BLUETOOTH_CONNECT,
-            Manifest.permission.BLUETOOTH_SCAN,
-        )
+        grantRequiredPermissions(context)
 
         var completed = false
         composeTestRule.setContent {
