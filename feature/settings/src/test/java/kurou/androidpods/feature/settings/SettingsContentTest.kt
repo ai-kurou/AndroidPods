@@ -29,6 +29,7 @@ class SettingsContentTest {
                     Manifest.permission.BLUETOOTH_SCAN to true,
                 ),
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+                columns = 1,
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
             )
@@ -49,6 +50,7 @@ class SettingsContentTest {
                     Manifest.permission.BLUETOOTH_SCAN to false,
                 ),
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+                columns = 1,
                 onPermissionWarningClick = { clicked = true },
                 onBluetoothWarningClick = {},
             )
@@ -67,6 +69,7 @@ class SettingsContentTest {
             SettingsContent(
                 permissionStates = emptyMap(),
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+                columns = 1,
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
             )
@@ -84,6 +87,7 @@ class SettingsContentTest {
             SettingsContent(
                 permissionStates = emptyMap(),
                 bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
+                columns = 1,
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = { clicked = true },
             )
@@ -103,6 +107,7 @@ class SettingsContentTest {
             SettingsContent(
                 permissionStates = emptyMap(),
                 bluetoothAdapterState = null,
+                columns = 1,
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = { clicked = true },
             )

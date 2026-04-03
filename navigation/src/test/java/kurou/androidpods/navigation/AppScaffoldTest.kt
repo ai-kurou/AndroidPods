@@ -3,6 +3,7 @@ package kurou.androidpods.navigation
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.os.Build
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.test.core.app.ApplicationProvider
@@ -45,6 +46,7 @@ class AppScaffoldTest {
     fun `ナビゲーションアイテムが表示される`() {
         composeTestRule.setContent {
             AppScaffold(
+                windowWidthSizeClass = WindowWidthSizeClass.Compact,
                 onStartScanService = {},
                 onStopScanService = {},
             )

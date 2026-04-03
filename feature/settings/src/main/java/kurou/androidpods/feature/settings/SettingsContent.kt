@@ -10,12 +10,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -31,6 +33,7 @@ import androidx.compose.ui.unit.dp
 internal fun SettingsContent(
     permissionStates: Map<String, Boolean>,
     bluetoothAdapterState: Int?,
+    columns: Int,
     onPermissionWarningClick: () -> Unit,
     onBluetoothWarningClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -39,9 +42,14 @@ internal fun SettingsContent(
     val isBluetoothUnavailable = bluetoothAdapterState == null
     val isBluetoothOff = bluetoothAdapterState != null && bluetoothAdapterState != BluetoothAdapter.STATE_ON
 
-    LazyColumn(modifier = modifier.fillMaxSize().padding(16.dp)) {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(columns),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier.fillMaxSize().padding(16.dp),
+    ) {
         if (hasNotGranted) {
-            item {
+            item(span = { GridItemSpan(maxLineSpan) }) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
@@ -69,11 +77,10 @@ internal fun SettingsContent(
                         tint = MaterialTheme.colorScheme.onErrorContainer,
                     )
                 }
-                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             }
         }
         if (isBluetoothUnavailable || isBluetoothOff) {
-            item {
+            item(span = { GridItemSpan(maxLineSpan) }) {
                 val backgroundColor = if (isBluetoothUnavailable) {
                     MaterialTheme.colorScheme.error
                 } else {
@@ -119,7 +126,6 @@ internal fun SettingsContent(
                         )
                     }
                 }
-                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             }
         }
     }
@@ -134,6 +140,7 @@ private fun SettingsContentPreviewNoWarning() {
             android.Manifest.permission.BLUETOOTH_SCAN to true,
         ),
         bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+        columns = 1,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
     )
@@ -148,6 +155,7 @@ private fun SettingsContentPreviewPermissionNotGranted() {
             android.Manifest.permission.BLUETOOTH_SCAN to false,
         ),
         bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+        columns = 1,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
     )
@@ -162,6 +170,7 @@ private fun SettingsContentPreviewBluetoothOff() {
             android.Manifest.permission.BLUETOOTH_SCAN to true,
         ),
         bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
+        columns = 1,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
     )
@@ -173,6 +182,7 @@ private fun SettingsContentPreviewBluetoothUnavailable() {
     SettingsContent(
         permissionStates = emptyMap(),
         bluetoothAdapterState = null,
+        columns = 1,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
     )
@@ -187,6 +197,37 @@ private fun SettingsContentPreviewAllWarnings() {
             android.Manifest.permission.BLUETOOTH_SCAN to false,
         ),
         bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
+        columns = 1,
+        onPermissionWarningClick = {},
+        onBluetoothWarningClick = {},
+    )
+}
+
+@Preview(showBackground = true, widthDp = 700, name = "2列 (Medium)")
+@Composable
+private fun SettingsContentPreviewMedium() {
+    SettingsContent(
+        permissionStates = mapOf(
+            android.Manifest.permission.BLUETOOTH_CONNECT to false,
+            android.Manifest.permission.BLUETOOTH_SCAN to false,
+        ),
+        bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
+        columns = 2,
+        onPermissionWarningClick = {},
+        onBluetoothWarningClick = {},
+    )
+}
+
+@Preview(showBackground = true, widthDp = 900, name = "3列 (Expanded)")
+@Composable
+private fun SettingsContentPreviewExpanded() {
+    SettingsContent(
+        permissionStates = mapOf(
+            android.Manifest.permission.BLUETOOTH_CONNECT to false,
+            android.Manifest.permission.BLUETOOTH_SCAN to false,
+        ),
+        bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
+        columns = 3,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
     )

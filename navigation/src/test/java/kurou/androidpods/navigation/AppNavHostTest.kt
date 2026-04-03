@@ -3,6 +3,7 @@ package kurou.androidpods.navigation
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.os.Build
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -57,6 +58,7 @@ class AppNavHostTest {
             AppNavHost(
                 navController = navController,
                 startDestination = Route.ONBOARDING,
+                windowWidthSizeClass = WindowWidthSizeClass.Compact,
                 onOnboardingComplete = { completeCalled = true },
                 onStartScanService = {},
                 onStopScanService = {},
