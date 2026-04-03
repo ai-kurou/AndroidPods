@@ -33,6 +33,7 @@ internal fun SettingsContent(
     permissionStates: Map<String, Boolean>,
     bluetoothAdapterState: Int?,
     onPermissionWarningClick: () -> Unit,
+    onBluetoothWarningClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.padding(16.dp)) {
@@ -67,15 +68,56 @@ internal fun SettingsContent(
             }
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
         }
-        val adapterStateText = when (bluetoothAdapterState) {
-            BluetoothAdapter.STATE_ON -> stringResource(R.string.bluetooth_state_on)
-            BluetoothAdapter.STATE_OFF -> stringResource(R.string.bluetooth_state_off)
-            BluetoothAdapter.STATE_TURNING_ON -> stringResource(R.string.bluetooth_state_turning_on)
-            BluetoothAdapter.STATE_TURNING_OFF -> stringResource(R.string.bluetooth_state_turning_off)
-            else -> stringResource(R.string.bluetooth_state_not_available)
+        val isBluetoothUnavailable = bluetoothAdapterState == null
+        val isBluetoothOff = bluetoothAdapterState != null && bluetoothAdapterState != BluetoothAdapter.STATE_ON
+        if (isBluetoothUnavailable || isBluetoothOff) {
+            val backgroundColor = if (isBluetoothUnavailable) {
+                MaterialTheme.colorScheme.error
+            } else {
+                MaterialTheme.colorScheme.errorContainer
+            }
+            val contentColor = if (isBluetoothUnavailable) {
+                MaterialTheme.colorScheme.onError
+            } else {
+                MaterialTheme.colorScheme.onErrorContainer
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(backgroundColor)
+                    .then(
+                        if (isBluetoothOff) Modifier.clickable(onClick = onBluetoothWarningClick)
+                        else Modifier
+                    )
+                    .padding(12.dp),
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Warning,
+                    contentDescription = null,
+                    tint = contentColor,
+                    modifier = Modifier.size(20.dp),
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(
+                    text = stringResource(
+                        if (isBluetoothUnavailable) R.string.bluetooth_not_supported
+                        else R.string.bluetooth_warning
+                    ),
+                    color = contentColor,
+                    modifier = Modifier.weight(1f),
+                )
+                if (isBluetoothOff) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = null,
+                        tint = contentColor,
+                    )
+                }
+            }
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
         }
-        Text(text = "${stringResource(R.string.bluetooth_adapter_state)}: $adapterStateText")
-        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
         LazyColumn(modifier = Modifier.fillMaxSize()) {
         }
     }
@@ -91,6 +133,7 @@ private fun SettingsContentPreviewAllGranted() {
         ),
         bluetoothAdapterState = BluetoothAdapter.STATE_ON,
         onPermissionWarningClick = {},
+        onBluetoothWarningClick = {},
     )
 }
 
@@ -102,8 +145,9 @@ private fun SettingsContentPreviewNotGranted() {
             android.Manifest.permission.BLUETOOTH_CONNECT to true,
             android.Manifest.permission.BLUETOOTH_SCAN to false,
         ),
-        bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+        bluetoothAdapterState = null,
         onPermissionWarningClick = {},
+        onBluetoothWarningClick = {},
     )
 }
 
@@ -116,5 +160,6 @@ private fun SettingsContentPreviewApi30() {
         ),
         bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
         onPermissionWarningClick = {},
+        onBluetoothWarningClick = {},
     )
 }

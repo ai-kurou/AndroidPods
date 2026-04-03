@@ -100,6 +100,9 @@ fun SettingsScreen(
             }
             context.startActivity(intent)
         },
+        onBluetoothWarningClick = {
+            context.startActivity(Intent(Settings.ACTION_BLUETOOTH_SETTINGS))
+        },
         modifier = modifier,
     )
 }

@@ -21,46 +21,7 @@ class SettingsContentTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun `BluetoothがONのとき「On」が表示される`() {
-        composeTestRule.setContent {
-            SettingsContent(
-                permissionStates = emptyMap(),
-                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
-                onPermissionWarningClick = {},
-            )
-        }
-
-        composeTestRule.onNodeWithText("Bluetooth Adapter: On").assertIsDisplayed()
-    }
-
-    @Test
-    fun `BluetoothがOFFのとき「Off」が表示される`() {
-        composeTestRule.setContent {
-            SettingsContent(
-                permissionStates = emptyMap(),
-                bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
-                onPermissionWarningClick = {},
-            )
-        }
-
-        composeTestRule.onNodeWithText("Bluetooth Adapter: Off").assertIsDisplayed()
-    }
-
-    @Test
-    fun `Bluetoothがnullのとき「Not Available」が表示される`() {
-        composeTestRule.setContent {
-            SettingsContent(
-                permissionStates = emptyMap(),
-                bluetoothAdapterState = null,
-                onPermissionWarningClick = {},
-            )
-        }
-
-        composeTestRule.onNodeWithText("Bluetooth Adapter: Not Available").assertIsDisplayed()
-    }
-
-    @Test
-    fun `全て許可済みのとき警告が表示されない`() {
+    fun `全て許可済みのとき権限警告が表示されない`() {
         composeTestRule.setContent {
             SettingsContent(
                 permissionStates = mapOf(
@@ -69,6 +30,7 @@ class SettingsContentTest {
                 ),
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 onPermissionWarningClick = {},
+                onBluetoothWarningClick = {},
             )
         }
 
@@ -78,7 +40,7 @@ class SettingsContentTest {
     }
 
     @Test
-    fun `未許可の権限があるとき警告が表示され、タップするとコールバックが呼ばれる`() {
+    fun `未許可の権限があるとき権限警告が表示され、タップするとコールバックが呼ばれる`() {
         var clicked = false
         composeTestRule.setContent {
             SettingsContent(
@@ -88,6 +50,7 @@ class SettingsContentTest {
                 ),
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 onPermissionWarningClick = { clicked = true },
+                onBluetoothWarningClick = {},
             )
         }
 
@@ -96,5 +59,59 @@ class SettingsContentTest {
         ).performClick()
 
         assertTrue(clicked)
+    }
+
+    @Test
+    fun `BluetoothがONのときBluetooth警告が表示されない`() {
+        composeTestRule.setContent {
+            SettingsContent(
+                permissionStates = emptyMap(),
+                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+                onPermissionWarningClick = {},
+                onBluetoothWarningClick = {},
+            )
+        }
+
+        composeTestRule.onNodeWithText(
+            "Bluetooth is not available. Please enable Bluetooth."
+        ).assertDoesNotExist()
+    }
+
+    @Test
+    fun `BluetoothがOFFのときBluetooth警告が表示され、タップするとコールバックが呼ばれる`() {
+        var clicked = false
+        composeTestRule.setContent {
+            SettingsContent(
+                permissionStates = emptyMap(),
+                bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
+                onPermissionWarningClick = {},
+                onBluetoothWarningClick = { clicked = true },
+            )
+        }
+
+        composeTestRule.onNodeWithText(
+            "Bluetooth is not available. Please enable Bluetooth."
+        ).performClick()
+
+        assertTrue(clicked)
+    }
+
+    @Test
+    fun `Bluetoothがnullのときbluetooth警告が表示されタップしてもコールバックが呼ばれない`() {
+        var clicked = false
+        composeTestRule.setContent {
+            SettingsContent(
+                permissionStates = emptyMap(),
+                bluetoothAdapterState = null,
+                onPermissionWarningClick = {},
+                onBluetoothWarningClick = { clicked = true },
+            )
+        }
+
+        composeTestRule.onNodeWithText(
+            "This device does not support Bluetooth."
+        ).assertIsDisplayed().performClick()
+
+        assertTrue(!clicked)
     }
 }
