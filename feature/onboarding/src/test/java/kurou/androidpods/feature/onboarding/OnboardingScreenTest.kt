@@ -41,7 +41,28 @@ class OnboardingScreenTest {
     }
 
     @Test
-    fun `ボタンを押してページ1からページ3へ遷移してonCompleteが呼ばれる`() {
+    fun `縦向きでボタンを押してページ1からページ3へ遷移してonCompleteが呼ばれる`() {
+        assertNavigationAndComplete()
+    }
+
+    @Test
+    @Config(qualifiers = "land")
+    fun `横向きでボタンを押してページ1からページ3へ遷移してonCompleteが呼ばれる`() {
+        assertNavigationAndComplete()
+    }
+
+    @Test
+    fun `縦向きでスワイプしてもページが遷移しない`() {
+        assertSwipeDoesNotNavigate()
+    }
+
+    @Test
+    @Config(qualifiers = "land")
+    fun `横向きでスワイプしてもページが遷移しない`() {
+        assertSwipeDoesNotNavigate()
+    }
+
+    private fun assertNavigationAndComplete() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         shadowOf(btAdapter(context)).setEnabled(true)
         grantRequiredPermissions(context)
@@ -71,8 +92,7 @@ class OnboardingScreenTest {
         assertTrue(completed)
     }
 
-    @Test
-    fun `スワイプしてもページが遷移しない`() {
+    private fun assertSwipeDoesNotNavigate() {
         composeTestRule.setContent {
             OnboardingScreen(onComplete = {})
         }
