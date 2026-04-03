@@ -65,7 +65,7 @@ internal fun SettingsContent(
                         tint = MaterialTheme.colorScheme.onErrorContainer,
                         modifier = Modifier.size(20.dp),
                     )
-                    Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = stringResource(R.string.permission_warning),
                         color = MaterialTheme.colorScheme.onErrorContainer,
@@ -109,7 +109,7 @@ internal fun SettingsContent(
                         tint = contentColor,
                         modifier = Modifier.size(20.dp),
                     )
-                    Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = stringResource(
                             if (isBluetoothUnavailable) R.string.bluetooth_not_supported
