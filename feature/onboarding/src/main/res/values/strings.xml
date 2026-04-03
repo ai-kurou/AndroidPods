@@ -1,0 +1,19 @@
+<resources>
+    <string name="onboarding_page1_text">Check the remaining battery level of your AirPods.</string>
+    <string name="onboarding_page2_text">Location permission is required to use Bluetooth.</string>
+    <string name="onboarding_page3_text">Please enable Bluetooth to connect to your AirPods.</string>
+    <string name="onboarding_button_next">Next</string>
+    <string name="onboarding_button_grant_permission">Grant Permission</string>
+    <string name="onboarding_button_enable_bluetooth">Enable Bluetooth</string>
+    <string name="onboarding_button_get_started">Get Started</string>
+    <string name="onboarding_permission_dialog_title">Permission Required</string>
+    <string name="onboarding_permission_dialog_message">Bluetooth permissions were denied. Please grant them in Settings.</string>
+    <string name="onboarding_permission_dialog_confirm">Open Settings</string>
+    <string name="onboarding_permission_dialog_dismiss">Cancel</string>
+    <string name="onboarding_bluetooth_unavailable_dialog_title">Bluetooth Unavailable</string>
+    <string name="onboarding_bluetooth_unavailable_dialog_message">This device does not have Bluetooth, so this app cannot be used.</string>
+<string name="onboarding_bluetooth_dialog_title">Bluetooth is Off</string>
+    <string name="onboarding_bluetooth_dialog_message">Bluetooth was not enabled. Please enable it in Settings.</string>
+    <string name="onboarding_bluetooth_dialog_confirm">Open Settings</string>
+    <string name="onboarding_bluetooth_dialog_dismiss">Cancel</string>
+</resources>
