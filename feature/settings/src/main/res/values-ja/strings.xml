@@ -6,6 +6,7 @@
     <string name="cancel">キャンセル</string>
     <string name="permission_granted">許可済み</string>
     <string name="permission_not_granted">未許可</string>
+    <string name="permission_warning">必要な権限が許可されていません。すべての権限を許可してください。</string>
     <string name="bluetooth_adapter_state">Bluetoothアダプタ</string>
     <string name="bluetooth_state_on">オン</string>
     <string name="bluetooth_state_off">オフ</string>

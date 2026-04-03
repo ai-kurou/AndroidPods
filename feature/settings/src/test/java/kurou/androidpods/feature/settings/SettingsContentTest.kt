@@ -55,7 +55,24 @@ class SettingsContentTest {
     }
 
     @Test
-    fun `パーミッションの許可状態が表示される`() {
+    fun `全て許可済みのとき警告が表示されない`() {
+        composeTestRule.setContent {
+            SettingsContent(
+                permissionStates = mapOf(
+                    Manifest.permission.BLUETOOTH_CONNECT to true,
+                    Manifest.permission.BLUETOOTH_SCAN to true,
+                ),
+                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+            )
+        }
+
+        composeTestRule.onNodeWithText(
+            "Some required permissions are not granted. Please grant all permissions."
+        ).assertDoesNotExist()
+    }
+
+    @Test
+    fun `未許可の権限があるとき警告が表示される`() {
         composeTestRule.setContent {
             SettingsContent(
                 permissionStates = mapOf(
@@ -66,7 +83,8 @@ class SettingsContentTest {
             )
         }
 
-        composeTestRule.onNodeWithText("BLUETOOTH_CONNECT: Granted").assertIsDisplayed()
-        composeTestRule.onNodeWithText("BLUETOOTH_SCAN: Not Granted").assertIsDisplayed()
+        composeTestRule.onNodeWithText(
+            "Some required permissions are not granted. Please grant all permissions."
+        ).assertIsDisplayed()
     }
 }
