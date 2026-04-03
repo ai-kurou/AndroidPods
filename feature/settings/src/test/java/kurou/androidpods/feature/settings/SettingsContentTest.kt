@@ -73,7 +73,7 @@ class SettingsContentTest {
         }
 
         composeTestRule.onNodeWithText(
-            "Bluetooth is not available. Please enable Bluetooth."
+            "Bluetooth is off. Please enable Bluetooth."
         ).assertDoesNotExist()
     }
 
@@ -90,7 +90,7 @@ class SettingsContentTest {
         }
 
         composeTestRule.onNodeWithText(
-            "Bluetooth is not available. Please enable Bluetooth."
+            "Bluetooth is off. Please enable Bluetooth."
         ).performClick()
 
         assertTrue(clicked)
