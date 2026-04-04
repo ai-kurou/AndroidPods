@@ -8,10 +8,12 @@ plugins {
     alias(libs.plugins.kover)
 }
 
-koverReport {
-    filters {
-        excludes {
-            annotatedBy("androidx.compose.ui.tooling.preview.Preview")
+kover {
+    reports {
+        filters {
+            excludes {
+                annotatedBy("androidx.compose.ui.tooling.preview.Preview")
+            }
         }
     }
 }
