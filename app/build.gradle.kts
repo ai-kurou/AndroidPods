@@ -40,8 +40,10 @@ android {
     buildFeatures {
         compose = true
     }
+}
 
-    koverReport.filters {
+koverReport {
+    filters {
         excludes {
             annotatedBy("androidx.compose.ui.tooling.preview.Preview")
         }
