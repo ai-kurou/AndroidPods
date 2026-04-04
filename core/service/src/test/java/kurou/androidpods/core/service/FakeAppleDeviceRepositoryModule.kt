@@ -8,6 +8,7 @@ import kurou.androidpods.core.domain.AppleDevice
 import kurou.androidpods.core.domain.AppleDeviceRepository
 import kurou.androidpods.core.domain.BluetoothAdapterRepository
 import kurou.androidpods.core.domain.FirstLaunchRepository
+import kurou.androidpods.core.domain.OverlaySettingsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -52,5 +53,12 @@ object FakeRepositoryModule {
         object : FirstLaunchRepository {
             override fun observeIsFirstLaunch(): Flow<Boolean> = emptyFlow()
             override suspend fun markAsLaunched() {}
+        }
+
+    @Provides
+    @Singleton
+    fun provideOverlaySettingsRepository(): OverlaySettingsRepository =
+        object : OverlaySettingsRepository {
+            override fun isEnabled(): Boolean = false
         }
 }

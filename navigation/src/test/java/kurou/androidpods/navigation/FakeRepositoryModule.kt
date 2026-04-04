@@ -7,6 +7,7 @@ import dagger.hilt.components.SingletonComponent
 import kurou.androidpods.core.domain.AppleDevice
 import kurou.androidpods.core.domain.AppleDeviceRepository
 import kurou.androidpods.core.domain.BluetoothAdapterRepository
+import kurou.androidpods.core.domain.OverlaySettingsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import javax.inject.Singleton
@@ -30,5 +31,12 @@ object FakeRepositoryModule {
             override fun observeDevices(): Flow<Map<String, AppleDevice>> = emptyFlow()
             override fun startScan() {}
             override fun stopScan() {}
+        }
+
+    @Provides
+    @Singleton
+    fun provideOverlaySettingsRepository(): OverlaySettingsRepository =
+        object : OverlaySettingsRepository {
+            override fun isEnabled(): Boolean = false
         }
 }

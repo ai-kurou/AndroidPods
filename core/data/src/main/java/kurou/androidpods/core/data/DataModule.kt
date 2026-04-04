@@ -7,6 +7,7 @@ import dagger.hilt.components.SingletonComponent
 import kurou.androidpods.core.domain.BluetoothAdapterRepository
 import kurou.androidpods.core.domain.FirstLaunchRepository
 import kurou.androidpods.core.domain.AppleDeviceRepository
+import kurou.androidpods.core.domain.OverlaySettingsRepository
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -25,4 +26,9 @@ abstract class DataModule {
     internal abstract fun bindAppleDeviceRepository(
         impl: AppleDeviceRepositoryImpl,
     ): AppleDeviceRepository
+
+    @Binds
+    internal abstract fun bindOverlaySettingsRepository(
+        impl: OverlaySettingsRepositoryImpl,
+    ): OverlaySettingsRepository
 }

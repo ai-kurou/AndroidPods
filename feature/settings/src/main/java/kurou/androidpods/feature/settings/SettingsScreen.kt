@@ -36,7 +36,7 @@ fun SettingsScreen(
 
     val permissionStates = remember { mutableStateMapOf<String, Boolean>() }
     val bluetoothAdapterState by viewModel.bluetoothAdapterState.collectAsStateWithLifecycle()
-    var overlayEnabled by remember { mutableStateOf(Settings.canDrawOverlays(context)) }
+    val overlayEnabled by viewModel.overlayEnabled.collectAsStateWithLifecycle()
     var showSettingsDialog by remember { mutableStateOf(false) }
     var initialRequestDone by remember { mutableStateOf(false) }
 
@@ -51,7 +51,7 @@ fun SettingsScreen(
     val overlaySettingsLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
     ) {
-        overlayEnabled = Settings.canDrawOverlays(context)
+        viewModel.refreshOverlayState()
     }
 
     val launcher = rememberLauncherForActivityResult(
@@ -78,7 +78,7 @@ fun SettingsScreen(
                 ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
         }
         viewModel.refreshBluetoothState()
-        overlayEnabled = Settings.canDrawOverlays(context)
+        viewModel.refreshOverlayState()
         onStartScanService()
         if (initialRequestDone) {
             val hasNotGranted = permissions.any {
@@ -122,14 +122,12 @@ fun SettingsScreen(
         onBluetoothWarningClick = {
             context.startActivity(Intent(Settings.ACTION_BLUETOOTH_SETTINGS))
         },
-        onOverlayToggle = { enabled ->
-            if (enabled) {
-                val intent = Intent(
-                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                    "package:${context.packageName}".toUri(),
-                )
-                overlaySettingsLauncher.launch(intent)
-            } else overlayEnabled = false
+        onOverlayToggle = {
+            val intent = Intent(
+                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                "package:${context.packageName}".toUri(),
+            )
+            overlaySettingsLauncher.launch(intent)
         },
         modifier = modifier,
     )

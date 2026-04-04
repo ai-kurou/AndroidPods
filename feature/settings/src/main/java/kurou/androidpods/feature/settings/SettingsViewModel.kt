@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kurou.androidpods.core.domain.AppleDevice
 import kurou.androidpods.core.domain.GetAppleDevicesUseCase
 import kurou.androidpods.core.domain.GetBluetoothAdapterStateUseCase
+import kurou.androidpods.core.domain.GetOverlaySettingsUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,6 +17,7 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     private val getBluetoothAdapterStateUseCase: GetBluetoothAdapterStateUseCase,
     private val getAppleDevicesUseCase: GetAppleDevicesUseCase,
+    private val getOverlaySettingsUseCase: GetOverlaySettingsUseCase,
 ) : ViewModel() {
 
     private val _bluetoothAdapterState = MutableStateFlow(getBluetoothAdapterStateUseCase.current())
@@ -23,6 +25,9 @@ class SettingsViewModel @Inject constructor(
 
     private val _appleDevices = MutableStateFlow<Map<String, AppleDevice>>(emptyMap())
     val appleDevices: StateFlow<Map<String, AppleDevice>> = _appleDevices.asStateFlow()
+
+    private val _overlayEnabled = MutableStateFlow(getOverlaySettingsUseCase.isEnabled())
+    val overlayEnabled: StateFlow<Boolean> = _overlayEnabled.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -39,6 +44,10 @@ class SettingsViewModel @Inject constructor(
 
     fun refreshBluetoothState() {
         _bluetoothAdapterState.value = getBluetoothAdapterStateUseCase.current()
+    }
+
+    fun refreshOverlayState() {
+        _overlayEnabled.value = getOverlaySettingsUseCase.isEnabled()
     }
 
     fun startScan() {
