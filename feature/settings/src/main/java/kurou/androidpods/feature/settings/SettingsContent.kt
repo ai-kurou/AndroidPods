@@ -1,122 +1,234 @@
 package kurou.androidpods.feature.settings
 
 import android.bluetooth.BluetoothAdapter
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kurou.androidpods.core.domain.AppleDevice
 
 @Composable
 internal fun SettingsContent(
     permissionStates: Map<String, Boolean>,
     bluetoothAdapterState: Int?,
-    appleDevices: List<AppleDevice>,
+    columns: Int,
+    onPermissionWarningClick: () -> Unit,
+    onBluetoothWarningClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier.padding(16.dp)) {
-        permissionStates.forEach { (permission, granted) ->
-            val shortName = permission.substringAfterLast(".")
-            val status = if (granted) stringResource(R.string.permission_granted) else stringResource(R.string.permission_not_granted)
-            Text(text = "$shortName: $status")
-        }
-        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-        val adapterStateText = when (bluetoothAdapterState) {
-            BluetoothAdapter.STATE_ON -> stringResource(R.string.bluetooth_state_on)
-            BluetoothAdapter.STATE_OFF -> stringResource(R.string.bluetooth_state_off)
-            BluetoothAdapter.STATE_TURNING_ON -> stringResource(R.string.bluetooth_state_turning_on)
-            BluetoothAdapter.STATE_TURNING_OFF -> stringResource(R.string.bluetooth_state_turning_off)
-            else -> stringResource(R.string.bluetooth_state_not_available)
-        }
-        Text(text = "${stringResource(R.string.bluetooth_adapter_state)}: $adapterStateText")
-        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-        Text(text = stringResource(R.string.apple_devices_title))
-        if (appleDevices.isEmpty()) {
-            Text(text = stringResource(R.string.no_apple_devices))
-        } else {
-            appleDevices.forEach { device ->
-                Text(text = "${device.modelName} (${device.address})")
-                val batteryInfo = if (device.isSingle) {
-                    "Battery: ${batteryText(device.leftBattery, device.leftCharging)}"
-                } else {
-                    "L: ${batteryText(device.leftBattery, device.leftCharging)} " +
-                        "R: ${batteryText(device.rightBattery, device.rightCharging)} " +
-                        "Case: ${batteryText(device.caseBattery, device.caseCharging)}"
+    val hasNotGranted = permissionStates.values.any { !it }
+    val isBluetoothUnavailable = bluetoothAdapterState == null
+    val isBluetoothOff = bluetoothAdapterState != null && bluetoothAdapterState != BluetoothAdapter.STATE_ON
+
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(columns),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier.fillMaxSize().padding(16.dp),
+    ) {
+        if (hasNotGranted) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(MaterialTheme.colorScheme.errorContainer)
+                        .clickable(onClick = onPermissionWarningClick)
+                        .padding(12.dp),
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Warning,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onErrorContainer,
+                        modifier = Modifier.size(20.dp),
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(R.string.permission_warning),
+                        color = MaterialTheme.colorScheme.onErrorContainer,
+                        modifier = Modifier.weight(1f),
+                    )
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onErrorContainer,
+                    )
                 }
-                Text(text = "RSSI: ${device.rssi} dBm / $batteryInfo")
-                val lidInfo = if (!device.isSingle) {
-                    val lidState = if (device.lidOpen) "Open" else "Closed"
-                    " / Lid: $lidState"
-                } else ""
-                Text(text = "Color: ${device.colorName}$lidInfo")
+            }
+        }
+        if (isBluetoothUnavailable || isBluetoothOff) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                val backgroundColor = if (isBluetoothUnavailable) {
+                    MaterialTheme.colorScheme.error
+                } else {
+                    MaterialTheme.colorScheme.errorContainer
+                }
+                val contentColor = if (isBluetoothUnavailable) {
+                    MaterialTheme.colorScheme.onError
+                } else {
+                    MaterialTheme.colorScheme.onErrorContainer
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(backgroundColor)
+                        .then(
+                            if (isBluetoothOff) Modifier.clickable(onClick = onBluetoothWarningClick)
+                            else Modifier
+                        )
+                        .padding(12.dp),
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Warning,
+                        contentDescription = null,
+                        tint = contentColor,
+                        modifier = Modifier.size(20.dp),
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(
+                            if (isBluetoothUnavailable) R.string.bluetooth_not_supported
+                            else R.string.bluetooth_warning
+                        ),
+                        color = contentColor,
+                        modifier = Modifier.weight(1f),
+                    )
+                    if (isBluetoothOff) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                            contentDescription = null,
+                            tint = contentColor,
+                        )
+                    }
+                }
             }
         }
     }
 }
 
-private fun batteryText(level: Int?, charging: Boolean = false): String {
-    val pct = when {
-        level == null -> "--"
-        level >= 10 -> "100%"
-        else -> "${level * 10 + 5}%"
-    }
-    return if (charging) "$pct⚡" else pct
-}
-
-@Preview(showBackground = true, name = "API 31+ (Android 12+)")
+@Preview(showBackground = true, name = "警告なし")
 @Composable
-private fun SettingsContentPreviewApi31() {
+private fun SettingsContentPreviewNoWarning() {
     SettingsContent(
         permissionStates = mapOf(
             android.Manifest.permission.BLUETOOTH_CONNECT to true,
             android.Manifest.permission.BLUETOOTH_SCAN to true,
         ),
         bluetoothAdapterState = BluetoothAdapter.STATE_ON,
-        appleDevices = listOf(
-            AppleDevice(
-                address = "AA:BB:CC:DD:EE:FF",
-                modelName = "AirPods Pro (2nd Gen)",
-                modelCode = 0x1420,
-                rssi = -45,
-                leftBattery = 8,
-                rightBattery = 9,
-                caseBattery = 7,
-                isSingle = false,
-                leftCharging = true,
-                rightCharging = true,
-                caseCharging = false,
-                lidOpen = true,
-                colorName = "White",
-            ),
-            AppleDevice(
-                address = "FF:EE:DD:CC:BB:AA",
-                modelName = "Beats Flex",
-                modelCode = 0x1020,
-                rssi = -40,
-                leftBattery = 6,
-                rightBattery = null,
-                caseBattery = null,
-                isSingle = true,
-                leftCharging = true,
-                colorName = "Black",
-            )
-        ),
+        columns = 1,
+        onPermissionWarningClick = {},
+        onBluetoothWarningClick = {},
     )
 }
 
-@Preview(showBackground = true, name = "API 30以下")
+@Preview(showBackground = true, name = "権限未許可")
 @Composable
-private fun SettingsContentPreviewApi30() {
+private fun SettingsContentPreviewPermissionNotGranted() {
     SettingsContent(
         permissionStates = mapOf(
-            android.Manifest.permission.ACCESS_FINE_LOCATION to false,
+            android.Manifest.permission.BLUETOOTH_CONNECT to true,
+            android.Manifest.permission.BLUETOOTH_SCAN to false,
+        ),
+        bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+        columns = 1,
+        onPermissionWarningClick = {},
+        onBluetoothWarningClick = {},
+    )
+}
+
+@Preview(showBackground = true, name = "Bluetoothオフ")
+@Composable
+private fun SettingsContentPreviewBluetoothOff() {
+    SettingsContent(
+        permissionStates = mapOf(
+            android.Manifest.permission.BLUETOOTH_CONNECT to true,
+            android.Manifest.permission.BLUETOOTH_SCAN to true,
         ),
         bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
-        appleDevices = emptyList(),
+        columns = 1,
+        onPermissionWarningClick = {},
+        onBluetoothWarningClick = {},
+    )
+}
+
+@Preview(showBackground = true, name = "Bluetooth非対応")
+@Composable
+private fun SettingsContentPreviewBluetoothUnavailable() {
+    SettingsContent(
+        permissionStates = emptyMap(),
+        bluetoothAdapterState = null,
+        columns = 1,
+        onPermissionWarningClick = {},
+        onBluetoothWarningClick = {},
+    )
+}
+
+@Preview(showBackground = true, name = "権限未許可 + Bluetoothオフ")
+@Composable
+private fun SettingsContentPreviewAllWarnings() {
+    SettingsContent(
+        permissionStates = mapOf(
+            android.Manifest.permission.BLUETOOTH_CONNECT to false,
+            android.Manifest.permission.BLUETOOTH_SCAN to false,
+        ),
+        bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
+        columns = 1,
+        onPermissionWarningClick = {},
+        onBluetoothWarningClick = {},
+    )
+}
+
+@Preview(showBackground = true, widthDp = 700, name = "2列 (Medium)")
+@Composable
+private fun SettingsContentPreviewMedium() {
+    SettingsContent(
+        permissionStates = mapOf(
+            android.Manifest.permission.BLUETOOTH_CONNECT to false,
+            android.Manifest.permission.BLUETOOTH_SCAN to false,
+        ),
+        bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
+        columns = 2,
+        onPermissionWarningClick = {},
+        onBluetoothWarningClick = {},
+    )
+}
+
+@Preview(showBackground = true, widthDp = 900, name = "3列 (Expanded)")
+@Composable
+private fun SettingsContentPreviewExpanded() {
+    SettingsContent(
+        permissionStates = mapOf(
+            android.Manifest.permission.BLUETOOTH_CONNECT to false,
+            android.Manifest.permission.BLUETOOTH_SCAN to false,
+        ),
+        bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
+        columns = 3,
+        onPermissionWarningClick = {},
+        onBluetoothWarningClick = {},
     )
 }

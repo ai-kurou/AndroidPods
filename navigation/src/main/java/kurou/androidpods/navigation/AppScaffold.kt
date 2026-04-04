@@ -6,6 +6,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -15,6 +16,7 @@ import kurou.androidpods.feature.settings.SettingsScreen
 
 @Composable
 fun AppScaffold(
+    windowWidthSizeClass: WindowWidthSizeClass,
     onStartScanService: () -> Unit,
     onStopScanService: () -> Unit,
     modifier: Modifier = Modifier,
@@ -38,6 +40,7 @@ fun AppScaffold(
         },
     ) {
         SettingsScreen(
+            windowWidthSizeClass = windowWidthSizeClass,
             onStartScanService = onStartScanService,
             onStopScanService = onStopScanService,
         )

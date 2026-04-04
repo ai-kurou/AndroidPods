@@ -1,17 +1,19 @@
 package kurou.androidpods.navigation
 
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import kurou.androidpods.feature.settings.SettingsScreen
 import kurou.androidpods.feature.onboarding.OnboardingScreen
+import kurou.androidpods.feature.settings.SettingsScreen
 
 @Composable
 fun AppNavHost(
     navController: NavHostController,
     startDestination: String,
+    windowWidthSizeClass: WindowWidthSizeClass,
     onOnboardingComplete: () -> Unit,
     onStartScanService: () -> Unit,
     onStopScanService: () -> Unit,
@@ -34,6 +36,7 @@ fun AppNavHost(
         }
         composable(Route.SETTINGS) {
             SettingsScreen(
+                windowWidthSizeClass = windowWidthSizeClass,
                 onStartScanService = onStartScanService,
                 onStopScanService = onStopScanService,
             )

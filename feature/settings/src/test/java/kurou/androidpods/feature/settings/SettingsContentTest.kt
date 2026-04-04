@@ -5,7 +5,8 @@ import android.bluetooth.BluetoothAdapter
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
-import kurou.androidpods.core.domain.AppleDevice
+import androidx.compose.ui.test.performClick
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -20,46 +21,28 @@ class SettingsContentTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun `BluetoothがONのとき「On」が表示される`() {
+    fun `全て許可済みのとき権限警告が表示されない`() {
         composeTestRule.setContent {
             SettingsContent(
-                permissionStates = emptyMap(),
+                permissionStates = mapOf(
+                    Manifest.permission.BLUETOOTH_CONNECT to true,
+                    Manifest.permission.BLUETOOTH_SCAN to true,
+                ),
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
-                appleDevices = emptyList(),
+                columns = 1,
+                onPermissionWarningClick = {},
+                onBluetoothWarningClick = {},
             )
         }
 
-        composeTestRule.onNodeWithText("Bluetooth Adapter: On").assertIsDisplayed()
+        composeTestRule.onNodeWithText(
+            "Some required permissions are not granted. Please grant all permissions."
+        ).assertDoesNotExist()
     }
 
     @Test
-    fun `BluetoothがOFFのとき「Off」が表示される`() {
-        composeTestRule.setContent {
-            SettingsContent(
-                permissionStates = emptyMap(),
-                bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
-                appleDevices = emptyList(),
-            )
-        }
-
-        composeTestRule.onNodeWithText("Bluetooth Adapter: Off").assertIsDisplayed()
-    }
-
-    @Test
-    fun `Bluetoothがnullのとき「Not Available」が表示される`() {
-        composeTestRule.setContent {
-            SettingsContent(
-                permissionStates = emptyMap(),
-                bluetoothAdapterState = null,
-                appleDevices = emptyList(),
-            )
-        }
-
-        composeTestRule.onNodeWithText("Bluetooth Adapter: Not Available").assertIsDisplayed()
-    }
-
-    @Test
-    fun `パーミッションの許可状態が表示される`() {
+    fun `未許可の権限があるとき権限警告が表示され、タップするとコールバックが呼ばれる`() {
+        var clicked = false
         composeTestRule.setContent {
             SettingsContent(
                 permissionStates = mapOf(
@@ -67,109 +50,73 @@ class SettingsContentTest {
                     Manifest.permission.BLUETOOTH_SCAN to false,
                 ),
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
-                appleDevices = emptyList(),
+                columns = 1,
+                onPermissionWarningClick = { clicked = true },
+                onBluetoothWarningClick = {},
             )
         }
 
-        composeTestRule.onNodeWithText("BLUETOOTH_CONNECT: Granted").assertIsDisplayed()
-        composeTestRule.onNodeWithText("BLUETOOTH_SCAN: Not Granted").assertIsDisplayed()
+        composeTestRule.onNodeWithText(
+            "Some required permissions are not granted. Please grant all permissions."
+        ).performClick()
+
+        assertTrue(clicked)
     }
 
     @Test
-    fun `Appleデバイスが表示される`() {
+    fun `BluetoothがONのときBluetooth警告が表示されない`() {
         composeTestRule.setContent {
             SettingsContent(
                 permissionStates = emptyMap(),
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
-                appleDevices = listOf(
-                    AppleDevice("AA:BB:CC:DD:EE:FF", "AirPods Pro (2nd Gen)", 0x1420, -45, 8, 9, 7),
-                ),
+                columns = 1,
+                onPermissionWarningClick = {},
+                onBluetoothWarningClick = {},
             )
         }
 
-        composeTestRule.onNodeWithText("Apple Devices").assertIsDisplayed()
-        composeTestRule.onNodeWithText("AirPods Pro (2nd Gen) (AA:BB:CC:DD:EE:FF)").assertIsDisplayed()
-        composeTestRule.onNodeWithText("RSSI: -45 dBm / L: 85% R: 95% Case: 75%").assertIsDisplayed()
+        composeTestRule.onNodeWithText(
+            "Bluetooth is off. Please enable Bluetooth."
+        ).assertDoesNotExist()
     }
 
     @Test
-    fun `充電中のデバイスにはアイコンが表示される`() {
+    fun `BluetoothがOFFのときBluetooth警告が表示され、タップするとコールバックが呼ばれる`() {
+        var clicked = false
         composeTestRule.setContent {
             SettingsContent(
                 permissionStates = emptyMap(),
-                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
-                appleDevices = listOf(
-                    AppleDevice(
-                        "AA:BB:CC:DD:EE:FF", "AirPods Pro (2nd Gen)", 0x1420, -45, 8, 9, 7,
-                        leftCharging = true, rightCharging = false, caseCharging = true,
-                    ),
-                ),
+                bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
+                columns = 1,
+                onPermissionWarningClick = {},
+                onBluetoothWarningClick = { clicked = true },
             )
         }
 
-        composeTestRule.onNodeWithText("RSSI: -45 dBm / L: 85%⚡ R: 95% Case: 75%⚡").assertIsDisplayed()
+        composeTestRule.onNodeWithText(
+            "Bluetooth is off. Please enable Bluetooth."
+        ).performClick()
+
+        assertTrue(clicked)
     }
 
     @Test
-    fun `シングルデバイスはBattery表示になる`() {
+    fun `Bluetoothがnullのときbluetooth警告が表示されタップしてもコールバックが呼ばれない`() {
+        var clicked = false
         composeTestRule.setContent {
             SettingsContent(
                 permissionStates = emptyMap(),
-                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
-                appleDevices = listOf(
-                    AppleDevice("11:22:33:44:55:66", "Beats Flex", 0x1020, -50, 9, null, null, isSingle = true),
-                ),
+                bluetoothAdapterState = null,
+                columns = 1,
+                onPermissionWarningClick = {},
+                onBluetoothWarningClick = { clicked = true },
             )
         }
 
-        composeTestRule.onNodeWithText("Beats Flex (11:22:33:44:55:66)").assertIsDisplayed()
-        composeTestRule.onNodeWithText("RSSI: -50 dBm / Battery: 95%").assertIsDisplayed()
-    }
+        composeTestRule.onNodeWithText(
+            "This device does not support Bluetooth."
+        ).assertIsDisplayed().performClick()
 
-    @Test
-    fun `デバイスカラーとLid状態が表示される`() {
-        composeTestRule.setContent {
-            SettingsContent(
-                permissionStates = emptyMap(),
-                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
-                appleDevices = listOf(
-                    AppleDevice(
-                        "AA:BB:CC:DD:EE:FF", "AirPods Pro (2nd Gen)", 0x1420, -45, 8, 9, 7,
-                        lidOpen = true, colorName = "White",
-                    ),
-                ),
-            )
-        }
-
-        composeTestRule.onNodeWithText("Color: White / Lid: Open").assertIsDisplayed()
-    }
-
-    @Test
-    fun `シングルデバイスはLid状態が表示されない`() {
-        composeTestRule.setContent {
-            SettingsContent(
-                permissionStates = emptyMap(),
-                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
-                appleDevices = listOf(
-                    AppleDevice("11:22:33:44:55:66", "Beats Flex", 0x1020, -50, 9, null, null, isSingle = true, colorName = "Black"),
-                ),
-            )
-        }
-
-        composeTestRule.onNodeWithText("Color: Black").assertIsDisplayed()
-    }
-
-    @Test
-    fun `Appleデバイスが空のとき案内メッセージが表示される`() {
-        composeTestRule.setContent {
-            SettingsContent(
-                permissionStates = emptyMap(),
-                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
-                appleDevices = emptyList(),
-            )
-        }
-
-        composeTestRule.onNodeWithText("Apple Devices").assertIsDisplayed()
-        composeTestRule.onNodeWithText("No Apple devices found").assertIsDisplayed()
+        assertTrue(!clicked)
     }
 }
