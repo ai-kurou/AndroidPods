@@ -40,6 +40,7 @@ internal class BatteryOverlayViewDelegate(private val context: Context) : Overla
     private var overlayView: View? = null
     private var cardsContainer: LinearLayout? = null
     private var layoutParams: WindowManager.LayoutParams? = null
+    private var hideAnimator: AnimatorSet? = null
 
     override val hasView: Boolean get() = overlayView != null
     override var onUserDismiss: (() -> Unit)? = null
@@ -177,6 +178,9 @@ internal class BatteryOverlayViewDelegate(private val context: Context) : Overla
     }
 
     override fun removeOverlayView() {
+        hideAnimator?.removeAllListeners()
+        hideAnimator?.cancel()
+        hideAnimator = null
         val view = overlayView ?: return
         windowManager.removeViewImmediate(view)
         overlayView = null
@@ -189,11 +193,12 @@ internal class BatteryOverlayViewDelegate(private val context: Context) : Overla
 
         val slideOut = ObjectAnimator.ofFloat(view, View.TRANSLATION_Y, 0f, view.height.toFloat())
         val fadeOut = ObjectAnimator.ofFloat(view, View.ALPHA, 1f, 0f)
-        AnimatorSet().apply {
+        hideAnimator = AnimatorSet().apply {
             playTogether(slideOut, fadeOut)
             duration = ANIM_DURATION_MS
             addListener(object : android.animation.AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: android.animation.Animator) {
+                    hideAnimator = null
                     if (overlayView === view) {
                         onComplete()
                     }
@@ -204,6 +209,18 @@ internal class BatteryOverlayViewDelegate(private val context: Context) : Overla
     }
 
     override fun updateContent(devices: List<AppleDevice>) {
+        // hide アニメーション中に show が呼ばれた場合、アニメーションをキャンセルしてviewを再利用
+        // cancel() は onAnimationEnd を発火させるので、先にリスナーを除去する
+        hideAnimator?.let {
+            it.removeAllListeners()
+            it.cancel()
+            hideAnimator = null
+            overlayView?.apply {
+                alpha = 1f
+                translationY = 0f
+            }
+        }
+
         val container = cardsContainer ?: return
         container.removeAllViews()
 
