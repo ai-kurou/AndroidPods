@@ -111,23 +111,19 @@ fun OnboardingScreen(
         if (isPreview) null else context.getSystemService<BluetoothManager>()?.adapter
     }
 
-    val permissionLauncher = if (!isPreview) {
+    val permissionLauncher = if (!isPreview)
         rememberLauncherForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions(),
         ) { results ->
-            if (results.values.all { it }) {
+            if (results.values.all { it })
                 coroutineScope.launch {
                     pagerState.animateScrollToPage(pagerState.currentPage + 1)
                 }
-            } else {
-                showPermissionDeniedDialog = true
-            }
+            else showPermissionDeniedDialog = true
         }
-    } else {
-        null
-    }
+    else null
 
-    val overlayPermissionLauncher = if (!isPreview) {
+    val overlayPermissionLauncher = if (!isPreview)
         rememberLauncherForActivityResult(
             ActivityResultContracts.StartActivityForResult(),
         ) {
@@ -135,20 +131,16 @@ fun OnboardingScreen(
                 pagerState.animateScrollToPage(pagerState.currentPage + 1)
             }
         }
-    } else {
-        null
-    }
+    else null
 
-    val bluetoothEnableLauncher = if (!isPreview) {
+    val bluetoothEnableLauncher = if (!isPreview)
         rememberLauncherForActivityResult(
             ActivityResultContracts.StartActivityForResult(),
         ) { result ->
             if (result.resultCode == Activity.RESULT_OK) onComplete()
             else showBluetoothDeniedDialog = true
         }
-    } else {
-        null
-    }
+    else null
 
     if (!isPreview) {
         LaunchedEffect(pagerState) {
