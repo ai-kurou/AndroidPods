@@ -20,6 +20,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -33,9 +34,11 @@ import androidx.compose.ui.unit.dp
 internal fun SettingsContent(
     permissionStates: Map<String, Boolean>,
     bluetoothAdapterState: Int?,
+    overlayEnabled: Boolean,
     columns: Int,
     onPermissionWarningClick: () -> Unit,
     onBluetoothWarningClick: () -> Unit,
+    onOverlayToggle: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val hasNotGranted = permissionStates.values.any { !it }
@@ -128,6 +131,25 @@ internal fun SettingsContent(
                 }
             }
         }
+        item(span = { GridItemSpan(1) }) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .padding(12.dp),
+            ) {
+                Text(
+                    text = stringResource(R.string.overlay_setting_label),
+                    modifier = Modifier.weight(1f),
+                )
+                Switch(
+                    checked = overlayEnabled,
+                    onCheckedChange = onOverlayToggle,
+                )
+            }
+        }
     }
 }
 
@@ -140,9 +162,11 @@ private fun SettingsContentPreviewNoWarning() {
             android.Manifest.permission.BLUETOOTH_SCAN to true,
         ),
         bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+        overlayEnabled = true,
         columns = 1,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
+        onOverlayToggle = {},
     )
 }
 
@@ -155,9 +179,11 @@ private fun SettingsContentPreviewPermissionNotGranted() {
             android.Manifest.permission.BLUETOOTH_SCAN to false,
         ),
         bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+        overlayEnabled = false,
         columns = 1,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
+        onOverlayToggle = {},
     )
 }
 
@@ -170,9 +196,11 @@ private fun SettingsContentPreviewBluetoothOff() {
             android.Manifest.permission.BLUETOOTH_SCAN to true,
         ),
         bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
+        overlayEnabled = false,
         columns = 1,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
+        onOverlayToggle = {},
     )
 }
 
@@ -182,9 +210,11 @@ private fun SettingsContentPreviewBluetoothUnavailable() {
     SettingsContent(
         permissionStates = emptyMap(),
         bluetoothAdapterState = null,
+        overlayEnabled = false,
         columns = 1,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
+        onOverlayToggle = {},
     )
 }
 
@@ -197,9 +227,11 @@ private fun SettingsContentPreviewAllWarnings() {
             android.Manifest.permission.BLUETOOTH_SCAN to false,
         ),
         bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
+        overlayEnabled = false,
         columns = 1,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
+        onOverlayToggle = {},
     )
 }
 
@@ -212,9 +244,11 @@ private fun SettingsContentPreviewMedium() {
             android.Manifest.permission.BLUETOOTH_SCAN to false,
         ),
         bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
+        overlayEnabled = false,
         columns = 2,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
+        onOverlayToggle = {},
     )
 }
 
@@ -227,8 +261,10 @@ private fun SettingsContentPreviewExpanded() {
             android.Manifest.permission.BLUETOOTH_SCAN to false,
         ),
         bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
+        overlayEnabled = false,
         columns = 3,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
+        onOverlayToggle = {},
     )
 }
