@@ -22,10 +22,7 @@ kover {
     reports {
         filters {
             excludes {
-                annotatedBy(
-                    "androidx.compose.ui.tooling.preview.Preview",
-                    "androidx.compose.ui.tooling.preview.Preview\$Container",
-                )
+                annotatedBy("androidx.compose.ui.tooling.preview.Preview")
             }
         }
     }
