@@ -8,16 +8,6 @@ plugins {
     alias(libs.plugins.kover)
 }
 
-dependencies {
-    kover(project(":app"))
-    kover(project(":core:domain"))
-    kover(project(":core:data"))
-    kover(project(":core:service"))
-    kover(project(":feature:settings"))
-    kover(project(":feature:onboarding"))
-    kover(project(":navigation"))
-}
-
 kover {
     reports {
         filters {
@@ -26,4 +16,14 @@ kover {
             }
         }
     }
+}
+
+dependencies {
+    kover(project(":app"))
+    kover(project(":core:domain"))
+    kover(project(":core:data"))
+    kover(project(":core:service"))
+    kover(project(":feature:settings"))
+    kover(project(":feature:onboarding"))
+    kover(project(":navigation"))
 }
