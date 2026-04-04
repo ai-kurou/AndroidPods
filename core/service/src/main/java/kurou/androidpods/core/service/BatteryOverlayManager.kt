@@ -6,7 +6,9 @@ import android.provider.Settings
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -41,19 +43,32 @@ internal class BatteryOverlayManager(private val context: Context) {
     val isShowing: Boolean get() = overlayView != null
 
     private fun addOverlayView() {
-        val view = LayoutInflater.from(context).inflate(R.layout.overlay_container, null)
-        val params = WindowManager.LayoutParams(
-            WindowManager.LayoutParams.WRAP_CONTENT,
-            WindowManager.LayoutParams.WRAP_CONTENT,
-            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
-            PixelFormat.TRANSLUCENT,
-        ).apply {
-            gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
+        val wrapper = FrameLayout(context).apply {
+            setBackgroundColor(0x80000000.toInt())
+            setOnClickListener { hide() }
         }
-        windowManager.addView(view, params)
-        overlayView = view
+
+        val card = LayoutInflater.from(context)
+            .inflate(R.layout.overlay_container, wrapper, false)
+        // コンテンツ部分のタップは背景に伝播させない
+        card.setOnClickListener { /* consume */ }
+
+        val lp = FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL,
+        )
+        wrapper.addView(card, lp)
+
+        val params = WindowManager.LayoutParams(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+            PixelFormat.TRANSLUCENT,
+        )
+        windowManager.addView(wrapper, params)
+        overlayView = wrapper
     }
 
     private fun updateContent(devices: List<AppleDevice>) {
