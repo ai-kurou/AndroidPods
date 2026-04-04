@@ -42,14 +42,6 @@ android {
     }
 }
 
-koverReport {
-    filters {
-        excludes {
-            annotatedBy("androidx.compose.ui.tooling.preview.Preview")
-        }
-    }
-}
-
 dependencies {
     // プロジェクトモジュール
     implementation(project(":core:domain"))

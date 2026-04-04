@@ -8,6 +8,14 @@ plugins {
     alias(libs.plugins.kover)
 }
 
+koverReport {
+    filters {
+        excludes {
+            annotatedBy("androidx.compose.ui.tooling.preview.Preview")
+        }
+    }
+}
+
 dependencies {
     kover(project(":app"))
     kover(project(":core:domain"))
