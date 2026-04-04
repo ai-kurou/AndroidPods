@@ -6,4 +6,7 @@
     android:background="@drawable/overlay_background"
     android:gravity="center"
     android:orientation="vertical"
-    android:padding="24dp" />
+    android:paddingStart="24dp"
+    android:paddingEnd="24dp"
+    android:paddingBottom="24dp"
+    android:paddingTop="48dp" />

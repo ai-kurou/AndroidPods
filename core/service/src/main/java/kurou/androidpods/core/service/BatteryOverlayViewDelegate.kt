@@ -8,6 +8,7 @@ import android.provider.Settings
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import android.view.animation.DecelerateInterpolator
@@ -25,7 +26,10 @@ internal class BatteryOverlayViewDelegate(private val context: Context) : Overla
         private const val CARD_WIDTH_DP = 280f
         private const val CARD_SPACING_DP = 12f
         private const val CONTAINER_MARGIN_BOTTOM_DP = 32f
+        private const val CLOSE_BUTTON_SIZE_DP = 36f
+        private const val CLOSE_BUTTON_MARGIN_DP = 8f
         private const val ANIM_DURATION_MS = 300L
+        private const val DRAG_THRESHOLD = 10f
     }
 
     private val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
@@ -40,7 +44,8 @@ internal class BatteryOverlayViewDelegate(private val context: Context) : Overla
     override fun addOverlayView() {
         val dm = context.resources.displayMetrics
         val cardWidthPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CARD_WIDTH_DP, dm).toInt()
-        val marginBottomPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CONTAINER_MARGIN_BOTTOM_DP, dm).toInt()
+        val closeSizePx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CLOSE_BUTTON_SIZE_DP, dm).toInt()
+        val closeMarginPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CLOSE_BUTTON_MARGIN_DP, dm).toInt()
 
         val container = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
@@ -50,47 +55,51 @@ internal class BatteryOverlayViewDelegate(private val context: Context) : Overla
 
         val scrollView = ScrollView(context).apply {
             addView(container, FrameLayout.LayoutParams(cardWidthPx, FrameLayout.LayoutParams.WRAP_CONTENT))
-            // スクロールバーを非表示
             isVerticalScrollBarEnabled = false
         }
 
-        val wrapper = FrameLayout(context).apply {
-            setBackgroundColor(0x80000000.toInt())
+        val closeButton = ImageView(context).apply {
+            setImageResource(R.drawable.ic_close)
+            scaleType = ImageView.ScaleType.CENTER_INSIDE
             setOnClickListener { hideWithAnimation() }
         }
 
-        val scrollLp = FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.WRAP_CONTENT,
-            FrameLayout.LayoutParams.WRAP_CONTENT,
-            Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL,
-        ).apply {
-            bottomMargin = marginBottomPx
+        val root = FrameLayout(context).apply {
+            addView(scrollView, FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+            ))
+            addView(closeButton, FrameLayout.LayoutParams(closeSizePx, closeSizePx, Gravity.TOP or Gravity.END).apply {
+                topMargin = closeMarginPx
+                marginEnd = closeMarginPx
+            })
         }
-        // スクロール部分のタップは背景に伝播させない
-        scrollView.setOnClickListener { /* consume */ }
-        wrapper.addView(scrollView, scrollLp)
 
         val params = WindowManager.LayoutParams(
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
             PixelFormat.TRANSLUCENT,
-        )
-        wrapper.alpha = 0f
-        windowManager.addView(wrapper, params)
-        overlayView = wrapper
+        ).apply {
+            gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
+        }
+
+        setupDragListener(root, params)
+
+        root.alpha = 0f
+        windowManager.addView(root, params)
+        overlayView = root
 
         // レイアウト確定後にアニメーション開始
-        scrollView.post {
-            val displayMetrics = context.resources.displayMetrics
+        root.post {
             val slideDistance = TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, CARD_WIDTH_DP + CONTAINER_MARGIN_BOTTOM_DP, displayMetrics,
+                TypedValue.COMPLEX_UNIT_DIP, CARD_WIDTH_DP + CONTAINER_MARGIN_BOTTOM_DP, dm,
             )
-            scrollView.translationY = slideDistance
+            root.translationY = slideDistance
 
-            val slideIn = ObjectAnimator.ofFloat(scrollView, View.TRANSLATION_Y, slideDistance, 0f)
-            val fadeIn = ObjectAnimator.ofFloat(wrapper, View.ALPHA, 0f, 1f)
+            val slideIn = ObjectAnimator.ofFloat(root, View.TRANSLATION_Y, slideDistance, 0f)
+            val fadeIn = ObjectAnimator.ofFloat(root, View.ALPHA, 0f, 1f)
             AnimatorSet().apply {
                 playTogether(slideIn, fadeIn)
                 duration = ANIM_DURATION_MS
@@ -100,30 +109,62 @@ internal class BatteryOverlayViewDelegate(private val context: Context) : Overla
         }
     }
 
+    @Suppress("ClickableViewAccessibility")
+    private fun setupDragListener(view: View, params: WindowManager.LayoutParams) {
+        var initialX = 0
+        var initialY = 0
+        var initialTouchX = 0f
+        var initialTouchY = 0f
+        var isDragging = false
+
+        view.setOnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    initialX = params.x
+                    initialY = params.y
+                    initialTouchX = event.rawX
+                    initialTouchY = event.rawY
+                    isDragging = false
+                    true
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    val dx = event.rawX - initialTouchX
+                    val dy = event.rawY - initialTouchY
+                    if (!isDragging && (dx * dx + dy * dy) > DRAG_THRESHOLD * DRAG_THRESHOLD) {
+                        isDragging = true
+                    }
+                    if (isDragging) {
+                        params.x = initialX + dx.toInt()
+                        // gravity が BOTTOM なので Y は上方向が正
+                        params.y = initialY - (event.rawY - initialTouchY).toInt()
+                        windowManager.updateViewLayout(view, params)
+                    }
+                    isDragging
+                }
+                MotionEvent.ACTION_UP -> isDragging
+                else -> false
+            }
+        }
+    }
+
     override fun removeOverlayView() {
-        val wrapper = overlayView ?: return
-        windowManager.removeViewImmediate(wrapper)
+        val view = overlayView ?: return
+        windowManager.removeViewImmediate(view)
         overlayView = null
         cardsContainer = null
     }
 
     override fun animateHide(onComplete: () -> Unit) {
-        val wrapper = overlayView ?: return
-        val scrollView = (wrapper as? FrameLayout)?.getChildAt(0) ?: run {
-            windowManager.removeViewImmediate(wrapper)
-            overlayView = null
-            cardsContainer = null
-            return
-        }
+        val view = overlayView ?: return
 
-        val slideOut = ObjectAnimator.ofFloat(scrollView, View.TRANSLATION_Y, 0f, scrollView.height.toFloat())
-        val fadeOut = ObjectAnimator.ofFloat(wrapper, View.ALPHA, 1f, 0f)
+        val slideOut = ObjectAnimator.ofFloat(view, View.TRANSLATION_Y, 0f, view.height.toFloat())
+        val fadeOut = ObjectAnimator.ofFloat(view, View.ALPHA, 1f, 0f)
         AnimatorSet().apply {
             playTogether(slideOut, fadeOut)
             duration = ANIM_DURATION_MS
             addListener(object : android.animation.AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: android.animation.Animator) {
-                    if (overlayView === wrapper) {
+                    if (overlayView === view) {
                         onComplete()
                     }
                 }
@@ -154,24 +195,18 @@ internal class BatteryOverlayViewDelegate(private val context: Context) : Overla
     }
 
     private fun hideWithAnimation() {
-        val wrapper = overlayView ?: return
+        val view = overlayView ?: return
         onUserDismiss?.invoke()
-        val scrollView = (wrapper as? FrameLayout)?.getChildAt(0) ?: run {
-            windowManager.removeViewImmediate(wrapper)
-            overlayView = null
-            cardsContainer = null
-            return
-        }
 
-        val slideOut = ObjectAnimator.ofFloat(scrollView, View.TRANSLATION_Y, 0f, scrollView.height.toFloat())
-        val fadeOut = ObjectAnimator.ofFloat(wrapper, View.ALPHA, 1f, 0f)
+        val slideOut = ObjectAnimator.ofFloat(view, View.TRANSLATION_Y, 0f, view.height.toFloat())
+        val fadeOut = ObjectAnimator.ofFloat(view, View.ALPHA, 1f, 0f)
         AnimatorSet().apply {
             playTogether(slideOut, fadeOut)
             duration = ANIM_DURATION_MS
             addListener(object : android.animation.AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: android.animation.Animator) {
-                    if (overlayView === wrapper) {
-                        windowManager.removeViewImmediate(wrapper)
+                    if (overlayView === view) {
+                        windowManager.removeViewImmediate(view)
                         overlayView = null
                         cardsContainer = null
                     }
