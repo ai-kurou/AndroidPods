@@ -24,6 +24,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
+import org.robolectric.shadows.ShadowSettings
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [30, 31])
@@ -45,13 +46,13 @@ class OnboardingScreenTest {
 
     @Test
     @Config(qualifiers = "port")
-    fun `縦向きでボタンを押してページ1からページ3へ遷移してonCompleteが呼ばれる`() {
+    fun `縦向きでボタンを押してページ1からページ4へ遷移してonCompleteが呼ばれる`() {
         assertNavigationAndComplete()
     }
 
     @Test
     @Config(qualifiers = "land")
-    fun `横向きでボタンを押してページ1からページ3へ遷移してonCompleteが呼ばれる`() {
+    fun `横向きでボタンを押してページ1からページ4へ遷移してonCompleteが呼ばれる`() {
         assertNavigationAndComplete()
     }
 
@@ -69,10 +70,11 @@ class OnboardingScreenTest {
 
     @Test
     @Config(qualifiers = "port")
-    fun `ページ3まで遷移して戻るボタンを3回押して画面が終了する`() {
+    fun `ページ4まで遷移して戻るボタンを4回押して画面が終了する`() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         shadowOf(btAdapter(context)).setEnabled(true)
         grantRequiredPermissions(context)
+        ShadowSettings.setCanDrawOverlays(true)
 
         composeTestRule.setContent {
             OnboardingScreen(onComplete = {})
@@ -82,6 +84,14 @@ class OnboardingScreenTest {
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("Grant Permission").performClick() // page 1 → 2
         composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Allow Overlay").performClick()   // page 2 → 3
+        composeTestRule.waitForIdle()
+
+        composeTestRule.activityRule.scenario.onActivity {
+            it.onBackPressedDispatcher.onBackPressed()                   // page 3 → 2
+        }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Allow Overlay").assertIsDisplayed()
 
         composeTestRule.activityRule.scenario.onActivity {
             it.onBackPressedDispatcher.onBackPressed()                   // page 2 → 1
@@ -107,6 +117,7 @@ class OnboardingScreenTest {
         val context = ApplicationProvider.getApplicationContext<Context>()
         // Bluetooth は有効化しない（デフォルトで無効）
         grantRequiredPermissions(context)
+        ShadowSettings.setCanDrawOverlays(true)
 
         composeTestRule.setContent {
             OnboardingScreen(onComplete = {})
@@ -115,6 +126,8 @@ class OnboardingScreenTest {
         composeTestRule.onNodeWithText("Next").performClick()            // page 0 → 1
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("Grant Permission").performClick() // page 1 → 2
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Allow Overlay").performClick()   // page 2 → 3
         composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithText("Enable Bluetooth").performClick()
@@ -128,6 +141,7 @@ class OnboardingScreenTest {
         val context = ApplicationProvider.getApplicationContext<Context>()
         shadowOf(btAdapter(context)).setEnabled(true)
         grantRequiredPermissions(context)
+        ShadowSettings.setCanDrawOverlays(true)
 
         var completed = false
         composeTestRule.setContent {
@@ -144,6 +158,12 @@ class OnboardingScreenTest {
         composeTestRule.onNodeWithText("Location permission is required to use Bluetooth.").assertExists()
 
         composeTestRule.onNodeWithText("Grant Permission").performClick() // page 1 → 2
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag("lottie_animation").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Allow overlay display to show battery info on screen.").assertExists()
+
+        composeTestRule.onNodeWithText("Allow Overlay").performClick()   // page 2 → 3
         composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithTag("lottie_animation").assertIsDisplayed()

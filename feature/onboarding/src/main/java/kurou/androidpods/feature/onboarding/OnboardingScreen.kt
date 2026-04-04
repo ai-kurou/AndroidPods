@@ -57,10 +57,12 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import kotlinx.coroutines.launch
+import androidx.core.net.toUri
 
-private const val PAGE_COUNT = 3
+private const val PAGE_COUNT = 4
 private const val PERMISSION_PAGE = 1
-private const val BLUETOOTH_PAGE = 2
+private const val OVERLAY_PAGE = 2
+private const val BLUETOOTH_PAGE = 3
 
 private fun requiredPermissions(): Array<String> =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -84,8 +86,12 @@ private val pages = listOf(
         textResId = R.string.onboarding_page2_text,
     ),
     OnboardingPageData(
-        lottieResId = R.raw.bluetooth,
+        lottieResId = R.raw.overlay,
         textResId = R.string.onboarding_page3_text,
+    ),
+    OnboardingPageData(
+        lottieResId = R.raw.bluetooth,
+        textResId = R.string.onboarding_page4_text,
     ),
 )
 
@@ -115,6 +121,18 @@ fun OnboardingScreen(
                 }
             } else {
                 showPermissionDeniedDialog = true
+            }
+        }
+    } else {
+        null
+    }
+
+    val overlayPermissionLauncher = if (!isPreview) {
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+        ) {
+            coroutineScope.launch {
+                pagerState.animateScrollToPage(pagerState.currentPage + 1)
             }
         }
     } else {
@@ -204,6 +222,19 @@ fun OnboardingScreen(
                     pagerState.currentPage == PERMISSION_PAGE -> {
                         permissionLauncher?.launch(requiredPermissions())
                     }
+                    pagerState.currentPage == OVERLAY_PAGE -> {
+                        if (Settings.canDrawOverlays(context)) {
+                            coroutineScope.launch {
+                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                            }
+                        } else {
+                            val intent = Intent(
+                                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                "package:${context.packageName}".toUri(),
+                            )
+                            overlayPermissionLauncher?.launch(intent)
+                        }
+                    }
                     pagerState.currentPage == BLUETOOTH_PAGE -> {
                         when {
                             bluetoothAdapter == null -> {
@@ -231,6 +262,7 @@ fun OnboardingScreen(
                 text = stringResource(
                     when {
                         pagerState.currentPage == PERMISSION_PAGE -> R.string.onboarding_button_grant_permission
+                        pagerState.currentPage == OVERLAY_PAGE -> R.string.onboarding_button_allow_overlay
                         pagerState.currentPage == BLUETOOTH_PAGE -> R.string.onboarding_button_enable_bluetooth
                         pagerState.currentPage < PAGE_COUNT - 1 -> R.string.onboarding_button_next
                         else -> R.string.onboarding_button_get_started

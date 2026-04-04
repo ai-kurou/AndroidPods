@@ -1,7 +1,8 @@
 <resources>
     <string name="onboarding_page1_text">AirPodsのバッテリー残量を確認できます。</string>
     <string name="onboarding_page2_text">Bluetoothを使うには位置情報権限が必要です。</string>
-    <string name="onboarding_page3_text">AirPodsに接続するにはBluetoothをONにしてください。</string>
+    <string name="onboarding_page3_text">バッテリー情報を画面に表示するにはオーバーレイ権限が必要です。</string>
+    <string name="onboarding_page4_text">AirPodsに接続するにはBluetoothをONにしてください。</string>
     <string name="onboarding_button_next">次へ</string>
     <string name="onboarding_button_grant_permission">権限を許可する</string>
     <string name="onboarding_button_enable_bluetooth">BluetoothをONにする</string>
@@ -16,4 +17,5 @@
     <string name="onboarding_bluetooth_dialog_message">Bluetoothが有効になりませんでした。設定から有効にしてください。</string>
     <string name="onboarding_bluetooth_dialog_confirm">設定を開く</string>
     <string name="onboarding_bluetooth_dialog_dismiss">キャンセル</string>
+    <string name="onboarding_button_allow_overlay">オーバーレイを許可する</string>
 </resources>

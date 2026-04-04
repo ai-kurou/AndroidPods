@@ -23,6 +23,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows
 import org.robolectric.annotation.Config
+import org.robolectric.shadows.ShadowSettings
 
 @HiltAndroidTest
 @RunWith(RobolectricTestRunner::class)
@@ -46,6 +47,7 @@ class AppNavHostTest {
         permissions.forEach { shadowApp.grantPermissions(it) }
 
         Shadows.shadowOf(BluetoothAdapter.getDefaultAdapter()).setEnabled(true)
+        ShadowSettings.setCanDrawOverlays(true)
     }
 
     @Test
@@ -73,7 +75,11 @@ class AppNavHostTest {
         composeTestRule.onNodeWithText("Grant Permission").assertIsDisplayed()
         composeTestRule.onNodeWithText("Grant Permission").performClick()
         composeTestRule.waitForIdle()
-        // ページ3: Bluetooth ONボタンを押す（テスト環境ではBluetoothが有効のため直接完了する）
+        // ページ3: オーバーレイ権限ボタンを押す（テスト環境では既に許可済み）
+        composeTestRule.onNodeWithText("Allow Overlay").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Allow Overlay").performClick()
+        composeTestRule.waitForIdle()
+        // ページ4: Bluetooth ONボタンを押す（テスト環境ではBluetoothが有効のため直接完了する）
         composeTestRule.onNodeWithText("Enable Bluetooth").assertIsDisplayed()
         composeTestRule.onNodeWithText("Enable Bluetooth").performClick()
         composeTestRule.waitForIdle()
