@@ -14,6 +14,7 @@ import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
 import kurou.androidpods.core.domain.AppleDevice
 import kurou.androidpods.core.domain.DeviceImages
@@ -21,36 +22,52 @@ import kurou.androidpods.core.domain.DeviceImages
 internal class BatteryOverlayViewDelegate(private val context: Context) : OverlayViewDelegate {
 
     companion object {
-        private const val CARD_SIZE_DP = 280f
-        private const val CARD_MARGIN_BOTTOM_DP = 32f
+        private const val CARD_WIDTH_DP = 280f
+        private const val CARD_SPACING_DP = 12f
+        private const val CONTAINER_MARGIN_BOTTOM_DP = 32f
         private const val ANIM_DURATION_MS = 300L
     }
 
     private val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     private var overlayView: View? = null
+    private var cardsContainer: LinearLayout? = null
 
     override val hasView: Boolean get() = overlayView != null
 
     override fun canDrawOverlays(): Boolean = Settings.canDrawOverlays(context)
 
     override fun addOverlayView() {
+        val dm = context.resources.displayMetrics
+        val cardWidthPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CARD_WIDTH_DP, dm).toInt()
+        val marginBottomPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CONTAINER_MARGIN_BOTTOM_DP, dm).toInt()
+
+        val container = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER_HORIZONTAL
+        }
+        cardsContainer = container
+
+        val scrollView = ScrollView(context).apply {
+            addView(container, FrameLayout.LayoutParams(cardWidthPx, FrameLayout.LayoutParams.WRAP_CONTENT))
+            // スクロールバーを非表示
+            isVerticalScrollBarEnabled = false
+        }
+
         val wrapper = FrameLayout(context).apply {
             setBackgroundColor(0x80000000.toInt())
             setOnClickListener { hideWithAnimation() }
         }
 
-        val card = LayoutInflater.from(context)
-            .inflate(R.layout.overlay_container, wrapper, false)
-        // コンテンツ部分のタップは背景に伝播させない
-        card.setOnClickListener { /* consume */ }
-
-        val dm = context.resources.displayMetrics
-        val sizePx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CARD_SIZE_DP, dm).toInt()
-        val marginPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CARD_MARGIN_BOTTOM_DP, dm).toInt()
-        val lp = FrameLayout.LayoutParams(sizePx, sizePx, Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL).apply {
-            bottomMargin = marginPx
+        val scrollLp = FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.WRAP_CONTENT,
+            FrameLayout.LayoutParams.WRAP_CONTENT,
+            Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL,
+        ).apply {
+            bottomMargin = marginBottomPx
         }
-        wrapper.addView(card, lp)
+        // スクロール部分のタップは背景に伝播させない
+        scrollView.setOnClickListener { /* consume */ }
+        wrapper.addView(scrollView, scrollLp)
 
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.MATCH_PARENT,
@@ -59,20 +76,19 @@ internal class BatteryOverlayViewDelegate(private val context: Context) : Overla
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
             PixelFormat.TRANSLUCENT,
         )
-        // 初期状態: 背景透明、カード画面外
         wrapper.alpha = 0f
         windowManager.addView(wrapper, params)
         overlayView = wrapper
 
         // レイアウト確定後にアニメーション開始
-        card.post {
+        scrollView.post {
             val displayMetrics = context.resources.displayMetrics
             val slideDistance = TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, CARD_SIZE_DP + CARD_MARGIN_BOTTOM_DP, displayMetrics,
+                TypedValue.COMPLEX_UNIT_DIP, CARD_WIDTH_DP + CONTAINER_MARGIN_BOTTOM_DP, displayMetrics,
             )
-            card.translationY = slideDistance
+            scrollView.translationY = slideDistance
 
-            val slideIn = ObjectAnimator.ofFloat(card, View.TRANSLATION_Y, slideDistance, 0f)
+            val slideIn = ObjectAnimator.ofFloat(scrollView, View.TRANSLATION_Y, slideDistance, 0f)
             val fadeIn = ObjectAnimator.ofFloat(wrapper, View.ALPHA, 0f, 1f)
             AnimatorSet().apply {
                 playTogether(slideIn, fadeIn)
@@ -87,17 +103,19 @@ internal class BatteryOverlayViewDelegate(private val context: Context) : Overla
         val wrapper = overlayView ?: return
         windowManager.removeViewImmediate(wrapper)
         overlayView = null
+        cardsContainer = null
     }
 
     override fun animateHide(onComplete: () -> Unit) {
         val wrapper = overlayView ?: return
-        val card = wrapper.findViewById<View>(R.id.overlay_root) ?: run {
+        val scrollView = (wrapper as? FrameLayout)?.getChildAt(0) ?: run {
             windowManager.removeViewImmediate(wrapper)
             overlayView = null
+            cardsContainer = null
             return
         }
 
-        val slideOut = ObjectAnimator.ofFloat(card, View.TRANSLATION_Y, 0f, card.height.toFloat())
+        val slideOut = ObjectAnimator.ofFloat(scrollView, View.TRANSLATION_Y, 0f, scrollView.height.toFloat())
         val fadeOut = ObjectAnimator.ofFloat(wrapper, View.ALPHA, 1f, 0f)
         AnimatorSet().apply {
             playTogether(slideOut, fadeOut)
@@ -114,26 +132,36 @@ internal class BatteryOverlayViewDelegate(private val context: Context) : Overla
     }
 
     override fun updateContent(devices: List<AppleDevice>) {
-        val container = overlayView?.findViewById<LinearLayout>(R.id.overlay_device_container)
-            ?: return
+        val container = cardsContainer ?: return
         container.removeAllViews()
 
+        val dm = context.resources.displayMetrics
+        val spacingPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CARD_SPACING_DP, dm).toInt()
         val inflater = LayoutInflater.from(context)
-        for (device in devices) {
-            val deviceView = buildDeviceView(inflater, container, device)
-            container.addView(deviceView)
+
+        for ((index, device) in devices.withIndex()) {
+            val card = inflater.inflate(R.layout.overlay_card, container, false) as LinearLayout
+            val deviceView = buildDeviceView(inflater, card, device)
+            card.addView(deviceView)
+            // カード間にスペースを追加
+            if (index > 0) {
+                (card.layoutParams as? LinearLayout.LayoutParams)?.topMargin = spacingPx
+            }
+            card.setOnClickListener { /* consume */ }
+            container.addView(card)
         }
     }
 
     private fun hideWithAnimation() {
         val wrapper = overlayView ?: return
-        val card = wrapper.findViewById<View>(R.id.overlay_root) ?: run {
+        val scrollView = (wrapper as? FrameLayout)?.getChildAt(0) ?: run {
             windowManager.removeViewImmediate(wrapper)
             overlayView = null
+            cardsContainer = null
             return
         }
 
-        val slideOut = ObjectAnimator.ofFloat(card, View.TRANSLATION_Y, 0f, card.height.toFloat())
+        val slideOut = ObjectAnimator.ofFloat(scrollView, View.TRANSLATION_Y, 0f, scrollView.height.toFloat())
         val fadeOut = ObjectAnimator.ofFloat(wrapper, View.ALPHA, 1f, 0f)
         AnimatorSet().apply {
             playTogether(slideOut, fadeOut)
@@ -143,6 +171,7 @@ internal class BatteryOverlayViewDelegate(private val context: Context) : Overla
                     if (overlayView === wrapper) {
                         windowManager.removeViewImmediate(wrapper)
                         overlayView = null
+                        cardsContainer = null
                     }
                 }
             })
