@@ -17,4 +17,5 @@
     <string name="bluetooth_state_not_available">Not Available</string>
     <string name="apple_devices_title">Apple Devices</string>
     <string name="no_apple_devices">No Apple devices found</string>
+    <string name="overlay_setting_label">Show battery overlay</string>
 </resources>

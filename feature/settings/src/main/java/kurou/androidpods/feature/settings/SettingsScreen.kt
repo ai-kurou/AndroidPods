@@ -21,6 +21,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.core.net.toUri
 
 @Composable
 fun SettingsScreen(
@@ -35,6 +36,7 @@ fun SettingsScreen(
 
     val permissionStates = remember { mutableStateMapOf<String, Boolean>() }
     val bluetoothAdapterState by viewModel.bluetoothAdapterState.collectAsStateWithLifecycle()
+    var overlayEnabled by remember { mutableStateOf(Settings.canDrawOverlays(context)) }
     var showSettingsDialog by remember { mutableStateOf(false) }
     var initialRequestDone by remember { mutableStateOf(false) }
 
@@ -44,6 +46,12 @@ fun SettingsScreen(
             permissionStates[permission] =
                 ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
         }
+    }
+
+    val overlaySettingsLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) {
+        overlayEnabled = Settings.canDrawOverlays(context)
     }
 
     val launcher = rememberLauncherForActivityResult(
@@ -70,6 +78,7 @@ fun SettingsScreen(
                 ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
         }
         viewModel.refreshBluetoothState()
+        overlayEnabled = Settings.canDrawOverlays(context)
         onStartScanService()
         if (initialRequestDone) {
             val hasNotGranted = permissions.any {
@@ -102,6 +111,7 @@ fun SettingsScreen(
     SettingsContent(
         permissionStates = permissionStates,
         bluetoothAdapterState = bluetoothAdapterState,
+        overlayEnabled = overlayEnabled,
         columns = columns,
         onPermissionWarningClick = {
             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
@@ -111,6 +121,15 @@ fun SettingsScreen(
         },
         onBluetoothWarningClick = {
             context.startActivity(Intent(Settings.ACTION_BLUETOOTH_SETTINGS))
+        },
+        onOverlayToggle = { enabled ->
+            if (enabled) {
+                val intent = Intent(
+                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    "package:${context.packageName}".toUri(),
+                )
+                overlaySettingsLauncher.launch(intent)
+            } else overlayEnabled = false
         },
         modifier = modifier,
     )

@@ -29,9 +29,11 @@ class SettingsContentTest {
                     Manifest.permission.BLUETOOTH_SCAN to true,
                 ),
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+                overlayEnabled = false,
                 columns = 1,
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
+                onOverlayToggle = {},
             )
         }
 
@@ -50,9 +52,11 @@ class SettingsContentTest {
                     Manifest.permission.BLUETOOTH_SCAN to false,
                 ),
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+                overlayEnabled = false,
                 columns = 1,
                 onPermissionWarningClick = { clicked = true },
                 onBluetoothWarningClick = {},
+                onOverlayToggle = {},
             )
         }
 
@@ -69,9 +73,11 @@ class SettingsContentTest {
             SettingsContent(
                 permissionStates = emptyMap(),
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+                overlayEnabled = false,
                 columns = 1,
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
+                onOverlayToggle = {},
             )
         }
 
@@ -87,9 +93,11 @@ class SettingsContentTest {
             SettingsContent(
                 permissionStates = emptyMap(),
                 bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
+                overlayEnabled = false,
                 columns = 1,
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = { clicked = true },
+                onOverlayToggle = {},
             )
         }
 
@@ -107,9 +115,11 @@ class SettingsContentTest {
             SettingsContent(
                 permissionStates = emptyMap(),
                 bluetoothAdapterState = null,
+                overlayEnabled = false,
                 columns = 1,
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = { clicked = true },
+                onOverlayToggle = {},
             )
         }
 
