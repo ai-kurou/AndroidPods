@@ -45,7 +45,7 @@ class DeviceScanService : Service() {
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
-        overlayManager = BatteryOverlayManager(this)
+        overlayManager = BatteryOverlayManager(BatteryOverlayViewDelegate(this))
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
