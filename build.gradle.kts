@@ -18,12 +18,8 @@ dependencies {
     kover(project(":navigation"))
 }
 
-kover {
-    reports {
-        filters {
-            excludes {
-                annotatedBy("androidx.compose.ui.tooling.preview.Preview")
-            }
-        }
+koverReport.filters {
+    excludes {
+        annotatedBy("androidx.compose.ui.tooling.preview.Preview")
     }
 }
