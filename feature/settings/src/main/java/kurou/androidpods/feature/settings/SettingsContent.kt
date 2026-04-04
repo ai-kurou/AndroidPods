@@ -172,7 +172,7 @@ private fun SettingsContentPreviewNoWarning() {
 
 @Preview(showBackground = true, name = "権限未許可")
 @Composable
-private fun SettingsContentPreviewPermissionNotGranted() {
+internal fun SettingsContentPreviewPermissionNotGranted() {
     SettingsContent(
         permissionStates = mapOf(
             android.Manifest.permission.BLUETOOTH_CONNECT to true,
