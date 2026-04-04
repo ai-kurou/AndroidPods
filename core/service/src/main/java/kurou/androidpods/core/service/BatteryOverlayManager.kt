@@ -3,10 +3,10 @@ package kurou.androidpods.core.service
 import android.content.Context
 import android.graphics.PixelFormat
 import android.provider.Settings
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -16,6 +16,11 @@ import kurou.androidpods.core.domain.AppleDevice
 import kurou.androidpods.core.domain.DeviceImages
 
 internal class BatteryOverlayManager(private val context: Context) {
+
+    companion object {
+        private const val CARD_SIZE_DP = 280f
+        private const val CARD_MARGIN_BOTTOM_DP = 32f
+    }
 
     private val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     private var overlayView: View? = null
@@ -53,11 +58,12 @@ internal class BatteryOverlayManager(private val context: Context) {
         // コンテンツ部分のタップは背景に伝播させない
         card.setOnClickListener { /* consume */ }
 
-        val lp = FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL,
-        )
+        val dm = context.resources.displayMetrics
+        val sizePx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CARD_SIZE_DP, dm).toInt()
+        val marginPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CARD_MARGIN_BOTTOM_DP, dm).toInt()
+        val lp = FrameLayout.LayoutParams(sizePx, sizePx, Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL).apply {
+            bottomMargin = marginPx
+        }
         wrapper.addView(card, lp)
 
         val params = WindowManager.LayoutParams(
