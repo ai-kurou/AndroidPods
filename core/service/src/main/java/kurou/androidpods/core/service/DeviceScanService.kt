@@ -18,6 +18,7 @@ import kurou.androidpods.core.domain.AppleDevice
 import kurou.androidpods.core.domain.AppleDeviceRepository
 import kurou.androidpods.core.domain.BluetoothAdapterRepository
 import kurou.androidpods.core.domain.DeviceImages
+import kurou.androidpods.core.domain.OverlaySettingsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -34,12 +35,17 @@ class DeviceScanService : Service() {
     @Inject
     lateinit var bluetoothAdapterRepository: BluetoothAdapterRepository
 
+    @Inject
+    lateinit var overlaySettingsRepository: OverlaySettingsRepository
+
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private var isForeground = false
+    private lateinit var overlayManager: BatteryOverlayManager
 
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
+        overlayManager = BatteryOverlayManager(BatteryOverlayViewDelegate(this))
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -59,6 +65,7 @@ class DeviceScanService : Service() {
     }
 
     override fun onDestroy() {
+        overlayManager.hide()
         appleDeviceRepository.stopScan()
         scope.cancel()
         super.onDestroy()
@@ -74,6 +81,11 @@ class DeviceScanService : Service() {
                 val notification = buildNotification(text, deviceList)
                 getSystemService(NotificationManager::class.java)
                     .notify(NOTIFICATION_ID, notification)
+
+                if (overlaySettingsRepository.isEnabled() && deviceList.isNotEmpty())
+                    overlayManager.show(deviceList)
+                else
+                    overlayManager.hide()
             }
         }
     }
