@@ -1,5 +1,6 @@
 package kurou.androidpods.core.service
 
+import android.annotation.SuppressLint
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Context
@@ -28,6 +29,9 @@ internal class BatteryOverlayViewDelegate(private val context: Context) : Overla
         private const val CONTAINER_MARGIN_BOTTOM_DP = 32f
         private const val CLOSE_BUTTON_SIZE_DP = 36f
         private const val CLOSE_BUTTON_MARGIN_DP = 8f
+        private const val DRAG_HANDLE_WIDTH_DP = 36f
+        private const val DRAG_HANDLE_HEIGHT_DP = 4f
+        private const val DRAG_HANDLE_MARGIN_TOP_DP = 14f
         private const val ANIM_DURATION_MS = 300L
         private const val DRAG_THRESHOLD = 10f
     }
@@ -35,6 +39,7 @@ internal class BatteryOverlayViewDelegate(private val context: Context) : Overla
     private val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     private var overlayView: View? = null
     private var cardsContainer: LinearLayout? = null
+    private var layoutParams: WindowManager.LayoutParams? = null
 
     override val hasView: Boolean get() = overlayView != null
     override var onUserDismiss: (() -> Unit)? = null
@@ -58,17 +63,28 @@ internal class BatteryOverlayViewDelegate(private val context: Context) : Overla
             isVerticalScrollBarEnabled = false
         }
 
+        val handleWidthPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, DRAG_HANDLE_WIDTH_DP, dm).toInt()
+        val handleHeightPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, DRAG_HANDLE_HEIGHT_DP, dm).toInt()
+        val handleMarginTopPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, DRAG_HANDLE_MARGIN_TOP_DP, dm).toInt()
+
+        val dragHandle = View(context).apply {
+            setBackgroundResource(R.drawable.overlay_drag_handle)
+        }
+
         val closeButton = ImageView(context).apply {
             setImageResource(R.drawable.ic_close)
             scaleType = ImageView.ScaleType.CENTER_INSIDE
             setOnClickListener { hideWithAnimation() }
         }
 
-        val root = FrameLayout(context).apply {
+        val root = DraggableFrameLayout(context, this).apply {
             addView(scrollView, FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.WRAP_CONTENT,
                 FrameLayout.LayoutParams.WRAP_CONTENT,
             ))
+            addView(dragHandle, FrameLayout.LayoutParams(handleWidthPx, handleHeightPx, Gravity.TOP or Gravity.CENTER_HORIZONTAL).apply {
+                topMargin = handleMarginTopPx
+            })
             addView(closeButton, FrameLayout.LayoutParams(closeSizePx, closeSizePx, Gravity.TOP or Gravity.END).apply {
                 topMargin = closeMarginPx
                 marginEnd = closeMarginPx
@@ -85,11 +101,10 @@ internal class BatteryOverlayViewDelegate(private val context: Context) : Overla
             gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
         }
 
-        setupDragListener(root, params)
-
         root.alpha = 0f
         windowManager.addView(root, params)
         overlayView = root
+        layoutParams = params
 
         // レイアウト確定後にアニメーション開始
         root.post {
@@ -109,41 +124,55 @@ internal class BatteryOverlayViewDelegate(private val context: Context) : Overla
         }
     }
 
-    @Suppress("ClickableViewAccessibility")
-    private fun setupDragListener(view: View, params: WindowManager.LayoutParams) {
-        var initialX = 0
-        var initialY = 0
-        var initialTouchX = 0f
-        var initialTouchY = 0f
-        var isDragging = false
+    private class DraggableFrameLayout(
+        context: Context,
+        private val delegate: BatteryOverlayViewDelegate,
+    ) : FrameLayout(context) {
 
-        view.setOnTouchListener { _, event ->
-            when (event.action) {
+        private var initialX = 0
+        private var initialY = 0
+        private var initialTouchX = 0f
+        private var initialTouchY = 0f
+        private var isDragging = false
+
+        override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
+            when (ev.action) {
                 MotionEvent.ACTION_DOWN -> {
+                    val params = delegate.layoutParams ?: return false
                     initialX = params.x
                     initialY = params.y
-                    initialTouchX = event.rawX
-                    initialTouchY = event.rawY
+                    initialTouchX = ev.rawX
+                    initialTouchY = ev.rawY
                     isDragging = false
-                    true
                 }
                 MotionEvent.ACTION_MOVE -> {
-                    val dx = event.rawX - initialTouchX
-                    val dy = event.rawY - initialTouchY
+                    val dx = ev.rawX - initialTouchX
+                    val dy = ev.rawY - initialTouchY
                     if (!isDragging && (dx * dx + dy * dy) > DRAG_THRESHOLD * DRAG_THRESHOLD) {
                         isDragging = true
                     }
-                    if (isDragging) {
-                        params.x = initialX + dx.toInt()
-                        // gravity が BOTTOM なので Y は上方向が正
-                        params.y = initialY - (event.rawY - initialTouchY).toInt()
-                        windowManager.updateViewLayout(view, params)
-                    }
-                    isDragging
+                    if (isDragging) return true
                 }
-                MotionEvent.ACTION_UP -> isDragging
-                else -> false
             }
+            return false
+        }
+
+        @SuppressLint("ClickableViewAccessibility")
+        override fun onTouchEvent(event: MotionEvent): Boolean {
+            val params = delegate.layoutParams ?: return false
+            when (event.action) {
+                MotionEvent.ACTION_MOVE -> {
+                    params.x = initialX + (event.rawX - initialTouchX).toInt()
+                    params.y = initialY - (event.rawY - initialTouchY).toInt()
+                    delegate.windowManager.updateViewLayout(this, params)
+                    return true
+                }
+                MotionEvent.ACTION_UP -> {
+                    isDragging = false
+                    return true
+                }
+            }
+            return super.onTouchEvent(event)
         }
     }
 
@@ -152,6 +181,7 @@ internal class BatteryOverlayViewDelegate(private val context: Context) : Overla
         windowManager.removeViewImmediate(view)
         overlayView = null
         cardsContainer = null
+        layoutParams = null
     }
 
     override fun animateHide(onComplete: () -> Unit) {
@@ -209,6 +239,7 @@ internal class BatteryOverlayViewDelegate(private val context: Context) : Overla
                         windowManager.removeViewImmediate(view)
                         overlayView = null
                         cardsContainer = null
+                        layoutParams = null
                     }
                 }
             })
