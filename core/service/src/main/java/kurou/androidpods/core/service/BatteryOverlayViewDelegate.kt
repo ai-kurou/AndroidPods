@@ -33,6 +33,7 @@ internal class BatteryOverlayViewDelegate(private val context: Context) : Overla
     private var cardsContainer: LinearLayout? = null
 
     override val hasView: Boolean get() = overlayView != null
+    override var onUserDismiss: (() -> Unit)? = null
 
     override fun canDrawOverlays(): Boolean = Settings.canDrawOverlays(context)
 
@@ -154,6 +155,7 @@ internal class BatteryOverlayViewDelegate(private val context: Context) : Overla
 
     private fun hideWithAnimation() {
         val wrapper = overlayView ?: return
+        onUserDismiss?.invoke()
         val scrollView = (wrapper as? FrameLayout)?.getChildAt(0) ?: run {
             windowManager.removeViewImmediate(wrapper)
             overlayView = null

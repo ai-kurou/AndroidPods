@@ -9,4 +9,5 @@ internal interface OverlayViewDelegate {
     fun animateHide(onComplete: () -> Unit)
     fun updateContent(devices: List<AppleDevice>)
     val hasView: Boolean
+    var onUserDismiss: (() -> Unit)?
 }

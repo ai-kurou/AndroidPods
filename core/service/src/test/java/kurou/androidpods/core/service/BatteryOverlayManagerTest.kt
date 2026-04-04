@@ -104,6 +104,57 @@ class BatteryOverlayManagerTest {
 
         assertEquals(2, fakeDelegate.addOverlayViewCount)
     }
+
+    @Test
+    fun `ユーザーがオーバーレイを閉じた後は同じデバイスで再表示されない`() {
+        fakeDelegate.overlayPermission = true
+        manager.show(listOf(baseDevice))
+        assertTrue(fakeDelegate.hasView)
+
+        // ユーザーが背景タップで閉じる
+        fakeDelegate.onUserDismiss?.invoke()
+        manager.hide()
+
+        // 同じデバイスが再度検出されても表示されない
+        manager.show(listOf(baseDevice))
+        assertFalse(fakeDelegate.hasView)
+        assertEquals(1, fakeDelegate.addOverlayViewCount)
+    }
+
+    @Test
+    fun `dismissedデバイスが圏外になった後に再検出されると再表示される`() {
+        fakeDelegate.overlayPermission = true
+        manager.show(listOf(baseDevice))
+
+        // ユーザーが閉じる
+        fakeDelegate.onUserDismiss?.invoke()
+        manager.hide()
+
+        // デバイスが圏外になる（空リストでshow）
+        manager.show(emptyList())
+
+        // 再度検出される → 再表示される
+        manager.show(listOf(baseDevice))
+        assertTrue(fakeDelegate.hasView)
+        assertEquals(2, fakeDelegate.addOverlayViewCount)
+    }
+
+    @Test
+    fun `dismissedでないデバイスは引き続き表示される`() {
+        fakeDelegate.overlayPermission = true
+        val device2 = baseDevice.copy(modelCode = 1, modelName = "AirPods Max")
+
+        // 2台表示中にユーザーが閉じる
+        manager.show(listOf(baseDevice, device2))
+        fakeDelegate.onUserDismiss?.invoke()
+        manager.hide()
+
+        // 別のデバイスのみ検出 → dismissed対象外なので表示される
+        val device3 = baseDevice.copy(modelCode = 2, modelName = "Beats Solo3")
+        manager.show(listOf(device3))
+        assertTrue(fakeDelegate.hasView)
+        assertEquals(listOf(device3), fakeDelegate.lastUpdatedDevices)
+    }
 }
 
 private class FakeOverlayViewDelegate : OverlayViewDelegate {
@@ -118,6 +169,7 @@ private class FakeOverlayViewDelegate : OverlayViewDelegate {
     private var viewAdded = false
 
     override val hasView: Boolean get() = viewAdded
+    override var onUserDismiss: (() -> Unit)? = null
 
     override fun canDrawOverlays(): Boolean = overlayPermission
 
