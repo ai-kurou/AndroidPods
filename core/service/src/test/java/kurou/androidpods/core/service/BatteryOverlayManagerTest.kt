@@ -106,7 +106,7 @@ class BatteryOverlayManagerTest {
     }
 
     @Test
-    fun `ユーザーがオーバーレイを閉じた後は同じデバイスで再表示されない`() {
+    fun `ユーザーがオーバーレイを閉じた後は同じlidOpenCounterでは再表示されない`() {
         fakeDelegate.overlayPermission = true
         manager.show(listOf(baseDevice))
         assertTrue(fakeDelegate.hasView)
@@ -115,10 +115,26 @@ class BatteryOverlayManagerTest {
         fakeDelegate.onUserDismiss?.invoke()
         manager.hide()
 
-        // 同じデバイスが再度検出されても表示されない
+        // 同じlidOpenCounterで再度検出されても表示されない
         manager.show(listOf(baseDevice))
         assertFalse(fakeDelegate.hasView)
         assertEquals(1, fakeDelegate.addOverlayViewCount)
+    }
+
+    @Test
+    fun `dismiss後にlidOpenCounterが変化すると再表示される`() {
+        fakeDelegate.overlayPermission = true
+        manager.show(listOf(baseDevice))
+
+        // ユーザーが閉じる
+        fakeDelegate.onUserDismiss?.invoke()
+        manager.hide()
+
+        // 蓋が再度開かれた（lidOpenCounterが変化）
+        val reopened = baseDevice.copy(lidOpenCounter = baseDevice.lidOpenCounter + 1)
+        manager.show(listOf(reopened))
+        assertTrue(fakeDelegate.hasView)
+        assertEquals(2, fakeDelegate.addOverlayViewCount)
     }
 
     @Test
@@ -133,7 +149,7 @@ class BatteryOverlayManagerTest {
         // デバイスが圏外になる（空リストでshow）
         manager.show(emptyList())
 
-        // 再度検出される → 再表示される
+        // 同じlidOpenCounterでも圏外後なら再表示される
         manager.show(listOf(baseDevice))
         assertTrue(fakeDelegate.hasView)
         assertEquals(2, fakeDelegate.addOverlayViewCount)
@@ -154,6 +170,23 @@ class BatteryOverlayManagerTest {
         manager.show(listOf(device3))
         assertTrue(fakeDelegate.hasView)
         assertEquals(listOf(device3), fakeDelegate.lastUpdatedDevices)
+    }
+
+    @Test
+    fun `dismiss後に蓋を閉じて開き直すとlidOpenCounterが循環しても再表示される`() {
+        fakeDelegate.overlayPermission = true
+        // lidOpenCounter = 7（最大値）
+        val deviceAtMax = baseDevice.copy(lidOpenCounter = 7)
+        manager.show(listOf(deviceAtMax))
+
+        fakeDelegate.onUserDismiss?.invoke()
+        manager.hide()
+
+        // カウンターが0に循環
+        val deviceWrapped = baseDevice.copy(lidOpenCounter = 0)
+        manager.show(listOf(deviceWrapped))
+        assertTrue(fakeDelegate.hasView)
+        assertEquals(2, fakeDelegate.addOverlayViewCount)
     }
 }
 
