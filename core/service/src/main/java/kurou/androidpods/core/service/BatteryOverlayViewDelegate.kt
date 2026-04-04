@@ -5,7 +5,6 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.graphics.PixelFormat
-import android.provider.Settings
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -21,7 +20,10 @@ import android.widget.TextView
 import kurou.androidpods.core.domain.AppleDevice
 import kurou.androidpods.core.domain.DeviceImages
 
-internal class BatteryOverlayViewDelegate(private val context: Context) : OverlayViewDelegate {
+internal class BatteryOverlayViewDelegate(
+    private val context: Context,
+    private val windowOps: OverlayWindowOperations = DefaultOverlayWindowOperations(context),
+) : OverlayViewDelegate {
 
     companion object {
         private const val CARD_WIDTH_DP = 280f
@@ -36,7 +38,6 @@ internal class BatteryOverlayViewDelegate(private val context: Context) : Overla
         private const val DRAG_THRESHOLD = 10f
     }
 
-    private val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     private var overlayView: View? = null
     private var cardsContainer: LinearLayout? = null
     private var layoutParams: WindowManager.LayoutParams? = null
@@ -45,7 +46,7 @@ internal class BatteryOverlayViewDelegate(private val context: Context) : Overla
     override val hasView: Boolean get() = overlayView != null
     override var onUserDismiss: (() -> Unit)? = null
 
-    override fun canDrawOverlays(): Boolean = Settings.canDrawOverlays(context)
+    override fun canDrawOverlays(): Boolean = windowOps.canDrawOverlays()
 
     override fun addOverlayView() {
         val dm = context.resources.displayMetrics
@@ -103,7 +104,7 @@ internal class BatteryOverlayViewDelegate(private val context: Context) : Overla
         }
 
         root.alpha = 0f
-        windowManager.addView(root, params)
+        windowOps.addView(root, params)
         overlayView = root
         layoutParams = params
 
@@ -165,7 +166,7 @@ internal class BatteryOverlayViewDelegate(private val context: Context) : Overla
                 MotionEvent.ACTION_MOVE -> {
                     params.x = initialX + (event.rawX - initialTouchX).toInt()
                     params.y = initialY - (event.rawY - initialTouchY).toInt()
-                    delegate.windowManager.updateViewLayout(this, params)
+                    delegate.windowOps.updateViewLayout(this, params)
                     return true
                 }
                 MotionEvent.ACTION_UP -> {
@@ -182,7 +183,7 @@ internal class BatteryOverlayViewDelegate(private val context: Context) : Overla
         hideAnimator?.cancel()
         hideAnimator = null
         val view = overlayView ?: return
-        windowManager.removeViewImmediate(view)
+        windowOps.removeViewImmediate(view)
         overlayView = null
         cardsContainer = null
         layoutParams = null
@@ -253,7 +254,7 @@ internal class BatteryOverlayViewDelegate(private val context: Context) : Overla
             addListener(object : android.animation.AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: android.animation.Animator) {
                     if (overlayView === view) {
-                        windowManager.removeViewImmediate(view)
+                        windowOps.removeViewImmediate(view)
                         overlayView = null
                         cardsContainer = null
                         layoutParams = null
