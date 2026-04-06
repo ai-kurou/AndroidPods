@@ -58,7 +58,7 @@ Hiltを使用。新しいRepositoryを追加する場合:
 ### テストパターン
 
 - **ViewModel テスト**: MockKでUseCaseをモック、`UnconfinedTestDispatcher`で`Dispatchers.Main`を差し替え
-- **Repository テスト**: Robolectric (`@Config(sdk = [34])`) でAndroid APIをシミュレート
+- **Repository テスト**: Robolectric (`@Config(sdk = [35])`) でAndroid APIをシミュレート
 - **Service テスト**: Hilt + Robolectric。`@UninstallModules(DataModule::class)`でFakeモジュールに差し替え、`Robolectric.buildService()`でServiceControllerを取得。ロジックは`internal fun`として抽出しユニットテスト可能にする
 - **Compose UIテスト**: `createAndroidComposeRule<ComponentActivity>()` + Robolectricでユニットテストとして実行。Activityへのアクセス（`activityRule.scenario`、`onBackPressedDispatcher`など）が不要な場合は`createComposeRule()`でも可
 - テスト名は日本語のバッククォート記法 (`` `初期状態はnullを返す`() ``)

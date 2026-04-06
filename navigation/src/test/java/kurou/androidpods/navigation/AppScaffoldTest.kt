@@ -20,7 +20,7 @@ import org.robolectric.annotation.Config
 
 @HiltAndroidTest
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [34], application = HiltTestApplication::class)
+@Config(sdk = [35], application = HiltTestApplication::class)
 class AppScaffoldTest {
 
     @get:Rule(order = 0)

@@ -27,7 +27,7 @@ import org.robolectric.shadows.ShadowSettings
 
 @HiltAndroidTest
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [34], application = HiltTestApplication::class)
+@Config(sdk = [35], application = HiltTestApplication::class)
 class AppNavHostTest {
 
     @get:Rule(order = 0)
