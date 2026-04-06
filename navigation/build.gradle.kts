@@ -37,7 +37,6 @@ dependencies {
 
     // Hilt (DI)
     implementation(libs.hilt.android)
-    implementation(libs.hilt.navigation.compose)
     ksp(libs.hilt.android.compiler)
 
     // Jetpack Compose
