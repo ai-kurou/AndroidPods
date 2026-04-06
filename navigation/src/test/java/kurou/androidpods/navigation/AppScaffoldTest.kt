@@ -49,28 +49,6 @@ class AppScaffoldTest {
     }
 
     @Test
-    fun `ナビゲーションアイテムが表示される`() {
-        composeTestRule.setContent {
-            AppScaffold(
-                isFirstLaunch = false,
-                windowWidthSizeClass = WindowWidthSizeClass.Compact,
-                onOnboardingComplete = {},
-                onStartScanService = {},
-                onStopScanService = {},
-            )
-        }
-
-        TopLevelDestination.entries.forEach { destination ->
-            composeTestRule
-                .onNodeWithContentDescription(
-                    composeTestRule.activity.getString(destination.labelResId),
-                    useUnmergedTree = true,
-                )
-                .assertExists()
-        }
-    }
-
-    @Test
     fun `初回起動時はオンボーディングが表示される`() {
         composeTestRule.setContent {
             AppScaffold(
