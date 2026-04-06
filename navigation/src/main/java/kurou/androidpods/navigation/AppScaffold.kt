@@ -3,6 +3,7 @@ package kurou.androidpods.navigation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
@@ -12,38 +13,52 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import kurou.androidpods.feature.onboarding.OnboardingScreen
 import kurou.androidpods.feature.settings.SettingsScreen
 
 @Composable
 fun AppScaffold(
+    isFirstLaunch: Boolean?,
     windowWidthSizeClass: WindowWidthSizeClass,
+    onOnboardingComplete: () -> Unit,
     onStartScanService: () -> Unit,
     onStopScanService: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    NavigationSuiteScaffold(
-        modifier = modifier,
-        navigationSuiteItems = {
-            TopLevelDestination.entries.forEach { destination ->
-                item(
-                    selected = destination == TopLevelDestination.SETTINGS,
-                    onClick = {},
-                    icon = {
-                        Icon(
-                            imageVector = destination.icon,
-                            contentDescription = stringResource(destination.labelResId),
-                        )
-                    },
-                    label = { Text(stringResource(destination.labelResId)) },
+    Scaffold(modifier = modifier.fillMaxSize()) { _ ->
+        when (isFirstLaunch) {
+            true -> {
+                OnboardingScreen(
+                    onComplete = onOnboardingComplete,
                 )
             }
-        },
-    ) {
-        SettingsScreen(
-            windowWidthSizeClass = windowWidthSizeClass,
-            onStartScanService = onStartScanService,
-            onStopScanService = onStopScanService,
-        )
+            false -> {
+                NavigationSuiteScaffold(
+                    navigationSuiteItems = {
+                        TopLevelDestination.entries.forEach { destination ->
+                            item(
+                                selected = destination == TopLevelDestination.SETTINGS,
+                                onClick = {},
+                                icon = {
+                                    Icon(
+                                        imageVector = destination.icon,
+                                        contentDescription = stringResource(destination.labelResId),
+                                    )
+                                },
+                                label = { Text(stringResource(destination.labelResId)) },
+                            )
+                        }
+                    },
+                ) {
+                    SettingsScreen(
+                        windowWidthSizeClass = windowWidthSizeClass,
+                        onStartScanService = onStartScanService,
+                        onStopScanService = onStopScanService,
+                    )
+                }
+            }
+            null -> {}
+        }
     }
 }
 
