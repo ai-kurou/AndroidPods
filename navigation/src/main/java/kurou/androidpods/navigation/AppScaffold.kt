@@ -1,6 +1,9 @@
 package kurou.androidpods.navigation
 
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
@@ -17,11 +20,15 @@ fun AppScaffold(
     onStopScanService: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Scaffold(modifier = modifier.fillMaxSize()) { _ ->
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        contentWindowInsets = WindowInsets.safeDrawing,
+    ) { innerPadding ->
         when (isFirstLaunch) {
             true -> {
                 OnboardingScreen(
                     onComplete = onOnboardingComplete,
+                    modifier = Modifier.padding(innerPadding),
                 )
             }
             false -> {
@@ -29,6 +36,7 @@ fun AppScaffold(
                     windowWidthSizeClass = windowWidthSizeClass,
                     onStartScanService = onStartScanService,
                     onStopScanService = onStopScanService,
+                    modifier = Modifier.padding(innerPadding),
                 )
             }
             null -> {}
