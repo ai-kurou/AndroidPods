@@ -33,7 +33,7 @@ import org.robolectric.annotation.Config
 @HiltAndroidTest
 @UninstallModules(DataModule::class)
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [34], application = HiltTestApplication::class)
+@Config(sdk = [35], application = HiltTestApplication::class)
 class DeviceScanServiceTest {
 
     @get:Rule

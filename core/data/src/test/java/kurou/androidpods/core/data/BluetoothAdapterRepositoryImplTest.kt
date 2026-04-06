@@ -19,7 +19,7 @@ import org.robolectric.shadows.ShadowLooper
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [34])
+@Config(sdk = [35])
 class BluetoothAdapterRepositoryImplTest {
 
     private val context = ApplicationProvider.getApplicationContext<android.app.Application>()
