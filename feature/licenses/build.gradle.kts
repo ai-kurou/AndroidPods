@@ -4,10 +4,11 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kover)
+    alias(libs.plugins.aboutlibraries)
 }
 
 android {
-    namespace = "kurou.androidpods.navigation"
+    namespace = "kurou.androidpods.feature.licenses"
     compileSdk = 36
 
     defaultConfig {
@@ -17,6 +18,7 @@ android {
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
+            all { it.failOnNoDiscoveredTests = false }
         }
     }
 
@@ -32,12 +34,15 @@ android {
 
 dependencies {
     // プロジェクトモジュール
-    implementation(project(":feature:settings"))
-    implementation(project(":feature:onboarding"))
-    implementation(project(":feature:licenses"))
+    implementation(project(":core:domain"))
+
+    // aboutlibraries
+    implementation(libs.aboutlibraries.core)
+    implementation(libs.aboutlibraries.compose.m3)
 
     // Hilt (DI)
     implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation.compose)
     ksp(libs.hilt.android.compiler)
 
     // Jetpack Compose
@@ -45,18 +50,18 @@ dependencies {
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.material3.windowsizeclass)
+    implementation(libs.androidx.compose.material.icons.core)
+
+    // AndroidX
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
 
     // Unit Test
-    testImplementation(project(":core:domain"))
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
-    testImplementation(libs.hilt.android.testing)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockk)
     testImplementation(libs.androidx.compose.ui.test.junit4)
-    kspTest(libs.hilt.android.compiler)
-
-    // Instrumented Test
-    androidTestImplementation(libs.androidx.test.runner)
 
     // Debug
     debugImplementation(libs.androidx.compose.ui.tooling)

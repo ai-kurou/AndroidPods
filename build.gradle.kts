@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.compose) apply false
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.ksp) apply false
+    alias(libs.plugins.aboutlibraries) apply false
     alias(libs.plugins.kover)
 }
 
@@ -25,5 +26,6 @@ dependencies {
     kover(project(":core:service"))
     kover(project(":feature:settings"))
     kover(project(":feature:onboarding"))
+    kover(project(":feature:licenses"))
     kover(project(":navigation"))
 }
