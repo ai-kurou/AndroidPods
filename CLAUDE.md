@@ -37,7 +37,7 @@ export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
 - **`:core:domain`** — リポジトリのインターフェースとUseCase。Android Framework非依存。
 - **`:core:data`** — リポジトリの実装とHilt DIモジュール(`DataModule`)。`@Binds`でインターフェースと実装をバインド。
 - **`:core:service`** — `DeviceScanService`（Foreground Service）でBLEスキャンとカスタム通知を管理。`:core:domain`に依存。通知はRemoteViewsで構築（Composeは使用不可）。
-- **`:navigation`** — ルート定数（`Route.ONBOARDING`、`Route.SETTINGS`）と`TopLevelDestination`を定義。`:feature:*`と`:app`が参照する。
+- **`:navigation`** — `AppScaffold.kt`が`NavHost`の全ルートを管理。ルート定数は`private object Route`として同ファイル内に定義。新しい画面追加時はこのファイルのみ編集する。
 - **`:feature:*`** — 各画面のViewModel, Composable, テスト。`:core:domain`(`:core:data`含む)に依存。
 - **`:app`** — `MainActivity`でNavigation Composeによるルーティング、`MainViewModel`で初回起動判定。`:core:domain`(UseCase利用)と`:core:data`(Hilt DIグラフ構築)の両方に依存。
 
@@ -47,6 +47,13 @@ export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
 初回起動: OnboardingScreen → (完了後) SettingsScreen
 2回目以降: SettingsScreen (直接表示)
 ```
+
+### ナビゲーション追加パターン
+
+新しい画面を追加する場合、`navigation/src/main/java/kurou/androidpods/navigation/AppScaffold.kt` を編集する:
+1. `private object Route` に定数を追加
+2. `NavHost` に `composable(Route.{NAME}) { ... }` ブロックを追加
+3. `navigation/build.gradle.kts` の依存に `implementation(project(":feature:{name}"))` を追加
 
 ### DI パターン
 
@@ -69,6 +76,21 @@ Hiltを使用。新しいRepositoryを追加する場合:
 - `HorizontalPager`内のノードは`assertIsDisplayed()`が失敗することがある（boundsチェックの問題）。代わりに`assertExists()`を使う
 - 戻るボタンのシミュレーションは`composeTestRule.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }`で行う
 - `RequestMultiplePermissions`ランチャーはRobolectricで自動的にコールバックを呼ばないため、権限拒否のシミュレーションは複雑になる
+
+## カバレッジ
+
+Koverでカバレッジを計測し、CIでCodecovにアップロードする。新しいモジュールを追加した場合、ルートの `build.gradle.kts` の `kover { }` ブロックに `kover(project(":module:name"))` を追加しないとカバレッジ集計から除外される。
+
+```bash
+# ローカルでカバレッジレポート生成（build/reports/kover/report.xml）
+./gradlew koverXmlReport
+```
+
+## CI
+
+main へのマージ時に `.github/workflows/on-main-merge.yml` が実行される:
+- **test ジョブ**: `assembleDebug` + `koverXmlReport` → Codecov へアップロード
+- **instrumented-test ジョブ**: Android エミュレータ（API 36）で `connectedDebugAndroidTest`
 
 ## Security Rules
 
