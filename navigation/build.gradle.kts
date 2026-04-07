@@ -38,6 +38,7 @@ dependencies {
 
     // AndroidX
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.navigation.compose)
 
     // Hilt (DI)
     implementation(libs.hilt.android)
