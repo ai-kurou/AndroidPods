@@ -28,6 +28,7 @@ fun SettingsScreen(
     windowWidthSizeClass: WindowWidthSizeClass,
     onStartScanService: () -> Unit,
     onStopScanService: () -> Unit,
+    onLicensesClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
@@ -122,6 +123,7 @@ fun SettingsScreen(
         onBluetoothWarningClick = {
             context.startActivity(Intent(Settings.ACTION_BLUETOOTH_SETTINGS))
         },
+        onLicensesClick = onLicensesClick,
         onOverlayToggle = {
             val intent = Intent(
                 Settings.ACTION_MANAGE_OVERLAY_PERMISSION,

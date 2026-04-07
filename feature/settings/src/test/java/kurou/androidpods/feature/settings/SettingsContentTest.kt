@@ -34,6 +34,7 @@ class SettingsContentTest {
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
+                onLicensesClick = {},
             )
         }
 
@@ -57,6 +58,7 @@ class SettingsContentTest {
                 onPermissionWarningClick = { clicked = true },
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
+                onLicensesClick = {},
             )
         }
 
@@ -78,6 +80,7 @@ class SettingsContentTest {
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
+                onLicensesClick = {},
             )
         }
 
@@ -98,6 +101,7 @@ class SettingsContentTest {
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = { clicked = true },
                 onOverlayToggle = {},
+                onLicensesClick = {},
             )
         }
 
@@ -120,6 +124,7 @@ class SettingsContentTest {
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = { clicked = true },
                 onOverlayToggle = {},
+                onLicensesClick = {},
             )
         }
 
@@ -128,5 +133,47 @@ class SettingsContentTest {
         ).assertIsDisplayed().performClick()
 
         assertTrue(!clicked)
+    }
+
+    @Test
+    fun `オーバーレイがオフのときアイテムをタップするとtrueでonOverlayToggleが呼ばれる`() {
+        var toggledValue: Boolean? = null
+        composeTestRule.setContent {
+            SettingsContent(
+                permissionStates = emptyMap(),
+                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+                overlayEnabled = false,
+                columns = 1,
+                onPermissionWarningClick = {},
+                onBluetoothWarningClick = {},
+                onOverlayToggle = { toggledValue = it },
+                onLicensesClick = {},
+            )
+        }
+
+        composeTestRule.onNodeWithText("Show battery overlay").performClick()
+
+        assertTrue(toggledValue == true)
+    }
+
+    @Test
+    fun `オーバーレイがオンのときアイテムをタップするとfalseでonOverlayToggleが呼ばれる`() {
+        var toggledValue: Boolean? = null
+        composeTestRule.setContent {
+            SettingsContent(
+                permissionStates = emptyMap(),
+                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+                overlayEnabled = true,
+                columns = 1,
+                onPermissionWarningClick = {},
+                onBluetoothWarningClick = {},
+                onOverlayToggle = { toggledValue = it },
+                onLicensesClick = {},
+            )
+        }
+
+        composeTestRule.onNodeWithText("Show battery overlay").performClick()
+
+        assertTrue(toggledValue == false)
     }
 }

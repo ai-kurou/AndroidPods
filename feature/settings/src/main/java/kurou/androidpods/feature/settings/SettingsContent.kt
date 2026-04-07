@@ -3,14 +3,16 @@ package kurou.androidpods.feature.settings
 import android.bluetooth.BluetoothAdapter
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -39,6 +41,7 @@ internal fun SettingsContent(
     onPermissionWarningClick: () -> Unit,
     onBluetoothWarningClick: () -> Unit,
     onOverlayToggle: (Boolean) -> Unit,
+    onLicensesClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val hasNotGranted = permissionStates.values.any { !it }
@@ -84,16 +87,14 @@ internal fun SettingsContent(
         }
         if (isBluetoothUnavailable || isBluetoothOff) {
             item(span = { GridItemSpan(maxLineSpan) }) {
-                val backgroundColor = if (isBluetoothUnavailable) {
+                val backgroundColor = if (isBluetoothUnavailable)
                     MaterialTheme.colorScheme.error
-                } else {
+                else
                     MaterialTheme.colorScheme.errorContainer
-                }
-                val contentColor = if (isBluetoothUnavailable) {
+                val contentColor = if (isBluetoothUnavailable)
                     MaterialTheme.colorScheme.onError
-                } else {
+                else
                     MaterialTheme.colorScheme.onErrorContainer
-                }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
@@ -121,34 +122,67 @@ internal fun SettingsContent(
                         color = contentColor,
                         modifier = Modifier.weight(1f),
                     )
-                    if (isBluetoothOff) {
+                    if (isBluetoothOff)
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                             contentDescription = null,
                             tint = contentColor,
                         )
-                    }
                 }
             }
         }
         item(span = { GridItemSpan(1) }) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .padding(12.dp),
+            SettingsItem(
+                label = stringResource(R.string.overlay_setting_label),
+                onClick = { onOverlayToggle(!overlayEnabled) },
             ) {
-                Text(
-                    text = stringResource(R.string.overlay_setting_label),
-                    modifier = Modifier.weight(1f),
-                )
                 Switch(
                     checked = overlayEnabled,
                     onCheckedChange = onOverlayToggle,
                 )
             }
+        }
+        item(span = { GridItemSpan(1) }) {
+            SettingsItem(
+                label = stringResource(R.string.open_source_licenses),
+                onClick = onLicensesClick,
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SettingsItem(
+    label: String,
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
+    trailing: @Composable () -> Unit,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+            .padding(12.dp),
+    ) {
+        Text(
+            text = label,
+            modifier = Modifier.weight(1f),
+        )
+        // M3 の minimumInteractiveComponentSize (48.dp) に揃えることで
+        // Switch と Icon の高さを構造的に一致させる
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.heightIn(min = 48.dp),
+        ) {
+            trailing()
         }
     }
 }
@@ -167,6 +201,7 @@ private fun SettingsContentPreviewNoWarning() {
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
+        onLicensesClick = {},
     )
 }
 
@@ -184,6 +219,7 @@ private fun SettingsContentPreviewPermissionNotGranted() {
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
+        onLicensesClick = {},
     )
 }
 
@@ -201,6 +237,7 @@ private fun SettingsContentPreviewBluetoothOff() {
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
+        onLicensesClick = {},
     )
 }
 
@@ -215,6 +252,7 @@ private fun SettingsContentPreviewBluetoothUnavailable() {
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
+        onLicensesClick = {},
     )
 }
 
@@ -232,6 +270,7 @@ private fun SettingsContentPreviewAllWarnings() {
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
+        onLicensesClick = {},
     )
 }
 
@@ -249,6 +288,7 @@ private fun SettingsContentPreviewMedium() {
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
+        onLicensesClick = {},
     )
 }
 
@@ -266,5 +306,6 @@ private fun SettingsContentPreviewExpanded() {
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
+        onLicensesClick = {},
     )
 }
