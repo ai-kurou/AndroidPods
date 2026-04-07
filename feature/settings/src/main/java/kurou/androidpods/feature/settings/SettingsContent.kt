@@ -135,7 +135,10 @@ internal fun SettingsContent(
             }
         }
         item(span = { GridItemSpan(1) }) {
-            SettingsItem(label = stringResource(R.string.overlay_setting_label)) {
+            SettingsItem(
+                label = stringResource(R.string.overlay_setting_label),
+                onClick = { onOverlayToggle(!overlayEnabled) },
+            ) {
                 Switch(
                     checked = overlayEnabled,
                     onCheckedChange = onOverlayToggle,
