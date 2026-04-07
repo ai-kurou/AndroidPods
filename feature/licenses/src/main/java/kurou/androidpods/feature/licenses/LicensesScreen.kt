@@ -15,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.mikepenz.aboutlibraries.ui.compose.android.produceLibraries
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 
@@ -24,7 +23,6 @@ import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 fun LicensesScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: LicensesViewModel = hiltViewModel(),
 ) {
     Scaffold(
         modifier = modifier,
