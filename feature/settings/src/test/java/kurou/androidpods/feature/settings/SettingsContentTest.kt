@@ -134,4 +134,46 @@ class SettingsContentTest {
 
         assertTrue(!clicked)
     }
+
+    @Test
+    fun `オーバーレイがオフのときアイテムをタップするとtrueでonOverlayToggleが呼ばれる`() {
+        var toggledValue: Boolean? = null
+        composeTestRule.setContent {
+            SettingsContent(
+                permissionStates = emptyMap(),
+                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+                overlayEnabled = false,
+                columns = 1,
+                onPermissionWarningClick = {},
+                onBluetoothWarningClick = {},
+                onOverlayToggle = { toggledValue = it },
+                onLicensesClick = {},
+            )
+        }
+
+        composeTestRule.onNodeWithText("Show battery overlay").performClick()
+
+        assertTrue(toggledValue == true)
+    }
+
+    @Test
+    fun `オーバーレイがオンのときアイテムをタップするとfalseでonOverlayToggleが呼ばれる`() {
+        var toggledValue: Boolean? = null
+        composeTestRule.setContent {
+            SettingsContent(
+                permissionStates = emptyMap(),
+                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+                overlayEnabled = true,
+                columns = 1,
+                onPermissionWarningClick = {},
+                onBluetoothWarningClick = {},
+                onOverlayToggle = { toggledValue = it },
+                onLicensesClick = {},
+            )
+        }
+
+        composeTestRule.onNodeWithText("Show battery overlay").performClick()
+
+        assertTrue(toggledValue == false)
+    }
 }
