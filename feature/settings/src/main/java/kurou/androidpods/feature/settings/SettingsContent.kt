@@ -87,16 +87,14 @@ internal fun SettingsContent(
         }
         if (isBluetoothUnavailable || isBluetoothOff) {
             item(span = { GridItemSpan(maxLineSpan) }) {
-                val backgroundColor = if (isBluetoothUnavailable) {
+                val backgroundColor = if (isBluetoothUnavailable)
                     MaterialTheme.colorScheme.error
-                } else {
+                else
                     MaterialTheme.colorScheme.errorContainer
-                }
-                val contentColor = if (isBluetoothUnavailable) {
+                val contentColor = if (isBluetoothUnavailable)
                     MaterialTheme.colorScheme.onError
-                } else {
+                else
                     MaterialTheme.colorScheme.onErrorContainer
-                }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
@@ -124,13 +122,12 @@ internal fun SettingsContent(
                         color = contentColor,
                         modifier = Modifier.weight(1f),
                     )
-                    if (isBluetoothOff) {
+                    if (isBluetoothOff)
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                             contentDescription = null,
                             tint = contentColor,
                         )
-                    }
                 }
             }
         }
