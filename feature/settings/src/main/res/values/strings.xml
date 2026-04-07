@@ -18,4 +18,5 @@
     <string name="apple_devices_title">Apple Devices</string>
     <string name="no_apple_devices">No Apple devices found</string>
     <string name="overlay_setting_label">Show battery overlay</string>
+    <string name="open_source_licenses">Open Source Licenses</string>
 </resources>

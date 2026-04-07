@@ -36,6 +36,9 @@ dependencies {
     implementation(project(":feature:onboarding"))
     implementation(project(":feature:licenses"))
 
+    // AndroidX
+    implementation(libs.androidx.activity.compose)
+
     // Hilt (DI)
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
