@@ -10,7 +10,7 @@
         android:id="@+id/device_model_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
+        android:textAppearance="@android:style/TextAppearance.Medium"
         android:textSize="16sp"
         android:textStyle="bold"
         android:paddingBottom="32dp" />
@@ -38,7 +38,7 @@
             android:id="@+id/text_body_battery"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
+            android:textAppearance="@android:style/TextAppearance.Medium"
             android:textSize="14sp"
             android:layout_marginStart="4dp" />
     </LinearLayout>
