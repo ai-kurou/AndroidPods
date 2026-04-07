@@ -64,6 +64,21 @@ class AppScaffoldTest {
     }
 
     @Test
+    fun `初回起動以降はSettings画面が表示される`() {
+        composeTestRule.setContent {
+            AppScaffold(
+                isFirstLaunch = false,
+                windowWidthSizeClass = WindowWidthSizeClass.Compact,
+                onOnboardingComplete = {},
+                onStartScanService = {},
+                onStopScanService = {},
+            )
+        }
+
+        composeTestRule.onNodeWithText("Show battery overlay").assertIsDisplayed()
+    }
+
+    @Test
     fun `オンボーディングを完了するとコールバックが呼ばれる`() {
         var completeCalled = false
 
