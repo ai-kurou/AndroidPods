@@ -1,5 +1,6 @@
 package kurou.androidpods.feature.licenses
 
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -24,6 +25,7 @@ fun LicensesScreen(
 ) {
     Scaffold(
         modifier = modifier,
+        contentWindowInsets = WindowInsets(0),
         topBar = {
             TopAppBar(
                 title = { Text("オープンソースライセンス") },
