@@ -111,7 +111,7 @@ class DeviceScanService : Service() {
 
     private fun buildNotification(contentText: String, devices: List<AppleDevice>): Notification {
         val builder = Notification.Builder(this, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.stat_sys_data_bluetooth)
+            .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(getString(R.string.notification_title))
             .setContentText(contentText)
             .setOngoing(true)

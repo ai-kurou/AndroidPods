@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- card body + top line -->
+    <path
+        android:pathData="M21,10H3M3,8A4,4,0,0,1,7,4H17A4,4,0,0,1,21,8V16A4,4,0,0,1,17,20H7A4,4,0,0,1,3,16Z"
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <!-- card slot -->
+    <path
+        android:pathData="M7,10V11.5A1.5,1.5,0,0,0,8.5,13H15.5A1.5,1.5,0,0,0,17,11.5V10"
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+</vector>
