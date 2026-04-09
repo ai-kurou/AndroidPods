@@ -100,6 +100,18 @@ class MainActivityTest {
                 .fetchSemanticsNodes().isNotEmpty()
         }
 
+        val compatibleDevices = activity.getString(SettingsR.string.compatible_devices)
+        composeTestRule.onNodeWithText(compatibleDevices).performClick()
+
+        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+            composeTestRule.onAllNodesWithText(compatibleDevices)
+                .fetchSemanticsNodes().isNotEmpty()
+        }
+
+        composeTestRule.activityRule.scenario.onActivity {
+            it.onBackPressedDispatcher.onBackPressed()
+        }
+
         val openSourceLicenses = activity.getString(SettingsR.string.open_source_licenses)
         composeTestRule.onNodeWithText(openSourceLicenses).performClick()
 
