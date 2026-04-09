@@ -89,7 +89,27 @@ class AppScaffoldTest {
             )
         }
 
-        composeTestRule.onNodeWithText("Show battery overlay").assertIsDisplayed()
+        composeTestRule.onNodeWithText("AndroidPods").assertIsDisplayed()
+
+        // SettingsScreen → DevicesScreen
+        composeTestRule.onNodeWithText("Compatible devices").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Compatible devices").assertIsDisplayed()
+
+        // DevicesScreen → SettingsScreen
+        composeTestRule.onNodeWithContentDescription("Back").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("AndroidPods").assertIsDisplayed()
+
+        // SettingsScreen → LicensesScreen
+        composeTestRule.onNodeWithText("Open Source Licenses").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Open Source Licenses").assertIsDisplayed()
+
+        // LicensesScreen → SettingsScreen
+        composeTestRule.onNodeWithContentDescription("Back").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("AndroidPods").assertIsDisplayed()
     }
 
 }

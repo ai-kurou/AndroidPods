@@ -71,15 +71,15 @@ fun AppScaffold(
                     onDevicesClick = { navController.navigate(Route.DEVICES) },
                 )
             }
-            composable(Route.LICENSES) {
-                LicensesScreen(
-                    onBack = { navController.popBackStack() },
-                )
-            }
             composable(Route.DEVICES) {
                 DevicesScreen(
                     onBack = { navController.popBackStack() },
                     windowWidthSizeClass = windowWidthSizeClass,
+                )
+            }
+            composable(Route.LICENSES) {
+                LicensesScreen(
+                    onBack = { navController.popBackStack() },
                 )
             }
         }
