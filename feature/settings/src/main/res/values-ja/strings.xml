@@ -17,6 +17,7 @@
     <string name="bluetooth_state_not_available">利用不可</string>
     <string name="apple_devices_title">Appleデバイス</string>
     <string name="no_apple_devices">Appleデバイスが見つかりません</string>
+    <string name="app_name">AndroidPods</string>
     <string name="overlay_setting_label">バッテリーオーバーレイを表示</string>
     <string name="compatible_devices">対応デバイス</string>
     <string name="open_source_licenses">オープンソースライセンス</string>
