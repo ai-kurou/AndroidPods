@@ -26,19 +26,34 @@ class DevicesScreenTest {
 
     private val useCase = mockk<GetCompatibleDevicesUseCase>()
 
+    private val devices = listOf(
+        CompatibleDevice(name = "AirPods Pro (2nd Gen)", images = null),
+        CompatibleDevice(name = "AirPods Max", images = null),
+    )
+    private val onBack = mockk<() -> Unit>(relaxed = true)
+
     @Test
-    fun `タイトルとデバイスリストがが表示され、戻るボタンを押す`() {
-        val devices = listOf(
-            CompatibleDevice(name = "AirPods Pro (2nd Gen)", images = null),
-            CompatibleDevice(name = "AirPods Max", images = null),
-        )
-        val onBack = mockk<() -> Unit>(relaxed = true)
+    fun `WindowWidthSizeClassがCompactの場合`() {
+        assertIsDisplayedWithBack(WindowWidthSizeClass.Compact)
+    }
+
+    @Test
+    fun `WindowWidthSizeClassがMediumの場合`() {
+        assertIsDisplayedWithBack(WindowWidthSizeClass.Medium)
+    }
+
+    @Test
+    fun `WindowWidthSizeClassがExpandedの場合`() {
+        assertIsDisplayedWithBack(WindowWidthSizeClass.Expanded)
+    }
+
+    private fun assertIsDisplayedWithBack(size: WindowWidthSizeClass) {
         every { useCase() } returns devices
 
         composeTestRule.setContent {
             DevicesScreen(
                 onBack = onBack,
-                windowWidthSizeClass = WindowWidthSizeClass.Compact,
+                windowWidthSizeClass = size,
                 viewModel = DevicesViewModel(useCase),
             )
         }
