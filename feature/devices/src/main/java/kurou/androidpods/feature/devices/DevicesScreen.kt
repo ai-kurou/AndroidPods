@@ -14,6 +14,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -24,9 +25,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 @Composable
 fun DevicesScreen(
     onBack: () -> Unit,
+    windowWidthSizeClass: WindowWidthSizeClass,
     modifier: Modifier = Modifier,
     viewModel: DevicesViewModel = hiltViewModel(),
 ) {
+    val columns = when (windowWidthSizeClass) {
+        WindowWidthSizeClass.Compact -> 3
+        WindowWidthSizeClass.Medium -> 4
+        else -> 5
+    }
     Scaffold(
         modifier = modifier,
         contentWindowInsets = WindowInsets(0),
@@ -45,7 +52,7 @@ fun DevicesScreen(
         },
     ) { innerPadding ->
         LazyVerticalGrid(
-            columns = GridCells.Fixed(1),
+            columns = GridCells.Fixed(columns),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.fillMaxSize().padding(innerPadding).padding(16.dp),

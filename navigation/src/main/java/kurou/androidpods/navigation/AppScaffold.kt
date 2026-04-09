@@ -79,6 +79,7 @@ fun AppScaffold(
             composable(Route.DEVICES) {
                 DevicesScreen(
                     onBack = { navController.popBackStack() },
+                    windowWidthSizeClass = windowWidthSizeClass,
                 )
             }
         }
