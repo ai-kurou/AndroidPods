@@ -144,6 +144,17 @@ internal fun SettingsContent(
         }
         item(span = { GridItemSpan(1) }) {
             SettingsItem(
+                label = stringResource(R.string.compatible_devices),
+                onClick = null,
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                )
+            }
+        }
+        item(span = { GridItemSpan(1) }) {
+            SettingsItem(
                 label = stringResource(R.string.open_source_licenses),
                 onClick = onLicensesClick,
             ) {
