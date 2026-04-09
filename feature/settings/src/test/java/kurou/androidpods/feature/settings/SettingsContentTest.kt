@@ -35,6 +35,7 @@ class SettingsContentTest {
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
                 onLicensesClick = {},
+                onDevicesClick = {},
             )
         }
 
@@ -59,6 +60,7 @@ class SettingsContentTest {
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
                 onLicensesClick = {},
+                onDevicesClick = {},
             )
         }
 
@@ -81,6 +83,7 @@ class SettingsContentTest {
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
                 onLicensesClick = {},
+                onDevicesClick = {},
             )
         }
 
@@ -102,6 +105,7 @@ class SettingsContentTest {
                 onBluetoothWarningClick = { clicked = true },
                 onOverlayToggle = {},
                 onLicensesClick = {},
+                onDevicesClick = {},
             )
         }
 
@@ -125,6 +129,7 @@ class SettingsContentTest {
                 onBluetoothWarningClick = { clicked = true },
                 onOverlayToggle = {},
                 onLicensesClick = {},
+                onDevicesClick = {},
             )
         }
 
@@ -148,6 +153,7 @@ class SettingsContentTest {
                 onBluetoothWarningClick = {},
                 onOverlayToggle = { toggledValue = it },
                 onLicensesClick = {},
+                onDevicesClick = {},
             )
         }
 
@@ -169,6 +175,7 @@ class SettingsContentTest {
                 onBluetoothWarningClick = {},
                 onOverlayToggle = { toggledValue = it },
                 onLicensesClick = {},
+                onDevicesClick = {},
             )
         }
 
