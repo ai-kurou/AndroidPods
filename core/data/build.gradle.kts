@@ -44,6 +44,7 @@ dependencies {
     testImplementation(libs.robolectric)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.androidx.test.core)
+    testImplementation(libs.mockk)
 
     // Instrumented Test
     androidTestImplementation(libs.androidx.test.runner)
