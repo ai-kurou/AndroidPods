@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import kurou.androidpods.feature.devices.DevicesScreen
 import kurou.androidpods.feature.licenses.LicensesScreen
 import kurou.androidpods.feature.onboarding.OnboardingScreen
 import kurou.androidpods.feature.settings.SettingsScreen
@@ -21,6 +22,7 @@ private object Route {
     const val ONBOARDING = "onboarding"
     const val SETTINGS = "settings"
     const val LICENSES = "licenses"
+    const val DEVICES = "devices"
 }
 
 @Composable
@@ -66,6 +68,13 @@ fun AppScaffold(
                     onStartScanService = onStartScanService,
                     onStopScanService = onStopScanService,
                     onLicensesClick = { navController.navigate(Route.LICENSES) },
+                    onDevicesClick = { navController.navigate(Route.DEVICES) },
+                )
+            }
+            composable(Route.DEVICES) {
+                DevicesScreen(
+                    onBack = { navController.popBackStack() },
+                    windowWidthSizeClass = windowWidthSizeClass,
                 )
             }
             composable(Route.LICENSES) {

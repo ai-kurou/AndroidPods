@@ -6,6 +6,12 @@ import android.net.Uri
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -16,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -23,12 +30,14 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.core.net.toUri
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     windowWidthSizeClass: WindowWidthSizeClass,
     onStartScanService: () -> Unit,
     onStopScanService: () -> Unit,
     onLicensesClick: () -> Unit,
+    onDevicesClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
@@ -109,28 +118,39 @@ fun SettingsScreen(
         else -> 3
     }
 
-    SettingsContent(
-        permissionStates = permissionStates,
-        bluetoothAdapterState = bluetoothAdapterState,
-        overlayEnabled = overlayEnabled,
-        columns = columns,
-        onPermissionWarningClick = {
-            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                data = Uri.fromParts("package", context.packageName, null)
-            }
-            context.startActivity(intent)
-        },
-        onBluetoothWarningClick = {
-            context.startActivity(Intent(Settings.ACTION_BLUETOOTH_SETTINGS))
-        },
-        onLicensesClick = onLicensesClick,
-        onOverlayToggle = {
-            val intent = Intent(
-                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                "package:${context.packageName}".toUri(),
-            )
-            overlaySettingsLauncher.launch(intent)
-        },
+    Scaffold(
         modifier = modifier,
-    )
+        contentWindowInsets = WindowInsets(0),
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.app_name)) },
+            )
+        },
+    ) { innerPadding ->
+        SettingsContent(
+            permissionStates = permissionStates,
+            bluetoothAdapterState = bluetoothAdapterState,
+            overlayEnabled = overlayEnabled,
+            columns = columns,
+            onPermissionWarningClick = {
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.fromParts("package", context.packageName, null)
+                }
+                context.startActivity(intent)
+            },
+            onBluetoothWarningClick = {
+                context.startActivity(Intent(Settings.ACTION_BLUETOOTH_SETTINGS))
+            },
+            onLicensesClick = onLicensesClick,
+            onDevicesClick = onDevicesClick,
+            onOverlayToggle = {
+                val intent = Intent(
+                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    "package:${context.packageName}".toUri(),
+                )
+                overlaySettingsLauncher.launch(intent)
+            },
+            modifier = Modifier.padding(innerPadding),
+        )
+    }
 }

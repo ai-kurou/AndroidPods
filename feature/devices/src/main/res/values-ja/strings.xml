@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="compatible_devices">対応デバイス</string>
+    <string name="back">戻る</string>
+</resources>

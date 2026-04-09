@@ -7,6 +7,8 @@ import dagger.hilt.components.SingletonComponent
 import kurou.androidpods.core.domain.AppleDevice
 import kurou.androidpods.core.domain.AppleDeviceRepository
 import kurou.androidpods.core.domain.BluetoothAdapterRepository
+import kurou.androidpods.core.domain.CompatibleDevice
+import kurou.androidpods.core.domain.CompatibleDeviceRepository
 import kurou.androidpods.core.domain.OverlaySettingsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
@@ -38,5 +40,12 @@ object FakeRepositoryModule {
     fun provideOverlaySettingsRepository(): OverlaySettingsRepository =
         object : OverlaySettingsRepository {
             override fun isEnabled(): Boolean = false
+        }
+
+    @Provides
+    @Singleton
+    fun provideCompatibleDeviceRepository(): CompatibleDeviceRepository =
+        object : CompatibleDeviceRepository {
+            override fun getCompatibleDevices(): List<CompatibleDevice> = emptyList()
         }
 }

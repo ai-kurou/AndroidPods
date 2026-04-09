@@ -49,18 +49,32 @@ class AppScaffoldTest {
     }
 
     @Test
-    fun `初回起動時はオンボーディングが表示される`() {
+    fun `初回起動時はオンボーディングが表示され、完了するとコールバックが呼ばれる`() {
+        var completeCalled = false
         composeTestRule.setContent {
             AppScaffold(
                 isFirstLaunch = true,
                 windowWidthSizeClass = WindowWidthSizeClass.Compact,
-                onOnboardingComplete = {},
+                onOnboardingComplete = { completeCalled = true},
                 onStartScanService = {},
                 onStopScanService = {},
             )
         }
 
-        composeTestRule.onNodeWithText("Next").assertIsDisplayed()
+        // ページ1 → ページ2
+        composeTestRule.onNodeWithText("Next").performClick()
+        composeTestRule.waitForIdle()
+        // ページ2: 権限要求ボタンを押す
+        composeTestRule.onNodeWithText("Grant Permission").performClick()
+        composeTestRule.waitForIdle()
+        // ページ3: オーバーレイ権限ボタンを押す
+        composeTestRule.onNodeWithText("Allow Overlay").performClick()
+        composeTestRule.waitForIdle()
+        // ページ4: Bluetooth ONボタンを押す
+        composeTestRule.onNodeWithText("Enable Bluetooth").performClick()
+        composeTestRule.waitForIdle()
+
+        assertTrue(completeCalled)
     }
 
     @Test
@@ -75,40 +89,27 @@ class AppScaffoldTest {
             )
         }
 
-        composeTestRule.onNodeWithText("Show battery overlay").assertIsDisplayed()
+        composeTestRule.onNodeWithText("AndroidPods").assertIsDisplayed()
+
+        // SettingsScreen → DevicesScreen
+        composeTestRule.onNodeWithText("Compatible devices").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Compatible devices").assertIsDisplayed()
+
+        // DevicesScreen → SettingsScreen
+        composeTestRule.onNodeWithContentDescription("Back").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("AndroidPods").assertIsDisplayed()
+
+        // SettingsScreen → LicensesScreen
+        composeTestRule.onNodeWithText("Open Source Licenses").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Open Source Licenses").assertIsDisplayed()
+
+        // LicensesScreen → SettingsScreen
+        composeTestRule.onNodeWithContentDescription("Back").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("AndroidPods").assertIsDisplayed()
     }
 
-    @Test
-    fun `オンボーディングを完了するとコールバックが呼ばれる`() {
-        var completeCalled = false
-
-        composeTestRule.setContent {
-            AppScaffold(
-                isFirstLaunch = true,
-                windowWidthSizeClass = WindowWidthSizeClass.Compact,
-                onOnboardingComplete = { completeCalled = true },
-                onStartScanService = {},
-                onStopScanService = {},
-            )
-        }
-
-        // ページ1 → ページ2
-        composeTestRule.onNodeWithText("Next").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Next").performClick()
-        composeTestRule.waitForIdle()
-        // ページ2: 権限要求ボタンを押す
-        composeTestRule.onNodeWithText("Grant Permission").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Grant Permission").performClick()
-        composeTestRule.waitForIdle()
-        // ページ3: オーバーレイ権限ボタンを押す
-        composeTestRule.onNodeWithText("Allow Overlay").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Allow Overlay").performClick()
-        composeTestRule.waitForIdle()
-        // ページ4: Bluetooth ONボタンを押す
-        composeTestRule.onNodeWithText("Enable Bluetooth").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Enable Bluetooth").performClick()
-        composeTestRule.waitForIdle()
-
-        assertTrue(completeCalled)
-    }
 }
