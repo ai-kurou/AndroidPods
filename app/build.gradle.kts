@@ -42,7 +42,42 @@ android {
     }
 }
 
+kover {
+    reports {
+        filters {
+            excludes {
+                packages(
+                    "dagger*",
+                    "hilt*"
+                )
+                classes(
+                    "*Module_Provide*",
+                    "*Binding",
+                    "*_Factory",
+                    "*_HiltModules*",
+                    "*Hilt_*",
+                    "*BuildConfig",
+                    "*HiltWrapper_*",
+                    "*ComposableSingletons*",
+                    "*_MembersInjector*",
+                    "*PreviewParameterProvider*",
+                )
+                annotatedBy("androidx.compose.ui.tooling.preview.Preview")
+            }
+        }
+    }
+}
+
 dependencies {
+    kover(project(":app"))
+    kover(project(":core:domain"))
+    kover(project(":core:data"))
+    kover(project(":core:service"))
+    kover(project(":feature:settings"))
+    kover(project(":feature:onboarding"))
+    kover(project(":feature:licenses"))
+    kover(project(":navigation"))
+
     // プロジェクトモジュール
     implementation(project(":core:domain"))
     implementation(project(":core:data"))
