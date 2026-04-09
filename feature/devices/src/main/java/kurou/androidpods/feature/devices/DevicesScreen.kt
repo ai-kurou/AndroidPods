@@ -35,6 +35,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -73,20 +74,63 @@ fun DevicesScreen(
             )
         },
     ) { innerPadding ->
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(columns),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(16.dp),
-        ) {
-            items(devices) { device ->
-                DeviceItem(device = device)
-            }
+        DevicesContent(
+            devices = devices,
+            columns = columns,
+            modifier = Modifier.padding(innerPadding),
+        )
+    }
+}
+
+@Composable
+internal fun DevicesContent(
+    devices: List<CompatibleDevice>,
+    columns: Int,
+    modifier: Modifier = Modifier,
+) {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(columns),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier.fillMaxSize().padding(16.dp),
+    ) {
+        items(devices) { device ->
+            DeviceItem(device = device)
         }
     }
+}
+
+private val previewDevices = listOf(
+    CompatibleDevice(name = "AirPods Pro (2nd Gen)", images = null),
+    CompatibleDevice(name = "AirPods (4th Gen)", images = null),
+    CompatibleDevice(name = "AirPods Max", images = null),
+    CompatibleDevice(name = "Beats Studio Buds+", images = null),
+    CompatibleDevice(name = "Powerbeats Pro", images = null),
+    CompatibleDevice(name = "Beats Solo3", images = null),
+)
+
+@Preview(showBackground = true, name = "Compact (2列)")
+@Composable
+private fun DevicesContentPreviewCompact() {
+    DevicesContent(devices = previewDevices, columns = 2)
+}
+
+@Preview(showBackground = true, widthDp = 700, name = "Medium (3列)")
+@Composable
+private fun DevicesContentPreviewMedium() {
+    DevicesContent(devices = previewDevices, columns = 3)
+}
+
+@Preview(showBackground = true, widthDp = 900, name = "Expanded (4列)")
+@Composable
+private fun DevicesContentPreviewExpanded() {
+    DevicesContent(devices = previewDevices, columns = 4)
+}
+
+@Preview(showBackground = true, name = "アイテム単体")
+@Composable
+private fun DeviceItemPreview() {
+    DeviceItem(device = CompatibleDevice(name = "AirPods Pro (2nd Gen)", images = null))
 }
 
 @Composable
