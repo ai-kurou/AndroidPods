@@ -42,6 +42,7 @@ internal fun SettingsContent(
     onBluetoothWarningClick: () -> Unit,
     onOverlayToggle: (Boolean) -> Unit,
     onLicensesClick: () -> Unit,
+    onDevicesClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val hasNotGranted = permissionStates.values.any { !it }
@@ -145,7 +146,7 @@ internal fun SettingsContent(
         item(span = { GridItemSpan(1) }) {
             SettingsItem(
                 label = stringResource(R.string.compatible_devices),
-                onClick = null,
+                onClick = onDevicesClick,
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
@@ -213,6 +214,7 @@ private fun SettingsContentPreviewNoWarning() {
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
         onLicensesClick = {},
+        onDevicesClick = {},
     )
 }
 
@@ -231,6 +233,7 @@ private fun SettingsContentPreviewPermissionNotGranted() {
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
         onLicensesClick = {},
+        onDevicesClick = {},
     )
 }
 
@@ -249,6 +252,7 @@ private fun SettingsContentPreviewBluetoothOff() {
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
         onLicensesClick = {},
+        onDevicesClick = {},
     )
 }
 
@@ -264,6 +268,7 @@ private fun SettingsContentPreviewBluetoothUnavailable() {
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
         onLicensesClick = {},
+        onDevicesClick = {},
     )
 }
 
@@ -282,6 +287,7 @@ private fun SettingsContentPreviewAllWarnings() {
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
         onLicensesClick = {},
+        onDevicesClick = {},
     )
 }
 
@@ -300,6 +306,7 @@ private fun SettingsContentPreviewMedium() {
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
         onLicensesClick = {},
+        onDevicesClick = {},
     )
 }
 
@@ -318,5 +325,6 @@ private fun SettingsContentPreviewExpanded() {
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
         onLicensesClick = {},
+        onDevicesClick = {},
     )
 }

@@ -31,4 +31,4 @@ include(":core:service")
 include(":feature:settings")
 include(":feature:onboarding")
 include(":feature:licenses")
- 
+include(":feature:devices")
