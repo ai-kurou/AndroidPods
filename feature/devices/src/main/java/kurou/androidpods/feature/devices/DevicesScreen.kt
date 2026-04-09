@@ -3,9 +3,12 @@ package kurou.androidpods.feature.devices
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -48,9 +51,9 @@ fun DevicesScreen(
 ) {
     val devices by viewModel.devices.collectAsStateWithLifecycle()
     val columns = when (windowWidthSizeClass) {
-        WindowWidthSizeClass.Compact -> 3
-        WindowWidthSizeClass.Medium -> 4
-        else -> 5
+        WindowWidthSizeClass.Compact -> 2
+        WindowWidthSizeClass.Medium -> 3
+        else -> 4
     }
 
     Scaffold(
@@ -91,11 +94,6 @@ private fun DeviceItem(
     device: CompatibleDevice,
     modifier: Modifier = Modifier,
 ) {
-    val imageRes = when (val img = device.images) {
-        is DeviceImages.Tws -> img.case
-        is DeviceImages.Single -> img.body
-        null -> null
-    }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
@@ -103,15 +101,48 @@ private fun DeviceItem(
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .padding(12.dp),
     ) {
-        if (imageRes != null) {
-            Image(
-                painter = painterResource(imageRes),
-                contentDescription = device.name,
-                contentScale = ContentScale.Fit,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(1f),
-            )
+        Box(
+            modifier = Modifier.fillMaxWidth().aspectRatio(1f).padding(16.dp),
+        ) {
+            when (val img = device.images) {
+                is DeviceImages.Tws -> Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxSize().padding(16.dp),
+                ) {
+                    Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                        Image(
+                            painter = painterResource(img.left),
+                            contentDescription = null,
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier.fillMaxSize().padding(4.dp),
+                        )
+                    }
+                    Box(modifier = Modifier.weight(2f).fillMaxHeight()) {
+                        Image(
+                            painter = painterResource(img.case),
+                            contentDescription = device.name,
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier.fillMaxSize().padding(4.dp),
+                        )
+                    }
+                    Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                        Image(
+                            painter = painterResource(img.right),
+                            contentDescription = null,
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier.fillMaxSize().padding(4.dp),
+                        )
+                    }
+                }
+                is DeviceImages.Single -> Image(
+                    painter = painterResource(img.body),
+                    contentDescription = device.name,
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.fillMaxSize(),
+                )
+                null -> Unit
+            }
         }
         Text(
             text = device.name,
