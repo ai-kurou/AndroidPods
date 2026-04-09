@@ -1,9 +1,9 @@
 package kurou.androidpods.feature.devices
 
-import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import kurou.androidpods.core.domain.CompatibleDevice
+import kurou.androidpods.core.domain.DeviceImages
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,5 +31,35 @@ class DevicesContentTest {
         composeTestRule.onNodeWithText("AirPods Pro (2nd Gen)").assertExists()
         composeTestRule.onNodeWithText("AirPods Max").assertExists()
         composeTestRule.onNodeWithText("Beats Studio Buds+").assertExists()
+    }
+
+    @Test
+    fun `TWSの画像があるデバイスの名前が表示される`() {
+        val device = CompatibleDevice(
+            name = "AirPods Pro (2nd Gen)",
+            images = DeviceImages.Tws(
+                left = android.R.drawable.ic_menu_camera,
+                right = android.R.drawable.ic_menu_camera,
+                case = android.R.drawable.ic_menu_camera,
+            ),
+        )
+        composeTestRule.setContent {
+            DevicesContent(devices = listOf(device), columns = 2)
+        }
+
+        composeTestRule.onNodeWithText("AirPods Pro (2nd Gen)").assertExists()
+    }
+
+    @Test
+    fun `Singleの画像があるデバイスの名前が表示される`() {
+        val device = CompatibleDevice(
+            name = "AirPods Max",
+            images = DeviceImages.Single(body = android.R.drawable.ic_menu_camera),
+        )
+        composeTestRule.setContent {
+            DevicesContent(devices = listOf(device), columns = 2)
+        }
+
+        composeTestRule.onNodeWithText("AirPods Max").assertExists()
     }
 }
