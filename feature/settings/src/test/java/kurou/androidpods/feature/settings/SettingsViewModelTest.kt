@@ -29,16 +29,16 @@ class SettingsViewModelTest {
     private val fakeFlow = MutableSharedFlow<Int?>()
     // productionと同様、observe()は初期値emptyMapをもつStateFlowを返す
     private val fakeAppleDevicesFlow = MutableStateFlow<Map<String, AppleDevice>>(emptyMap())
-    private val useCase = mockk<GetBluetoothAdapterStateUseCase>()
-    private val appleDevicesUseCase = mockk<GetAppleDevicesUseCase>(relaxUnitFun = true)
-    private val overlaySettingsUseCase = mockk<GetOverlaySettingsUseCase>()
+    private val getBluetoothAdapterStateUseCase = mockk<GetBluetoothAdapterStateUseCase>()
+    private val getAppleDevicesUseCase = mockk<GetAppleDevicesUseCase>(relaxUnitFun = true)
+    private val getOverlaySettingsUseCase = mockk<GetOverlaySettingsUseCase>()
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        every { useCase.observe() } returns fakeFlow
-        every { appleDevicesUseCase.observe() } returns fakeAppleDevicesFlow
-        every { overlaySettingsUseCase.isEnabled() } returns false
+        every { getBluetoothAdapterStateUseCase.observe() } returns fakeFlow
+        every { getAppleDevicesUseCase.observe() } returns fakeAppleDevicesFlow
+        every { getOverlaySettingsUseCase.isEnabled() } returns false
     }
 
     @After
@@ -48,18 +48,18 @@ class SettingsViewModelTest {
 
     @Test
     fun `初期状態にcurrentの値が反映される`() {
-        every { useCase.current() } returns BluetoothAdapter.STATE_ON
+        every { getBluetoothAdapterStateUseCase.current() } returns BluetoothAdapter.STATE_ON
 
-        val viewModel = SettingsViewModel(useCase, appleDevicesUseCase, overlaySettingsUseCase)
+        val viewModel = SettingsViewModel(getBluetoothAdapterStateUseCase, getAppleDevicesUseCase, getOverlaySettingsUseCase)
 
         assertEquals(BluetoothAdapter.STATE_ON, viewModel.uiState.value.bluetoothAdapterState)
     }
 
     @Test
     fun `observeのFlowに値を流すとbluetoothAdapterStateが更新される`() = runTest {
-        every { useCase.current() } returns BluetoothAdapter.STATE_OFF
+        every { getBluetoothAdapterStateUseCase.current() } returns BluetoothAdapter.STATE_OFF
 
-        val viewModel = SettingsViewModel(useCase, appleDevicesUseCase, overlaySettingsUseCase)
+        val viewModel = SettingsViewModel(getBluetoothAdapterStateUseCase, getAppleDevicesUseCase, getOverlaySettingsUseCase)
 
         // fakeAppleDevicesFlowはStateFlowなので初期値emptyMapを既に持っている
         fakeFlow.emit(BluetoothAdapter.STATE_ON)
@@ -71,27 +71,27 @@ class SettingsViewModelTest {
 
     @Test
     fun `アダプタ非対応時はnullが設定される`() {
-        every { useCase.current() } returns null
+        every { getBluetoothAdapterStateUseCase.current() } returns null
 
-        val viewModel = SettingsViewModel(useCase, appleDevicesUseCase, overlaySettingsUseCase)
+        val viewModel = SettingsViewModel(getBluetoothAdapterStateUseCase, getAppleDevicesUseCase, getOverlaySettingsUseCase)
 
         assertNull(viewModel.uiState.value.bluetoothAdapterState)
     }
 
     @Test
     fun `初期状態ではAppleデバイスが空`() {
-        every { useCase.current() } returns BluetoothAdapter.STATE_ON
+        every { getBluetoothAdapterStateUseCase.current() } returns BluetoothAdapter.STATE_ON
 
-        val viewModel = SettingsViewModel(useCase, appleDevicesUseCase, overlaySettingsUseCase)
+        val viewModel = SettingsViewModel(getBluetoothAdapterStateUseCase, getAppleDevicesUseCase, getOverlaySettingsUseCase)
 
         assertEquals(emptyMap<String, AppleDevice>(), viewModel.uiState.value.appleDevices)
     }
 
     @Test
     fun `observeのFlowに値を流すとappleDevicesが更新される`() = runTest {
-        every { useCase.current() } returns BluetoothAdapter.STATE_ON
+        every { getBluetoothAdapterStateUseCase.current() } returns BluetoothAdapter.STATE_ON
 
-        val viewModel = SettingsViewModel(useCase, appleDevicesUseCase, overlaySettingsUseCase)
+        val viewModel = SettingsViewModel(getBluetoothAdapterStateUseCase, getAppleDevicesUseCase, getOverlaySettingsUseCase)
 
         // combineはすべてのupstreamが1回以上emitするまで値を出さないため、
         // bluetoothFlowに初期値を流してcombineを動作可能にする
@@ -105,37 +105,37 @@ class SettingsViewModelTest {
 
     @Test
     fun `refreshOverlayStateでisEnabledの最新値が反映される`() = runTest {
-        every { useCase.current() } returns BluetoothAdapter.STATE_ON
+        every { getBluetoothAdapterStateUseCase.current() } returns BluetoothAdapter.STATE_ON
 
-        val viewModel = SettingsViewModel(useCase, appleDevicesUseCase, overlaySettingsUseCase)
+        val viewModel = SettingsViewModel(getBluetoothAdapterStateUseCase, getAppleDevicesUseCase, getOverlaySettingsUseCase)
 
         // combineはすべてのupstreamが1回以上emitするまで値を出さないため、
         // bluetoothFlowに初期値を流してcombineを動作可能にする
         fakeFlow.emit(BluetoothAdapter.STATE_ON)
         assertEquals(false, viewModel.uiState.value.overlayEnabled)
 
-        every { overlaySettingsUseCase.isEnabled() } returns true
+        every { getOverlaySettingsUseCase.isEnabled() } returns true
         viewModel.refreshOverlayState()
         assertEquals(true, viewModel.uiState.value.overlayEnabled)
     }
 
     @Test
     fun `startScanでUseCaseのstartScanが呼ばれる`() {
-        every { useCase.current() } returns BluetoothAdapter.STATE_ON
+        every { getBluetoothAdapterStateUseCase.current() } returns BluetoothAdapter.STATE_ON
 
-        val viewModel = SettingsViewModel(useCase, appleDevicesUseCase, overlaySettingsUseCase)
+        val viewModel = SettingsViewModel(getBluetoothAdapterStateUseCase, getAppleDevicesUseCase, getOverlaySettingsUseCase)
         viewModel.startScan()
 
-        verify(exactly = 1) { appleDevicesUseCase.startScan() }
+        verify(exactly = 1) { getAppleDevicesUseCase.startScan() }
     }
 
     @Test
     fun `stopScanでUseCaseのstopScanが呼ばれる`() {
-        every { useCase.current() } returns BluetoothAdapter.STATE_ON
+        every { getBluetoothAdapterStateUseCase.current() } returns BluetoothAdapter.STATE_ON
 
-        val viewModel = SettingsViewModel(useCase, appleDevicesUseCase, overlaySettingsUseCase)
+        val viewModel = SettingsViewModel(getBluetoothAdapterStateUseCase, getAppleDevicesUseCase, getOverlaySettingsUseCase)
         viewModel.stopScan()
 
-        verify(exactly = 1) { appleDevicesUseCase.stopScan() }
+        verify(exactly = 1) { getAppleDevicesUseCase.stopScan() }
     }
 }
