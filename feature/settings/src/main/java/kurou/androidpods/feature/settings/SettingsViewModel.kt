@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class SettingsUiState(
@@ -28,13 +27,11 @@ class SettingsViewModel @Inject constructor(
     private val getOverlaySettingsUseCase: GetOverlaySettingsUseCase,
 ) : ViewModel() {
 
-    private val _bluetoothAdapterState = MutableStateFlow(getBluetoothAdapterStateUseCase.current())
-    private val _appleDevices = MutableStateFlow<Map<String, AppleDevice>>(emptyMap())
     private val _overlayEnabled = MutableStateFlow(getOverlaySettingsUseCase.isEnabled())
 
     val uiState: StateFlow<SettingsUiState> = combine(
-        _bluetoothAdapterState,
-        _appleDevices,
+        getBluetoothAdapterStateUseCase.observe(),
+        getAppleDevicesUseCase.observe(),
         _overlayEnabled,
     ) { bluetoothAdapterState, appleDevices, overlayEnabled ->
         SettingsUiState(bluetoothAdapterState, appleDevices, overlayEnabled)
@@ -42,27 +39,10 @@ class SettingsViewModel @Inject constructor(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
         initialValue = SettingsUiState(
-            bluetoothAdapterState = _bluetoothAdapterState.value,
-            overlayEnabled = _overlayEnabled.value,
+            bluetoothAdapterState = getBluetoothAdapterStateUseCase.current(),
+            overlayEnabled = getOverlaySettingsUseCase.isEnabled(),
         ),
     )
-
-    init {
-        viewModelScope.launch {
-            getBluetoothAdapterStateUseCase.observe().collect { state ->
-                _bluetoothAdapterState.value = state
-            }
-        }
-        viewModelScope.launch {
-            getAppleDevicesUseCase.observe().collect { devices ->
-                _appleDevices.value = devices
-            }
-        }
-    }
-
-    fun refreshBluetoothState() {
-        _bluetoothAdapterState.value = getBluetoothAdapterStateUseCase.current()
-    }
 
     fun refreshOverlayState() {
         _overlayEnabled.value = getOverlaySettingsUseCase.isEnabled()

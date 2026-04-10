@@ -86,7 +86,6 @@ fun SettingsScreen(
             permissionStates[permission] =
                 ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
         }
-        viewModel.refreshBluetoothState()
         viewModel.refreshOverlayState()
         onStartScanService()
         if (initialRequestDone) {

@@ -7,6 +7,7 @@ import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -26,7 +27,8 @@ class SettingsViewModelTest {
 
     private val testDispatcher = UnconfinedTestDispatcher()
     private val fakeFlow = MutableSharedFlow<Int?>()
-    private val fakeAppleDevicesFlow = MutableSharedFlow<Map<String, AppleDevice>>()
+    // productionと同様、observe()は初期値emptyMapをもつStateFlowを返す
+    private val fakeAppleDevicesFlow = MutableStateFlow<Map<String, AppleDevice>>(emptyMap())
     private val useCase = mockk<GetBluetoothAdapterStateUseCase>()
     private val appleDevicesUseCase = mockk<GetAppleDevicesUseCase>(relaxUnitFun = true)
     private val overlaySettingsUseCase = mockk<GetOverlaySettingsUseCase>()
@@ -59,23 +61,12 @@ class SettingsViewModelTest {
 
         val viewModel = SettingsViewModel(useCase, appleDevicesUseCase, overlaySettingsUseCase)
 
+        // fakeAppleDevicesFlowはStateFlowなので初期値emptyMapを既に持っている
         fakeFlow.emit(BluetoothAdapter.STATE_ON)
         assertEquals(BluetoothAdapter.STATE_ON, viewModel.uiState.value.bluetoothAdapterState)
 
         fakeFlow.emit(BluetoothAdapter.STATE_TURNING_OFF)
         assertEquals(BluetoothAdapter.STATE_TURNING_OFF, viewModel.uiState.value.bluetoothAdapterState)
-    }
-
-    @Test
-    fun `refreshBluetoothStateでcurrentの最新値が反映される`() {
-        every { useCase.current() } returns BluetoothAdapter.STATE_OFF
-
-        val viewModel = SettingsViewModel(useCase, appleDevicesUseCase, overlaySettingsUseCase)
-        assertEquals(BluetoothAdapter.STATE_OFF, viewModel.uiState.value.bluetoothAdapterState)
-
-        every { useCase.current() } returns BluetoothAdapter.STATE_ON
-        viewModel.refreshBluetoothState()
-        assertEquals(BluetoothAdapter.STATE_ON, viewModel.uiState.value.bluetoothAdapterState)
     }
 
     @Test
@@ -102,10 +93,30 @@ class SettingsViewModelTest {
 
         val viewModel = SettingsViewModel(useCase, appleDevicesUseCase, overlaySettingsUseCase)
 
+        // combineはすべてのupstreamが1回以上emitするまで値を出さないため、
+        // bluetoothFlowに初期値を流してcombineを動作可能にする
+        fakeFlow.emit(BluetoothAdapter.STATE_ON)
+
         val device = AppleDevice("AA:BB:CC:DD:EE:FF", "AirPods Pro (2nd Gen)", 0x1420, -45, 8, 9, 7)
         val devices = mapOf(device.address to device)
         fakeAppleDevicesFlow.emit(devices)
         assertEquals(devices, viewModel.uiState.value.appleDevices)
+    }
+
+    @Test
+    fun `refreshOverlayStateでisEnabledの最新値が反映される`() = runTest {
+        every { useCase.current() } returns BluetoothAdapter.STATE_ON
+
+        val viewModel = SettingsViewModel(useCase, appleDevicesUseCase, overlaySettingsUseCase)
+
+        // combineはすべてのupstreamが1回以上emitするまで値を出さないため、
+        // bluetoothFlowに初期値を流してcombineを動作可能にする
+        fakeFlow.emit(BluetoothAdapter.STATE_ON)
+        assertEquals(false, viewModel.uiState.value.overlayEnabled)
+
+        every { overlaySettingsUseCase.isEnabled() } returns true
+        viewModel.refreshOverlayState()
+        assertEquals(true, viewModel.uiState.value.overlayEnabled)
     }
 
     @Test
