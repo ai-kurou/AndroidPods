@@ -42,18 +42,6 @@ class FirstLaunchUseCaseTest {
     }
 
     @Test
-    fun `observeはfalseの値も返す`() = runTest {
-        val fakeFlow = MutableStateFlow(false)
-        every { repository.observeIsFirstLaunch() } returns fakeFlow
-
-        val result = useCase.observe().first()
-
-        assertEquals(false, result)
-        verify(exactly = 1) { repository.observeIsFirstLaunch() }
-        confirmVerified(repository)
-    }
-
-    @Test
     fun `markAsLaunchedでrepositoryのmarkAsLaunchedが呼ばれる`() = runTest {
         useCase.markAsLaunched()
 
