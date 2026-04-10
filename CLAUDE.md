@@ -6,6 +6,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Android モバイルアプリケーションのプロジェクト。**パブリックリポジトリ**のため、コミット・プッシュされた内容はすべて公開される。
 
+## 作業完了前のルール
+
+コードを変更したら、**完了報告の前に必ず変更したモジュールのユニットテストを実行すること**。
+
+```bash
+# 変更したモジュールのテストを実行（例: feature:settings を変更した場合）
+./gradlew :feature:settings:testDebugUnitTest
+```
+
+複数モジュールを変更した場合はそれぞれのテストを実行する。テストが失敗した場合は修正してからレポートする。
+
 ## ビルド・テスト
 
 システムにJavaがインストールされていない場合、Android Studio同梱のJBRを使用する:

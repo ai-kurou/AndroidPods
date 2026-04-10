@@ -45,8 +45,7 @@ fun SettingsScreen(
     val permissions = requiredPermissions()
 
     val permissionStates = remember { mutableStateMapOf<String, Boolean>() }
-    val bluetoothAdapterState by viewModel.bluetoothAdapterState.collectAsStateWithLifecycle()
-    val overlayEnabled by viewModel.overlayEnabled.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showSettingsDialog by remember { mutableStateOf(false) }
     var initialRequestDone by remember { mutableStateOf(false) }
 
@@ -87,7 +86,6 @@ fun SettingsScreen(
             permissionStates[permission] =
                 ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
         }
-        viewModel.refreshBluetoothState()
         viewModel.refreshOverlayState()
         onStartScanService()
         if (initialRequestDone) {
@@ -129,8 +127,8 @@ fun SettingsScreen(
     ) { innerPadding ->
         SettingsContent(
             permissionStates = permissionStates,
-            bluetoothAdapterState = bluetoothAdapterState,
-            overlayEnabled = overlayEnabled,
+            bluetoothAdapterState = uiState.bluetoothAdapterState,
+            overlayEnabled = uiState.overlayEnabled,
             columns = columns,
             onPermissionWarningClick = {
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
