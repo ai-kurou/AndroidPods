@@ -11,8 +11,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DevicesViewModel @Inject constructor(
-    getCompatibleDevices: GetCompatibleDevicesUseCase,
+    getCompatibleDevicesUseCase: GetCompatibleDevicesUseCase,
 ) : ViewModel() {
     val devices: StateFlow<List<CompatibleDevice>> =
-        MutableStateFlow(getCompatibleDevices()).asStateFlow()
+        MutableStateFlow(getCompatibleDevicesUseCase()).asStateFlow()
 }
