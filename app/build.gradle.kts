@@ -46,23 +46,8 @@ kover {
     reports {
         filters {
             excludes {
-                packages(
-                    "dagger*",
-                    "hilt*"
-                )
-                classes(
-                    "*Module_Provide*",
-                    "*Binding",
-                    "*_Factory",
-                    "*_HiltModules*",
-                    "*Hilt_*",
-                    "*BuildConfig",
-                    "*HiltWrapper_*",
-                    "*ComposableSingletons*",
-                    "*_MembersInjector*",
-                    "*PreviewParameterProvider*",
-                )
-                annotatedBy("androidx.compose.ui.tooling.preview.Preview")
+                annotatedBy("androidx.compose.ui.tooling.preview.Preview")  // 既存（念のため残す）
+                classes("**.*PreviewKt")  // ← 追加：*Preview.kt から生成される JVM クラス
             }
         }
     }
