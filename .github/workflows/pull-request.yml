@@ -24,7 +24,7 @@ jobs:
 
       - uses: codecov/codecov-action@v5
         with:
-          files: ./app/build/reports/kover/reportDebug.xml
+          files: build/reports/kover/report.xml
 
   instrumented-test:
     runs-on: ubuntu-latest

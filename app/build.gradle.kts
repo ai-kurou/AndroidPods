@@ -42,27 +42,7 @@ android {
     }
 }
 
-kover {
-    reports {
-        filters {
-            excludes {
-                annotatedBy("androidx.compose.ui.tooling.preview.Preview")  // 既存（念のため残す）
-                classes("**.*PreviewKt")  // ← 追加：*Preview.kt から生成される JVM クラス
-            }
-        }
-    }
-}
-
 dependencies {
-    kover(project(":app"))
-    kover(project(":core:domain"))
-    kover(project(":core:data"))
-    kover(project(":core:service"))
-    kover(project(":feature:settings"))
-    kover(project(":feature:onboarding"))
-    kover(project(":feature:licenses"))
-    kover(project(":navigation"))
-
     // プロジェクトモジュール
     implementation(project(":core:domain"))
     implementation(project(":core:data"))
