@@ -38,10 +38,7 @@ class SettingsViewModel @Inject constructor(
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
-        initialValue = SettingsUiState(
-            bluetoothAdapterState = getBluetoothAdapterStateUseCase.current(),
-            overlayEnabled = _overlayEnabled.value,
-        ),
+        initialValue = SettingsUiState(),
     )
 
     fun refreshOverlayState() {
