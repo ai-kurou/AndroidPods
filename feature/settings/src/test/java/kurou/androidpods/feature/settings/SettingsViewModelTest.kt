@@ -1,6 +1,7 @@
 package kurou.androidpods.feature.settings
 
 import android.bluetooth.BluetoothAdapter
+import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -53,6 +54,11 @@ class SettingsViewModelTest {
         val viewModel = SettingsViewModel(getBluetoothAdapterStateUseCase, getAppleDevicesUseCase, getOverlaySettingsUseCase)
 
         assertEquals(BluetoothAdapter.STATE_ON, viewModel.uiState.value.bluetoothAdapterState)
+        verify(exactly = 1) { getBluetoothAdapterStateUseCase.current() }
+        verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
+        verify(exactly = 1) { getAppleDevicesUseCase.observe() }
+        verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
+        confirmVerified(getBluetoothAdapterStateUseCase, getAppleDevicesUseCase, getOverlaySettingsUseCase)
     }
 
     @Test
@@ -67,6 +73,11 @@ class SettingsViewModelTest {
 
         fakeFlow.emit(BluetoothAdapter.STATE_TURNING_OFF)
         assertEquals(BluetoothAdapter.STATE_TURNING_OFF, viewModel.uiState.value.bluetoothAdapterState)
+        verify(exactly = 1) { getBluetoothAdapterStateUseCase.current() }
+        verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
+        verify(exactly = 1) { getAppleDevicesUseCase.observe() }
+        verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
+        confirmVerified(getBluetoothAdapterStateUseCase, getAppleDevicesUseCase, getOverlaySettingsUseCase)
     }
 
     @Test
@@ -76,6 +87,11 @@ class SettingsViewModelTest {
         val viewModel = SettingsViewModel(getBluetoothAdapterStateUseCase, getAppleDevicesUseCase, getOverlaySettingsUseCase)
 
         assertNull(viewModel.uiState.value.bluetoothAdapterState)
+        verify(exactly = 1) { getBluetoothAdapterStateUseCase.current() }
+        verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
+        verify(exactly = 1) { getAppleDevicesUseCase.observe() }
+        verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
+        confirmVerified(getBluetoothAdapterStateUseCase, getAppleDevicesUseCase, getOverlaySettingsUseCase)
     }
 
     @Test
@@ -85,6 +101,11 @@ class SettingsViewModelTest {
         val viewModel = SettingsViewModel(getBluetoothAdapterStateUseCase, getAppleDevicesUseCase, getOverlaySettingsUseCase)
 
         assertEquals(emptyMap<String, AppleDevice>(), viewModel.uiState.value.appleDevices)
+        verify(exactly = 1) { getBluetoothAdapterStateUseCase.current() }
+        verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
+        verify(exactly = 1) { getAppleDevicesUseCase.observe() }
+        verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
+        confirmVerified(getBluetoothAdapterStateUseCase, getAppleDevicesUseCase, getOverlaySettingsUseCase)
     }
 
     @Test
@@ -101,6 +122,11 @@ class SettingsViewModelTest {
         val devices = mapOf(device.address to device)
         fakeAppleDevicesFlow.emit(devices)
         assertEquals(devices, viewModel.uiState.value.appleDevices)
+        verify(exactly = 1) { getBluetoothAdapterStateUseCase.current() }
+        verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
+        verify(exactly = 1) { getAppleDevicesUseCase.observe() }
+        verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
+        confirmVerified(getBluetoothAdapterStateUseCase, getAppleDevicesUseCase, getOverlaySettingsUseCase)
     }
 
     @Test
@@ -117,6 +143,12 @@ class SettingsViewModelTest {
         every { getOverlaySettingsUseCase.isEnabled() } returns true
         viewModel.refreshOverlayState()
         assertEquals(true, viewModel.uiState.value.overlayEnabled)
+        verify(exactly = 1) { getBluetoothAdapterStateUseCase.current() }
+        verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
+        verify(exactly = 1) { getAppleDevicesUseCase.observe() }
+        // コンストラクタで1回 + refreshOverlayState()で1回 = 合計2回
+        verify(exactly = 2) { getOverlaySettingsUseCase.isEnabled() }
+        confirmVerified(getBluetoothAdapterStateUseCase, getAppleDevicesUseCase, getOverlaySettingsUseCase)
     }
 
     @Test
@@ -126,7 +158,12 @@ class SettingsViewModelTest {
         val viewModel = SettingsViewModel(getBluetoothAdapterStateUseCase, getAppleDevicesUseCase, getOverlaySettingsUseCase)
         viewModel.startScan()
 
+        verify(exactly = 1) { getBluetoothAdapterStateUseCase.current() }
+        verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
+        verify(exactly = 1) { getAppleDevicesUseCase.observe() }
         verify(exactly = 1) { getAppleDevicesUseCase.startScan() }
+        verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
+        confirmVerified(getBluetoothAdapterStateUseCase, getAppleDevicesUseCase, getOverlaySettingsUseCase)
     }
 
     @Test
@@ -136,6 +173,11 @@ class SettingsViewModelTest {
         val viewModel = SettingsViewModel(getBluetoothAdapterStateUseCase, getAppleDevicesUseCase, getOverlaySettingsUseCase)
         viewModel.stopScan()
 
+        verify(exactly = 1) { getBluetoothAdapterStateUseCase.current() }
+        verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
+        verify(exactly = 1) { getAppleDevicesUseCase.observe() }
         verify(exactly = 1) { getAppleDevicesUseCase.stopScan() }
+        verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
+        confirmVerified(getBluetoothAdapterStateUseCase, getAppleDevicesUseCase, getOverlaySettingsUseCase)
     }
 }

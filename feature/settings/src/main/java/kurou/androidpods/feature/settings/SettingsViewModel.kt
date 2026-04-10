@@ -40,7 +40,7 @@ class SettingsViewModel @Inject constructor(
         started = SharingStarted.Eagerly,
         initialValue = SettingsUiState(
             bluetoothAdapterState = getBluetoothAdapterStateUseCase.current(),
-            overlayEnabled = getOverlaySettingsUseCase.isEnabled(),
+            overlayEnabled = _overlayEnabled.value,
         ),
     )
 
