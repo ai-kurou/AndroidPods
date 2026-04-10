@@ -44,11 +44,8 @@ class MainViewModelTest {
 
     @Test
     fun `初期状態はnullを返す`() {
-        val viewModel = MainViewModel(firstLaunchUseCase)
-
         assertNull(viewModel.isFirstLaunch.value)
-        // setUpのviewModel生成で1回 + このテストのviewModel生成で1回 = 合計2回
-        verify(exactly = 2) { firstLaunchUseCase.observe() }
+        verify(exactly = 1) { firstLaunchUseCase.observe() }
         confirmVerified(firstLaunchUseCase)
     }
 
