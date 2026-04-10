@@ -50,7 +50,7 @@ class SettingsViewModelTest {
 
         val viewModel = SettingsViewModel(useCase, appleDevicesUseCase, overlaySettingsUseCase)
 
-        assertEquals(BluetoothAdapter.STATE_ON, viewModel.bluetoothAdapterState.value)
+        assertEquals(BluetoothAdapter.STATE_ON, viewModel.uiState.value.bluetoothAdapterState)
     }
 
     @Test
@@ -60,10 +60,10 @@ class SettingsViewModelTest {
         val viewModel = SettingsViewModel(useCase, appleDevicesUseCase, overlaySettingsUseCase)
 
         fakeFlow.emit(BluetoothAdapter.STATE_ON)
-        assertEquals(BluetoothAdapter.STATE_ON, viewModel.bluetoothAdapterState.value)
+        assertEquals(BluetoothAdapter.STATE_ON, viewModel.uiState.value.bluetoothAdapterState)
 
         fakeFlow.emit(BluetoothAdapter.STATE_TURNING_OFF)
-        assertEquals(BluetoothAdapter.STATE_TURNING_OFF, viewModel.bluetoothAdapterState.value)
+        assertEquals(BluetoothAdapter.STATE_TURNING_OFF, viewModel.uiState.value.bluetoothAdapterState)
     }
 
     @Test
@@ -71,11 +71,11 @@ class SettingsViewModelTest {
         every { useCase.current() } returns BluetoothAdapter.STATE_OFF
 
         val viewModel = SettingsViewModel(useCase, appleDevicesUseCase, overlaySettingsUseCase)
-        assertEquals(BluetoothAdapter.STATE_OFF, viewModel.bluetoothAdapterState.value)
+        assertEquals(BluetoothAdapter.STATE_OFF, viewModel.uiState.value.bluetoothAdapterState)
 
         every { useCase.current() } returns BluetoothAdapter.STATE_ON
         viewModel.refreshBluetoothState()
-        assertEquals(BluetoothAdapter.STATE_ON, viewModel.bluetoothAdapterState.value)
+        assertEquals(BluetoothAdapter.STATE_ON, viewModel.uiState.value.bluetoothAdapterState)
     }
 
     @Test
@@ -84,7 +84,7 @@ class SettingsViewModelTest {
 
         val viewModel = SettingsViewModel(useCase, appleDevicesUseCase, overlaySettingsUseCase)
 
-        assertNull(viewModel.bluetoothAdapterState.value)
+        assertNull(viewModel.uiState.value.bluetoothAdapterState)
     }
 
     @Test
@@ -93,7 +93,7 @@ class SettingsViewModelTest {
 
         val viewModel = SettingsViewModel(useCase, appleDevicesUseCase, overlaySettingsUseCase)
 
-        assertEquals(emptyMap<String, AppleDevice>(), viewModel.appleDevices.value)
+        assertEquals(emptyMap<String, AppleDevice>(), viewModel.uiState.value.appleDevices)
     }
 
     @Test
@@ -105,7 +105,7 @@ class SettingsViewModelTest {
         val device = AppleDevice("AA:BB:CC:DD:EE:FF", "AirPods Pro (2nd Gen)", 0x1420, -45, 8, 9, 7)
         val devices = mapOf(device.address to device)
         fakeAppleDevicesFlow.emit(devices)
-        assertEquals(devices, viewModel.appleDevices.value)
+        assertEquals(devices, viewModel.uiState.value.appleDevices)
     }
 
     @Test

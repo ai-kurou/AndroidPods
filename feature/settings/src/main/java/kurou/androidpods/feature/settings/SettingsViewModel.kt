@@ -8,10 +8,18 @@ import kurou.androidpods.core.domain.GetAppleDevicesUseCase
 import kurou.androidpods.core.domain.GetBluetoothAdapterStateUseCase
 import kurou.androidpods.core.domain.GetOverlaySettingsUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+data class SettingsUiState(
+    val bluetoothAdapterState: Int? = null,
+    val appleDevices: Map<String, AppleDevice> = emptyMap(),
+    val overlayEnabled: Boolean = false,
+)
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
@@ -21,13 +29,23 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _bluetoothAdapterState = MutableStateFlow(getBluetoothAdapterStateUseCase.current())
-    val bluetoothAdapterState: StateFlow<Int?> = _bluetoothAdapterState.asStateFlow()
-
     private val _appleDevices = MutableStateFlow<Map<String, AppleDevice>>(emptyMap())
-    val appleDevices: StateFlow<Map<String, AppleDevice>> = _appleDevices.asStateFlow()
-
     private val _overlayEnabled = MutableStateFlow(getOverlaySettingsUseCase.isEnabled())
-    val overlayEnabled: StateFlow<Boolean> = _overlayEnabled.asStateFlow()
+
+    val uiState: StateFlow<SettingsUiState> = combine(
+        _bluetoothAdapterState,
+        _appleDevices,
+        _overlayEnabled,
+    ) { bluetoothAdapterState, appleDevices, overlayEnabled ->
+        SettingsUiState(bluetoothAdapterState, appleDevices, overlayEnabled)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = SettingsUiState(
+            bluetoothAdapterState = _bluetoothAdapterState.value,
+            overlayEnabled = _overlayEnabled.value,
+        ),
+    )
 
     init {
         viewModelScope.launch {
