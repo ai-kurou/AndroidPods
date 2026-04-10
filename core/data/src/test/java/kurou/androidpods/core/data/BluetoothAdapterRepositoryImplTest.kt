@@ -1,6 +1,8 @@
 package kurou.androidpods.core.data
 
+import android.app.Application
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothManager
 import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
 import kotlinx.coroutines.flow.take
@@ -11,11 +13,20 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import org.robolectric.annotation.Implementation
+import org.robolectric.annotation.Implements
 import org.robolectric.shadows.ShadowLooper
+
+@Implements(BluetoothManager::class)
+class ShadowBluetoothManagerNoAdapter {
+    @Implementation
+    fun getAdapter(): BluetoothAdapter? = null
+}
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
@@ -55,5 +66,30 @@ class BluetoothAdapterRepositoryImplTest {
         }
         context.sendBroadcast(intent)
         ShadowLooper.idleMainLooper()
+    }
+}
+
+@OptIn(ExperimentalCoroutinesApi::class)
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [35], shadows = [ShadowBluetoothManagerNoAdapter::class])
+class BluetoothAdapterRepositoryImplNullAdapterTest {
+
+    private val context = ApplicationProvider.getApplicationContext<Application>()
+    private val repository = BluetoothAdapterRepositoryImpl(context)
+
+    @Test
+    fun `BluetoothAdapterがnullのときgetCurrentStateはnullを返す`() {
+        assertNull(repository.getCurrentState())
+    }
+
+    @Test
+    fun `BluetoothAdapterがnullのときobserveAdapterStateは最初にnullを流す`() = runTest {
+        val results = mutableListOf<Int?>()
+        val job = launch(UnconfinedTestDispatcher(testScheduler)) {
+            repository.observeAdapterState().take(1).toList(results)
+        }
+
+        job.join()
+        assertNull(results[0])
     }
 }
