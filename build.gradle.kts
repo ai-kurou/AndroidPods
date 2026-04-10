@@ -14,6 +14,7 @@ kover {
         filters {
             excludes {
                 annotatedBy("androidx.compose.ui.tooling.preview.Preview")
+                annotatedBy("dagger.Module")
             }
         }
     }
