@@ -10,4 +10,6 @@ You are welcome to fork and modify for personal use.
 
 ## Screenshots
 
-![screen_record](https://github.com/user-attachments/assets/5787a1d4-dbc7-41fa-8897-5e6b2a9e8977)
+||
+|--|
+| ![screen_record](https://github.com/user-attachments/assets/5787a1d4-dbc7-41fa-8897-5e6b2a9e8977) |
