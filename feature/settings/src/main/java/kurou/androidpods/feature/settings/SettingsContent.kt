@@ -28,6 +28,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -136,6 +138,7 @@ internal fun SettingsContent(
         item(span = { GridItemSpan(1) }) {
             SettingsItem(
                 label = stringResource(R.string.overlay_setting_label),
+                icon = painterResource(R.drawable.ic_overlay_setting_label),
                 onClick = { onOverlayToggle(!overlayEnabled) },
             ) {
                 Switch(
@@ -147,6 +150,7 @@ internal fun SettingsContent(
         item(span = { GridItemSpan(1) }) {
             SettingsItem(
                 label = stringResource(R.string.compatible_devices),
+                icon = painterResource(R.drawable.ic_compatible_devices),
                 onClick = onDevicesClick,
             ) {
                 Icon(
@@ -158,6 +162,7 @@ internal fun SettingsContent(
         item(span = { GridItemSpan(1) }) {
             SettingsItem(
                 label = stringResource(R.string.open_source_licenses),
+                icon = painterResource(R.drawable.ic_open_source_licenses),
                 onClick = onLicensesClick,
             ) {
                 Icon(
@@ -169,6 +174,7 @@ internal fun SettingsContent(
         item(span = { GridItemSpan(1) }) {
             SettingsItem(
                 label = stringResource(R.string.github_repository),
+                icon = painterResource(R.drawable.ic_github_repository),
                 onClick = onGithubClick,
             ) {
                 Icon(
@@ -183,6 +189,7 @@ internal fun SettingsContent(
 @Composable
 private fun SettingsItem(
     label: String,
+    icon: Painter,
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
     trailing: @Composable () -> Unit,
@@ -196,6 +203,13 @@ private fun SettingsItem(
             .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
             .padding(12.dp),
     ) {
+        Icon(
+            painter = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(20.dp),
+        )
+        Spacer(modifier = Modifier.width(12.dp))
         Text(
             text = label,
             modifier = Modifier.weight(1f),
