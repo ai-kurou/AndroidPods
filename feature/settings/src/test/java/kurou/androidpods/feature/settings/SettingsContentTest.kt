@@ -36,6 +36,7 @@ class SettingsContentTest {
                 onOverlayToggle = {},
                 onLicensesClick = {},
                 onDevicesClick = {},
+                onGithubClick = {},
             )
         }
 
@@ -61,6 +62,7 @@ class SettingsContentTest {
                 onOverlayToggle = {},
                 onLicensesClick = {},
                 onDevicesClick = {},
+                onGithubClick = {},
             )
         }
 
@@ -84,6 +86,7 @@ class SettingsContentTest {
                 onOverlayToggle = {},
                 onLicensesClick = {},
                 onDevicesClick = {},
+                onGithubClick = {},
             )
         }
 
@@ -106,6 +109,7 @@ class SettingsContentTest {
                 onOverlayToggle = {},
                 onLicensesClick = {},
                 onDevicesClick = {},
+                onGithubClick = {},
             )
         }
 
@@ -130,6 +134,7 @@ class SettingsContentTest {
                 onOverlayToggle = {},
                 onLicensesClick = {},
                 onDevicesClick = {},
+                onGithubClick = {},
             )
         }
 
@@ -138,6 +143,29 @@ class SettingsContentTest {
         ).assertIsDisplayed().performClick()
 
         assertTrue(!clicked)
+    }
+
+    @Test
+    fun `GithubレポジトリアイテムをタップするとonGithubClickが呼ばれる`() {
+        var clicked = false
+        composeTestRule.setContent {
+            SettingsContent(
+                permissionStates = emptyMap(),
+                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+                overlayEnabled = false,
+                columns = 1,
+                onPermissionWarningClick = {},
+                onBluetoothWarningClick = {},
+                onOverlayToggle = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                onGithubClick = { clicked = true },
+            )
+        }
+
+        composeTestRule.onNodeWithText("GitHub Repository").performClick()
+
+        assertTrue(clicked)
     }
 
     @Test
@@ -154,6 +182,7 @@ class SettingsContentTest {
                 onOverlayToggle = { toggledValue = it },
                 onLicensesClick = {},
                 onDevicesClick = {},
+                onGithubClick = {},
             )
         }
 
@@ -176,6 +205,7 @@ class SettingsContentTest {
                 onOverlayToggle = { toggledValue = it },
                 onLicensesClick = {},
                 onDevicesClick = {},
+                onGithubClick = {},
             )
         }
 

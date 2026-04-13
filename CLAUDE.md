@@ -103,6 +103,13 @@ main へのマージ時に `.github/workflows/on-main-merge.yml` が実行され
 - **test ジョブ**: `assembleDebug` + `koverXmlReport` → Codecov へアップロード
 - **instrumented-test ジョブ**: Android エミュレータ（API 36）で `connectedDebugAndroidTest`
 
+## 文字列リソース
+
+`strings.xml` に文字列を追加・変更する場合、**必ず `values/`（英語）と `values-ja/`（日本語）の両方を同時に更新すること**。片方だけの追加は禁止。
+
+- `values/strings.xml` — 英語（デフォルト）
+- `values-ja/strings.xml` — 日本語
+
 ## Security Rules
 
 ### 自動スキャン

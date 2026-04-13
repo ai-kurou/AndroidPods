@@ -21,4 +21,5 @@
     <string name="overlay_setting_label">バッテリーオーバーレイを表示</string>
     <string name="compatible_devices">対応デバイス</string>
     <string name="open_source_licenses">オープンソースライセンス</string>
+    <string name="github_repository">Githubレポジトリ</string>
 </resources>

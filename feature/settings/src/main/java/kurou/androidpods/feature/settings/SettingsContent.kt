@@ -43,6 +43,7 @@ internal fun SettingsContent(
     onOverlayToggle: (Boolean) -> Unit,
     onLicensesClick: () -> Unit,
     onDevicesClick: () -> Unit,
+    onGithubClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val hasNotGranted = permissionStates.values.any { !it }
@@ -165,6 +166,17 @@ internal fun SettingsContent(
                 )
             }
         }
+        item(span = { GridItemSpan(1) }) {
+            SettingsItem(
+                label = stringResource(R.string.github_repository),
+                onClick = onGithubClick,
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                )
+            }
+        }
     }
 }
 
@@ -215,6 +227,7 @@ private fun SettingsContentPreviewNoWarning() {
         onOverlayToggle = {},
         onLicensesClick = {},
         onDevicesClick = {},
+        onGithubClick = {},
     )
 }
 
@@ -234,6 +247,7 @@ private fun SettingsContentPreviewPermissionNotGranted() {
         onOverlayToggle = {},
         onLicensesClick = {},
         onDevicesClick = {},
+        onGithubClick = {},
     )
 }
 
@@ -253,6 +267,7 @@ private fun SettingsContentPreviewBluetoothOff() {
         onOverlayToggle = {},
         onLicensesClick = {},
         onDevicesClick = {},
+        onGithubClick = {},
     )
 }
 
@@ -269,6 +284,7 @@ private fun SettingsContentPreviewBluetoothUnavailable() {
         onOverlayToggle = {},
         onLicensesClick = {},
         onDevicesClick = {},
+        onGithubClick = {},
     )
 }
 
@@ -288,6 +304,7 @@ private fun SettingsContentPreviewAllWarnings() {
         onOverlayToggle = {},
         onLicensesClick = {},
         onDevicesClick = {},
+        onGithubClick = {},
     )
 }
 
@@ -307,6 +324,7 @@ private fun SettingsContentPreviewMedium() {
         onOverlayToggle = {},
         onLicensesClick = {},
         onDevicesClick = {},
+        onGithubClick = {},
     )
 }
 
@@ -326,5 +344,6 @@ private fun SettingsContentPreviewExpanded() {
         onOverlayToggle = {},
         onLicensesClick = {},
         onDevicesClick = {},
+        onGithubClick = {},
     )
 }

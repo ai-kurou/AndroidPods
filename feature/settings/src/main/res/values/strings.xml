@@ -21,4 +21,5 @@
     <string name="overlay_setting_label">Show battery overlay</string>
     <string name="compatible_devices">Compatible devices</string>
     <string name="open_source_licenses">Open Source Licenses</string>
+    <string name="github_repository">GitHub Repository</string>
 </resources>
