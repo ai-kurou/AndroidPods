@@ -141,6 +141,10 @@ fun SettingsScreen(
             },
             onLicensesClick = onLicensesClick,
             onDevicesClick = onDevicesClick,
+            onGithubClick = {
+                val intent = Intent(Intent.ACTION_VIEW, "https://github.com/ai-kurou/AndroidPods".toUri())
+                context.startActivity(intent)
+            },
             onOverlayToggle = {
                 val intent = Intent(
                     Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
