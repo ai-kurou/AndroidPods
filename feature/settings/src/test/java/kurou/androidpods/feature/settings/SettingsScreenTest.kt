@@ -8,6 +8,10 @@ import android.content.Intent
 import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -57,6 +61,32 @@ class SettingsScreenTest {
         every { appleDevicesUseCase.observe() } returns MutableStateFlow<Map<String, AppleDevice>>(emptyMap())
         every { overlayUseCase.isEnabled() } returns false
         return SettingsViewModel(btUseCase, appleDevicesUseCase, overlayUseCase)
+    }
+
+    @Test
+    fun `Compact・Medium・ExpandedのwindowWidthSizeClassでSettingsScreenが表示される`() {
+        var widthSizeClass by mutableStateOf(WindowWidthSizeClass.Compact)
+
+        composeTestRule.setContent {
+            SettingsScreen(
+                windowWidthSizeClass = widthSizeClass,
+                onStartScanService = {},
+                onStopScanService = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                viewModel = createViewModel(BluetoothAdapter.STATE_ON),
+            )
+        }
+
+        listOf(
+            WindowWidthSizeClass.Compact,
+            WindowWidthSizeClass.Medium,
+            WindowWidthSizeClass.Expanded,
+        ).forEach { sizeClass ->
+            widthSizeClass = sizeClass
+            composeTestRule.waitForIdle()
+            composeTestRule.onNodeWithText("AndroidPods").assertIsDisplayed()
+        }
     }
 
     @Test
