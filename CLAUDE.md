@@ -100,7 +100,7 @@ Koverでカバレッジを計測し、CIでCodecovにアップロードする。
 ## CI
 
 main へのマージ時に `.github/workflows/on-main-merge.yml` が実行される:
-- **test ジョブ**: `assembleDebug` + `koverXmlReport` → Codecov へアップロード
+- **test ジョブ**: `koverXmlReport` → Codecov へアップロード（`koverXmlReport` がコンパイル・テスト・カバレッジ計測を包含するため `assembleDebug` は不要）
 - **instrumented-test ジョブ**: Android エミュレータ（API 36）で `connectedDebugAndroidTest`
 
 ## 文字列リソース
