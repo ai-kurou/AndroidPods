@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.os.Build
+import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -109,6 +110,29 @@ class OnboardingScreenTest {
             it.onBackPressedDispatcher.onBackPressed()                   // page 0 → 終了
         }
         assertTrue(composeTestRule.activity.isFinishing)
+    }
+
+    @Test
+    @Config(qualifiers = "port")
+    fun `オーバーレイ権限がない状態でAllow Overlayボタンをクリックするとインテントが発行される`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        grantRequiredPermissions(context)
+        ShadowSettings.setCanDrawOverlays(false)
+
+        composeTestRule.setContent {
+            OnboardingScreen(onComplete = {})
+        }
+
+        composeTestRule.onNodeWithText("Next").performClick()            // page 0 → 1
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Grant Permission").performClick() // page 1 → 2
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Allow Overlay").performClick()
+        composeTestRule.waitForIdle()
+
+        val started = shadowOf(composeTestRule.activity).nextStartedActivityForResult
+        assertEquals(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, started?.intent?.action)
     }
 
     @Test
