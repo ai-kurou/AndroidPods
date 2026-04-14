@@ -39,7 +39,7 @@ android {
                 storePassword = localProperties.getProperty("STORE_PASSWORD")
                 keyAlias = localProperties.getProperty("KEY_ALIAS")
                 keyPassword = localProperties.getProperty("KEY_PASSWORD")
-                storeType = localProperties.getProperty("STORE_TYPE") ?: "PKCS12"
+                storeType = "PKCS12"
             }
         }
     }

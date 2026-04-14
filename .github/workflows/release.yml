@@ -56,7 +56,6 @@ jobs:
           STORE_PASSWORD=${{ secrets.STORE_PASSWORD }}
           KEY_ALIAS=${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}
-          STORE_TYPE=${{ secrets.STORE_TYPE }}
           EOF
 
       - name: Build release APK
