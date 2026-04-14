@@ -1,0 +1,189 @@
+package kurou.androidpods.feature.settings
+
+import android.Manifest
+import android.app.Application
+import android.bluetooth.BluetoothAdapter
+import android.content.Context
+import android.content.Intent
+import android.provider.Settings
+import androidx.activity.ComponentActivity
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.test.core.app.ApplicationProvider
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.unmockkAll
+import kotlinx.coroutines.flow.MutableStateFlow
+import kurou.androidpods.core.domain.AppleDevice
+import kurou.androidpods.core.domain.GetAppleDevicesUseCase
+import kurou.androidpods.core.domain.GetBluetoothAdapterStateUseCase
+import kurou.androidpods.core.domain.GetOverlaySettingsUseCase
+import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.Shadows.shadowOf
+import org.robolectric.annotation.Config
+
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [35])
+class SettingsScreenTest {
+
+    @get:Rule
+    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+
+    private val btUseCase = mockk<GetBluetoothAdapterStateUseCase>()
+    private val appleDevicesUseCase = mockk<GetAppleDevicesUseCase>(relaxUnitFun = true)
+    private val overlayUseCase = mockk<GetOverlaySettingsUseCase>()
+
+    @After
+    fun tearDown() {
+        unmockkAll()
+    }
+
+    private fun grantRequiredPermissions(context: Context) {
+        shadowOf(context as Application).grantPermissions(
+            Manifest.permission.BLUETOOTH_CONNECT,
+            Manifest.permission.BLUETOOTH_SCAN,
+        )
+    }
+
+    private fun createViewModel(bluetoothAdapterState: Int): SettingsViewModel {
+        every { btUseCase.observe() } returns MutableStateFlow(bluetoothAdapterState)
+        every { appleDevicesUseCase.observe() } returns MutableStateFlow<Map<String, AppleDevice>>(emptyMap())
+        every { overlayUseCase.isEnabled() } returns false
+        return SettingsViewModel(btUseCase, appleDevicesUseCase, overlayUseCase)
+    }
+
+    @Test
+    fun `Compact・Medium・ExpandedのwindowWidthSizeClassでSettingsScreenが表示される`() {
+        var widthSizeClass by mutableStateOf(WindowWidthSizeClass.Compact)
+
+        composeTestRule.setContent {
+            SettingsScreen(
+                windowWidthSizeClass = widthSizeClass,
+                onStartScanService = {},
+                onStopScanService = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                viewModel = createViewModel(BluetoothAdapter.STATE_ON),
+            )
+        }
+
+        listOf(
+            WindowWidthSizeClass.Compact,
+            WindowWidthSizeClass.Medium,
+            WindowWidthSizeClass.Expanded,
+        ).forEach { sizeClass ->
+            widthSizeClass = sizeClass
+            composeTestRule.waitForIdle()
+            composeTestRule.onNodeWithText("AndroidPods").assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun `権限警告をタップするとACTION_APPLICATION_DETAILS_SETTINGSのインテントが発行される`() {
+        composeTestRule.setContent {
+            SettingsScreen(
+                windowWidthSizeClass = WindowWidthSizeClass.Compact,
+                onStartScanService = {},
+                onStopScanService = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                viewModel = createViewModel(BluetoothAdapter.STATE_ON),
+            )
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText(
+            "Some required permissions are not granted. Please grant all permissions."
+        ).performClick()
+        composeTestRule.waitForIdle()
+
+        val started = shadowOf(composeTestRule.activity).nextStartedActivity
+        assertEquals(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, started?.action)
+    }
+
+    @Test
+    fun `Bluetooth警告をタップするとACTION_BLUETOOTH_SETTINGSのインテントが発行される`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        grantRequiredPermissions(context)
+
+        composeTestRule.setContent {
+            SettingsScreen(
+                windowWidthSizeClass = WindowWidthSizeClass.Compact,
+                onStartScanService = {},
+                onStopScanService = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                viewModel = createViewModel(bluetoothAdapterState = BluetoothAdapter.STATE_OFF),
+            )
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText(
+            "Bluetooth is off. Please enable Bluetooth."
+        ).performClick()
+        composeTestRule.waitForIdle()
+
+        val started = shadowOf(composeTestRule.activity).nextStartedActivity
+        assertEquals(Settings.ACTION_BLUETOOTH_SETTINGS, started?.action)
+    }
+
+    @Test
+    fun `GitHubリポジトリをタップするとACTION_VIEWのインテントが発行される`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        grantRequiredPermissions(context)
+
+        composeTestRule.setContent {
+            SettingsScreen(
+                windowWidthSizeClass = WindowWidthSizeClass.Compact,
+                onStartScanService = {},
+                onStopScanService = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                viewModel = createViewModel(BluetoothAdapter.STATE_ON),
+            )
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("GitHub Repository").performClick()
+        composeTestRule.waitForIdle()
+
+        val started = shadowOf(composeTestRule.activity).nextStartedActivity
+        assertEquals(Intent.ACTION_VIEW, started?.action)
+        assertEquals("https://github.com/ai-kurou/AndroidPods", started?.dataString)
+    }
+
+    @Test
+    fun `オーバーレイトグルをタップするとACTION_MANAGE_OVERLAY_PERMISSIONのインテントが発行される`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        grantRequiredPermissions(context)
+
+        composeTestRule.setContent {
+            SettingsScreen(
+                windowWidthSizeClass = WindowWidthSizeClass.Compact,
+                onStartScanService = {},
+                onStopScanService = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                viewModel = createViewModel(BluetoothAdapter.STATE_ON),
+            )
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Show battery overlay").performClick()
+        composeTestRule.waitForIdle()
+
+        val started = shadowOf(composeTestRule.activity).nextStartedActivityForResult
+        assertEquals(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, started?.intent?.action)
+    }
+}
