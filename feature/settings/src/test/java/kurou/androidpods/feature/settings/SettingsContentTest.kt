@@ -146,6 +146,52 @@ class SettingsContentTest {
     }
 
     @Test
+    fun `対応デバイスアイテムをタップするとonDevicesClickが呼ばれる`() {
+        var clicked = false
+        composeTestRule.setContent {
+            SettingsContent(
+                permissionStates = emptyMap(),
+                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+                overlayEnabled = false,
+                columns = 1,
+                onPermissionWarningClick = {},
+                onBluetoothWarningClick = {},
+                onOverlayToggle = {},
+                onLicensesClick = {},
+                onDevicesClick = { clicked = true },
+                onGithubClick = {},
+            )
+        }
+
+        composeTestRule.onNodeWithText("Compatible devices").performClick()
+
+        assertTrue(clicked)
+    }
+
+    @Test
+    fun `ライセンスアイテムをタップするとonLicensesClickが呼ばれる`() {
+        var clicked = false
+        composeTestRule.setContent {
+            SettingsContent(
+                permissionStates = emptyMap(),
+                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+                overlayEnabled = false,
+                columns = 1,
+                onPermissionWarningClick = {},
+                onBluetoothWarningClick = {},
+                onOverlayToggle = {},
+                onLicensesClick = { clicked = true },
+                onDevicesClick = {},
+                onGithubClick = {},
+            )
+        }
+
+        composeTestRule.onNodeWithText("Open Source Licenses").performClick()
+
+        assertTrue(clicked)
+    }
+
+    @Test
     fun `GithubレポジトリアイテムをタップするとonGithubClickが呼ばれる`() {
         var clicked = false
         composeTestRule.setContent {
