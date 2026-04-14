@@ -5,7 +5,7 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
+  unit-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,16 +17,6 @@ jobs:
           java-version: 17
 
       - uses: gradle/actions/setup-gradle@v4
-
-      # signingConfigs の定義に local.properties が必要だが、
-      # このジョブはテスト・カバレッジのみで署名は実行しないため
-      # ダミー値で問題ない。実際の署名はリリースワークフローで行う。
-      - name: Create local.properties
-        run: |
-          echo "STORE_FILE=app/androidpods.jks" >> local.properties
-          echo "STORE_PASSWORD=placeholder" >> local.properties
-          echo "KEY_ALIAS=placeholder" >> local.properties
-          echo "KEY_PASSWORD=placeholder" >> local.properties
 
       - run: ./gradlew koverXmlReport
 
@@ -46,16 +36,6 @@ jobs:
           java-version: 17
 
       - uses: gradle/actions/setup-gradle@v4
-
-      # signingConfigs の定義に local.properties が必要だが、
-      # このジョブはインスツルメンテッドテストのみで署名は実行しないため
-      # ダミー値で問題ない。実際の署名はリリースワークフローで行う。
-      - name: Create local.properties
-        run: |
-          echo "STORE_FILE=app/androidpods.jks" >> local.properties
-          echo "STORE_PASSWORD=placeholder" >> local.properties
-          echo "KEY_ALIAS=placeholder" >> local.properties
-          echo "KEY_PASSWORD=placeholder" >> local.properties
 
       - name: Enable KVM
         run: |
