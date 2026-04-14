@@ -1,10 +1,11 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - 'v*'
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'バージョン番号 (例: 1.2.0)'
+        required: true
 
 jobs:
   release:
@@ -15,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main          # タグではなく main を取得
+          ref: main
           fetch-depth: 0
 
       - name: Set up JDK
@@ -25,10 +26,9 @@ jobs:
           distribution: temurin
           cache: gradle
 
-      - name: Extract version from tag
+      - name: Set version
         run: |
-          VERSION=${GITHUB_REF_NAME#v}
-          echo "VERSION_NAME=$VERSION" >> $GITHUB_ENV
+          echo "VERSION_NAME=${{ github.event.inputs.version }}" >> $GITHUB_ENV
           echo "VERSION_CODE=$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
 
       - name: Update versionName and versionCode
@@ -64,8 +64,8 @@ jobs:
 
       - name: Create GitHub Release
         run: |
-          gh release create "$GITHUB_REF_NAME" \
-            --title "Release $GITHUB_REF_NAME" \
+          gh release create "v$VERSION_NAME" \
+            --title "Release v$VERSION_NAME" \
             --generate-notes \
             app/build/outputs/apk/release/app-release.apk
         env:
