@@ -132,11 +132,11 @@ fun OnboardingScreen(
     OnboardingContent(
         pagerState = pagerState,
         onButtonClick = {
-            when {
-                pagerState.currentPage == PERMISSION_PAGE -> {
+            when (pagerState.currentPage) {
+                PERMISSION_PAGE -> {
                     permissionLauncher?.launch(requiredPermissions())
                 }
-                pagerState.currentPage == OVERLAY_PAGE -> {
+                OVERLAY_PAGE -> {
                     if (Settings.canDrawOverlays(context)) {
                         coroutineScope.launch {
                             pagerState.animateScrollToPage(pagerState.currentPage + 1)
@@ -149,11 +149,12 @@ fun OnboardingScreen(
                         overlayPermissionLauncher?.launch(intent)
                     }
                 }
-                pagerState.currentPage == BLUETOOTH_PAGE -> {
+                BLUETOOTH_PAGE -> {
                     when {
                         bluetoothAdapter == null -> {
                             showBluetoothUnavailableDialog = true
                         }
+
                         bluetoothAdapter.isEnabled -> onComplete()
                         else -> bluetoothEnableLauncher?.launch(
                             Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE),
