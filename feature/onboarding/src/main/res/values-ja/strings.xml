@@ -6,7 +6,6 @@
     <string name="onboarding_button_next">次へ</string>
     <string name="onboarding_button_grant_permission">権限を許可する</string>
     <string name="onboarding_button_enable_bluetooth">BluetoothをONにする</string>
-    <string name="onboarding_button_get_started">はじめる</string>
     <string name="onboarding_permission_dialog_title">権限が必要です</string>
     <string name="onboarding_permission_dialog_message">Bluetooth権限が拒否されました。設定から許可してください。</string>
     <string name="onboarding_permission_dialog_confirm">設定を開く</string>

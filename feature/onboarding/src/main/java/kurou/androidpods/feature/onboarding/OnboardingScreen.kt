@@ -160,12 +160,11 @@ fun OnboardingScreen(
                         )
                     }
                 }
-                pagerState.currentPage < PAGE_COUNT - 1 -> {
+                else -> {
                     coroutineScope.launch {
                         pagerState.animateScrollToPage(pagerState.currentPage + 1)
                     }
                 }
-                else -> onComplete()
             }
         },
         modifier = modifier,

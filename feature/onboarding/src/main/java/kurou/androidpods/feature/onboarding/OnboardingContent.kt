@@ -103,8 +103,7 @@ internal fun OnboardingContent(
                         pagerState.currentPage == PERMISSION_PAGE -> R.string.onboarding_button_grant_permission
                         pagerState.currentPage == OVERLAY_PAGE -> R.string.onboarding_button_allow_overlay
                         pagerState.currentPage == BLUETOOTH_PAGE -> R.string.onboarding_button_enable_bluetooth
-                        pagerState.currentPage < PAGE_COUNT - 1 -> R.string.onboarding_button_next
-                        else -> R.string.onboarding_button_get_started
+                        else -> R.string.onboarding_button_next
                     },
                 ),
             )
