@@ -61,11 +61,16 @@ jobs:
       - name: Build release APK
         run: ./gradlew assembleRelease
 
+      - name: Rename APK
+        run: |
+          mv app/build/outputs/apk/release/app-release.apk \
+             app/build/outputs/apk/release/androidpods-${VERSION_NAME}.apk
+
       - name: Create GitHub Release
         run: |
           gh release create "v$VERSION_NAME" \
             --title "Release v$VERSION_NAME" \
             --generate-notes \
-            app/build/outputs/apk/release/app-release.apk
+            app/build/outputs/apk/release/androidpods-${VERSION_NAME}.apk
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
