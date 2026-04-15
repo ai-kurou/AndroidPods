@@ -10,6 +10,7 @@ import kurou.androidpods.core.domain.BluetoothAdapterRepository
 import kurou.androidpods.core.domain.CompatibleDevice
 import kurou.androidpods.core.domain.CompatibleDeviceRepository
 import kurou.androidpods.core.domain.OverlaySettingsRepository
+import kurou.androidpods.core.domain.UpdateRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import javax.inject.Singleton
@@ -47,5 +48,12 @@ object FakeRepositoryModule {
     fun provideCompatibleDeviceRepository(): CompatibleDeviceRepository =
         object : CompatibleDeviceRepository {
             override fun getCompatibleDevices(): List<CompatibleDevice> = emptyList()
+        }
+
+    @Provides
+    @Singleton
+    fun provideUpdateRepository(): UpdateRepository =
+        object : UpdateRepository {
+            override suspend fun fetchLatestTagName(): String? = null
         }
 }
