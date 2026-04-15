@@ -80,6 +80,15 @@ fun SettingsScreen(
         if (notGranted.isNotEmpty()) launcher.launch(notGranted.toTypedArray())
     }
 
+    // 起動時にアップデート確認
+    LaunchedEffect(Unit) {
+        @Suppress("DEPRECATION")
+        val versionName = runCatching {
+            context.packageManager.getPackageInfo(context.packageName, 0).versionName
+        }.getOrNull() ?: return@LaunchedEffect
+        viewModel.checkUpdate(versionName)
+    }
+
     // アプリ復帰時（ON_RESUME）にスキャン開始、権限状態とアダプタ状態を再チェック
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         permissions.forEach { permission ->
@@ -129,6 +138,7 @@ fun SettingsScreen(
             permissionStates = permissionStates,
             bluetoothAdapterState = uiState.bluetoothAdapterState,
             overlayEnabled = uiState.overlayEnabled,
+            updateAvailable = uiState.updateAvailable,
             columns = columns,
             onPermissionWarningClick = {
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
@@ -138,6 +148,10 @@ fun SettingsScreen(
             },
             onBluetoothWarningClick = {
                 context.startActivity(Intent(Settings.ACTION_BLUETOOTH_SETTINGS))
+            },
+            onUpdateClick = {
+                val intent = Intent(Intent.ACTION_VIEW, "https://github.com/ai-kurou/AndroidPods/releases/latest".toUri())
+                context.startActivity(intent)
             },
             onLicensesClick = onLicensesClick,
             onDevicesClick = onDevicesClick,
