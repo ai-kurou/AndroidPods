@@ -80,4 +80,20 @@ class CheckUpdateUseCaseTest {
 
         assertFalse(useCase("0.1.0"))
     }
+
+    @Test
+    fun `最新バージョンのコンポーネント数が多い場合に正しく比較できる`() = runTest {
+        // l="1.0.1"(3コンポーネント) vs c="1.0"(2コンポーネント): c.getOrElse(2){0}が呼ばれる
+        coEvery { repository.fetchLatestTagName() } returns "v1.0.1"
+
+        assertTrue(useCase("1.0"))
+    }
+
+    @Test
+    fun `現在バージョンのコンポーネント数が多い場合に正しく比較できる`() = runTest {
+        // l="1.0"(2コンポーネント) vs c="1.0.1"(3コンポーネント): l.getOrElse(2){0}が呼ばれる
+        coEvery { repository.fetchLatestTagName() } returns "v1.0"
+
+        assertFalse(useCase("1.0.1"))
+    }
 }
