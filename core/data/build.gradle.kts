@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kover)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -36,10 +37,17 @@ dependencies {
     // Kotlin Coroutines
     implementation(libs.kotlinx.coroutines.core)
 
+    // Ktor (HTTP Client)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
+
     // DataStore (永続化)
     implementation(libs.androidx.datastore.preferences)
 
     // Unit Test
+    testImplementation(libs.ktor.client.mock)
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     testImplementation(libs.kotlinx.coroutines.test)
