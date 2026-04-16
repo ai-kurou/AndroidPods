@@ -29,9 +29,9 @@ internal fun PermissionRequiredDialog(
     )
 }
 
-@Preview(showBackground = true, name = "権限設定ダイアログ")
+@Preview(showBackground = true)
 @Composable
-private fun PermissionSettingsDialogPreview() {
+private fun PermissionRequiredDialogPreview() {
     PermissionRequiredDialog(
         onDismiss = {},
         onConfirm = {},

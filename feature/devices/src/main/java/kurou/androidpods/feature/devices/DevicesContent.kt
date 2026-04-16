@@ -56,28 +56,22 @@ private val previewDevices = listOf(
     CompatibleDevice(name = "Beats Solo3", images = null),
 )
 
-@Preview(showBackground = true, name = "Compact (2列)")
+@Preview(showBackground = true, widthDp = 400, heightDp = 700)
 @Composable
-private fun DevicesContentPreviewCompact() {
+private fun DevicesContentPreviewTwoColumns() {
     DevicesContent(devices = previewDevices, columns = 2)
 }
 
-@Preview(showBackground = true, widthDp = 700, name = "Medium (3列)")
+@Preview(showBackground = true, widthDp = 700, heightDp = 400)
 @Composable
-private fun DevicesContentPreviewMedium() {
+private fun DevicesContentPreviewThreeColumns() {
     DevicesContent(devices = previewDevices, columns = 3)
 }
 
-@Preview(showBackground = true, widthDp = 900, name = "Expanded (4列)")
+@Preview(showBackground = true, widthDp = 900, heightDp = 400)
 @Composable
-private fun DevicesContentPreviewExpanded() {
+private fun DevicesContentPreviewFourColumns() {
     DevicesContent(devices = previewDevices, columns = 4)
-}
-
-@Preview(showBackground = true, name = "アイテム単体")
-@Composable
-private fun DeviceItemPreview() {
-    DeviceItem(device = CompatibleDevice(name = "AirPods Pro (2nd Gen)", images = null))
 }
 
 @Composable

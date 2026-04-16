@@ -187,8 +187,8 @@ private fun PageIndicator(
     }
 }
 
-@Preview(showBackground = true, name = "Portrait", device = "spec:width=411dp,height=891dp")
-@Preview(showBackground = true, name = "Landscape", device = "spec:width=891dp,height=411dp")
+@Preview(showBackground = true, name = "Portrait", widthDp = 400, heightDp = 700)
+@Preview(showBackground = true, name = "Landscape", widthDp = 700, heightDp = 400)
 @Composable
 private fun OnboardingContentPreview() {
     OnboardingContent(
