@@ -49,6 +49,12 @@ export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
 
 # 特定テストクラスの実行
 ./gradlew :app:testDebugUnitTest --tests "kurou.androidpods.MainViewModelTest"
+
+# スクリーンショットを記録（初回・UI変更後に実行してgitにコミット）
+./gradlew recordRoborazziDebug
+
+# スクリーンショットを検証（CIと同等）
+./gradlew verifyRoborazziDebug
 ```
 
 ## アーキテクチャ
@@ -89,6 +95,7 @@ Hiltを使用。新しいRepositoryを追加する場合:
 - **Repository テスト**: Robolectric (`@Config(sdk = [35])`) でAndroid APIをシミュレート
 - **Service テスト**: Hilt + Robolectric。`@UninstallModules(DataModule::class)`でFakeモジュールに差し替え、`Robolectric.buildService()`でServiceControllerを取得。ロジックは`internal fun`として抽出しユニットテスト可能にする
 - **Compose UIテスト**: `createAndroidComposeRule<ComponentActivity>()` + Robolectricでユニットテストとして実行。Activityへのアクセス（`activityRule.scenario`、`onBackPressedDispatcher`など）が不要な場合は`createComposeRule()`でも可
+- **スクリーンショットテスト（Roborazzi）**: `@GraphicsMode(GraphicsMode.Mode.NATIVE)` を付けて `captureRoboImage()` でスクリーンショットを取得。クラスに `@Config(qualifiers = "w360dp-h640dp-port-xxhdpi")` でデバイスサイズを固定する。横向きは `@Config(qualifiers = "w640dp-h360dp-land-xxhdpi")` をメソッドに付与。アニメーション・`HorizontalPager`など描画が不安定なComposableは `RoborazziOptions(compareOptions = RoborazziOptions.CompareOptions(changeThreshold = 0.05f))` で差分しきい値を設定する
 - テスト名は日本語のバッククォート記法 (`` `初期状態はnullを返す`() ``)
 - 画面の向きは`@Config(qualifiers = "port")`または`@Config(qualifiers = "land")`で指定
 
@@ -109,9 +116,16 @@ Koverでカバレッジを計測し、CIでCodecovにアップロードする。
 
 ## CI
 
-main へのマージ時に `.github/workflows/on-main-merge.yml` が実行される:
-- **test ジョブ**: `koverXmlReport` → Codecov へアップロード（`koverXmlReport` がコンパイル・テスト・カバレッジ計測を包含するため `assembleDebug` は不要）
+PR時に `.github/workflows/pull-request.yml` が実行される:
+- **unit-test ジョブ**: `koverXmlReport` → Codecov へアップロード
+- **screenshot-test ジョブ**: `verifyRoborazziDebug` でスクリーンショットを比較。差分が出た場合は `**/build/outputs/roborazzi/*.png` をアーティファクトとしてアップロード
 - **instrumented-test ジョブ**: Android エミュレータ（API 36）で `connectedDebugAndroidTest`
+
+main へのマージ時に `.github/workflows/on-main-merge.yml` が実行される:
+- **unit-test ジョブ**: `koverXmlReport` → Codecov へアップロード（`koverXmlReport` がコンパイル・テスト・カバレッジ計測を包含するため `assembleDebug` は不要）
+- **instrumented-test ジョブ**: Android エミュレータ（API 36）で `connectedDebugAndroidTest`
+
+スクリーンショットのベースラインは各モジュールの `src/test/snapshots/` に格納してgit管理する。UI変更後は `./gradlew recordRoborazziDebug` で再記録してコミットすること。
 
 ## 文字列リソース
 
