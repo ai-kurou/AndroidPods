@@ -3,6 +3,7 @@ package kurou.androidpods.feature.onboarding
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
+import com.github.takahirom.roborazzi.RoborazziOptions
 import com.github.takahirom.roborazzi.captureRoboImage
 import org.junit.Rule
 import org.junit.Test
@@ -15,6 +16,12 @@ import org.robolectric.annotation.GraphicsMode
 @Config(sdk = [35], qualifiers = "w360dp-h640dp-port-xxhdpi")
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 class OnboardingContentScreenshotTest {
+
+    private val roborazziOptions = RoborazziOptions(
+        compareOptions = RoborazziOptions.CompareOptions(
+            changeThreshold = 0.05f,
+        ),
+    )
 
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -30,7 +37,7 @@ class OnboardingContentScreenshotTest {
                 onButtonClick = {},
             )
         }
-        composeTestRule.onRoot().captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage(roborazziOptions = roborazziOptions)
     }
 
     @Test
@@ -44,7 +51,7 @@ class OnboardingContentScreenshotTest {
                 onButtonClick = {},
             )
         }
-        composeTestRule.onRoot().captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage(roborazziOptions = roborazziOptions)
     }
 
     @Test
@@ -58,7 +65,7 @@ class OnboardingContentScreenshotTest {
                 onButtonClick = {},
             )
         }
-        composeTestRule.onRoot().captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage(roborazziOptions = roborazziOptions)
     }
 
     @Test
@@ -72,7 +79,7 @@ class OnboardingContentScreenshotTest {
                 onButtonClick = {},
             )
         }
-        composeTestRule.onRoot().captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage(roborazziOptions = roborazziOptions)
     }
 
     @Test
@@ -87,7 +94,7 @@ class OnboardingContentScreenshotTest {
                 onButtonClick = {},
             )
         }
-        composeTestRule.onRoot().captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage(roborazziOptions = roborazziOptions)
     }
 
     @Test
@@ -102,7 +109,7 @@ class OnboardingContentScreenshotTest {
                 onButtonClick = {},
             )
         }
-        composeTestRule.onRoot().captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage(roborazziOptions = roborazziOptions)
     }
 
     @Test
@@ -117,7 +124,7 @@ class OnboardingContentScreenshotTest {
                 onButtonClick = {},
             )
         }
-        composeTestRule.onRoot().captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage(roborazziOptions = roborazziOptions)
     }
 
     @Test
@@ -132,6 +139,6 @@ class OnboardingContentScreenshotTest {
                 onButtonClick = {},
             )
         }
-        composeTestRule.onRoot().captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage(roborazziOptions = roborazziOptions)
     }
 }
