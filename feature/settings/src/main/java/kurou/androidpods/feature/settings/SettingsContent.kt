@@ -39,10 +39,12 @@ internal fun SettingsContent(
     permissionStates: Map<String, Boolean>,
     bluetoothAdapterState: Int?,
     overlayEnabled: Boolean,
+    updateAvailable: Boolean,
     columns: Int,
     onPermissionWarningClick: () -> Unit,
     onBluetoothWarningClick: () -> Unit,
     onOverlayToggle: (Boolean) -> Unit,
+    onUpdateClick: () -> Unit,
     onLicensesClick: () -> Unit,
     onDevicesClick: () -> Unit,
     onGithubClick: () -> Unit,
@@ -132,6 +134,37 @@ internal fun SettingsContent(
                             contentDescription = null,
                             tint = contentColor,
                         )
+                }
+            }
+        }
+        if (updateAvailable) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(MaterialTheme.colorScheme.primaryContainer)
+                        .clickable(onClick = onUpdateClick)
+                        .padding(12.dp),
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Warning,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.size(20.dp),
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(R.string.update_available),
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.weight(1f),
+                    )
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    )
                 }
             }
         }
@@ -235,50 +268,12 @@ private fun SettingsContentPreviewNoWarning() {
         ),
         bluetoothAdapterState = BluetoothAdapter.STATE_ON,
         overlayEnabled = true,
+        updateAvailable = false,
         columns = 1,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
-        onLicensesClick = {},
-        onDevicesClick = {},
-        onGithubClick = {},
-    )
-}
-
-@Preview(showBackground = true, name = "権限未許可")
-@Composable
-private fun SettingsContentPreviewPermissionNotGranted() {
-    SettingsContent(
-        permissionStates = mapOf(
-            android.Manifest.permission.BLUETOOTH_CONNECT to true,
-            android.Manifest.permission.BLUETOOTH_SCAN to false,
-        ),
-        bluetoothAdapterState = BluetoothAdapter.STATE_ON,
-        overlayEnabled = false,
-        columns = 1,
-        onPermissionWarningClick = {},
-        onBluetoothWarningClick = {},
-        onOverlayToggle = {},
-        onLicensesClick = {},
-        onDevicesClick = {},
-        onGithubClick = {},
-    )
-}
-
-@Preview(showBackground = true, name = "Bluetoothオフ")
-@Composable
-private fun SettingsContentPreviewBluetoothOff() {
-    SettingsContent(
-        permissionStates = mapOf(
-            android.Manifest.permission.BLUETOOTH_CONNECT to true,
-            android.Manifest.permission.BLUETOOTH_SCAN to true,
-        ),
-        bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
-        overlayEnabled = false,
-        columns = 1,
-        onPermissionWarningClick = {},
-        onBluetoothWarningClick = {},
-        onOverlayToggle = {},
+        onUpdateClick = {},
         onLicensesClick = {},
         onDevicesClick = {},
         onGithubClick = {},
@@ -292,10 +287,12 @@ private fun SettingsContentPreviewBluetoothUnavailable() {
         permissionStates = emptyMap(),
         bluetoothAdapterState = null,
         overlayEnabled = false,
+        updateAvailable = false,
         columns = 1,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
+        onUpdateClick = {},
         onLicensesClick = {},
         onDevicesClick = {},
         onGithubClick = {},
@@ -312,10 +309,12 @@ private fun SettingsContentPreviewAllWarnings() {
         ),
         bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
         overlayEnabled = false,
+        updateAvailable = true,
         columns = 1,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
+        onUpdateClick = {},
         onLicensesClick = {},
         onDevicesClick = {},
         onGithubClick = {},
@@ -332,10 +331,12 @@ private fun SettingsContentPreviewMedium() {
         ),
         bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
         overlayEnabled = false,
+        updateAvailable = true,
         columns = 2,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
+        onUpdateClick = {},
         onLicensesClick = {},
         onDevicesClick = {},
         onGithubClick = {},
@@ -352,10 +353,12 @@ private fun SettingsContentPreviewExpanded() {
         ),
         bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
         overlayEnabled = false,
+        updateAvailable = true,
         columns = 3,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
+        onUpdateClick = {},
         onLicensesClick = {},
         onDevicesClick = {},
         onGithubClick = {},

@@ -16,11 +16,13 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.core.app.ApplicationProvider
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.unmockkAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kurou.androidpods.core.domain.AppleDevice
+import kurou.androidpods.core.domain.CheckUpdateUseCase
 import kurou.androidpods.core.domain.GetAppleDevicesUseCase
 import kurou.androidpods.core.domain.GetBluetoothAdapterStateUseCase
 import kurou.androidpods.core.domain.GetOverlaySettingsUseCase
@@ -43,6 +45,7 @@ class SettingsScreenTest {
     private val btUseCase = mockk<GetBluetoothAdapterStateUseCase>()
     private val appleDevicesUseCase = mockk<GetAppleDevicesUseCase>(relaxUnitFun = true)
     private val overlayUseCase = mockk<GetOverlaySettingsUseCase>()
+    private val checkUpdateUseCase = mockk<CheckUpdateUseCase>()
 
     @After
     fun tearDown() {
@@ -60,7 +63,8 @@ class SettingsScreenTest {
         every { btUseCase.observe() } returns MutableStateFlow(bluetoothAdapterState)
         every { appleDevicesUseCase.observe() } returns MutableStateFlow<Map<String, AppleDevice>>(emptyMap())
         every { overlayUseCase.isEnabled() } returns false
-        return SettingsViewModel(btUseCase, appleDevicesUseCase, overlayUseCase)
+        coEvery { checkUpdateUseCase(any()) } returns false
+        return SettingsViewModel(btUseCase, appleDevicesUseCase, overlayUseCase, checkUpdateUseCase)
     }
 
     @Test
