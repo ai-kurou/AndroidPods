@@ -160,4 +160,76 @@ class SettingsContentScreenshotTest {
         }
         composeTestRule.onRoot().captureRoboImage()
     }
+
+    @Test
+    @Config(qualifiers = "w640dp-h360dp-land-xxhdpi")
+    fun `通常状態_警告なし_横向き_3列`() {
+        composeTestRule.setContent {
+            SettingsContent(
+                permissionStates = mapOf(
+                    Manifest.permission.BLUETOOTH_CONNECT to true,
+                    Manifest.permission.BLUETOOTH_SCAN to true,
+                ),
+                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+                overlayEnabled = true,
+                updateAvailable = false,
+                columns = 3,
+                onPermissionWarningClick = {},
+                onBluetoothWarningClick = {},
+                onOverlayToggle = {},
+                onUpdateClick = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                onGithubClick = {},
+            )
+        }
+        composeTestRule.onRoot().captureRoboImage()
+    }
+
+    @Test
+    @Config(qualifiers = "w640dp-h360dp-land-xxhdpi")
+    fun `Bluetooth非対応の警告が表示される_横向き_3列`() {
+        composeTestRule.setContent {
+            SettingsContent(
+                permissionStates = emptyMap(),
+                bluetoothAdapterState = null,
+                overlayEnabled = false,
+                updateAvailable = false,
+                columns = 3,
+                onPermissionWarningClick = {},
+                onBluetoothWarningClick = {},
+                onOverlayToggle = {},
+                onUpdateClick = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                onGithubClick = {},
+            )
+        }
+        composeTestRule.onRoot().captureRoboImage()
+    }
+
+    @Test
+    @Config(qualifiers = "w640dp-h360dp-land-xxhdpi")
+    fun `全警告が表示される_横向き_3列`() {
+        composeTestRule.setContent {
+            SettingsContent(
+                permissionStates = mapOf(
+                    Manifest.permission.BLUETOOTH_CONNECT to false,
+                    Manifest.permission.BLUETOOTH_SCAN to false,
+                ),
+                bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
+                overlayEnabled = false,
+                updateAvailable = true,
+                columns = 3,
+                onPermissionWarningClick = {},
+                onBluetoothWarningClick = {},
+                onOverlayToggle = {},
+                onUpdateClick = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                onGithubClick = {},
+            )
+        }
+        composeTestRule.onRoot().captureRoboImage()
+    }
 }
