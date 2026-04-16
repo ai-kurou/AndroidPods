@@ -42,7 +42,7 @@ internal fun DevicesContent(
         modifier = modifier.fillMaxSize().padding(16.dp),
     ) {
         items(devices) { device ->
-            DeviceItem(device = device)
+            DeviceItem(device = device, modifier = Modifier.fillMaxWidth().aspectRatio(1f))
         }
     }
 }
@@ -93,7 +93,7 @@ private fun DeviceItem(
             .padding(12.dp),
     ) {
         Box(
-            modifier = Modifier.fillMaxWidth().aspectRatio(1f).padding(16.dp),
+            modifier = Modifier.fillMaxWidth().weight(1f).padding(8.dp),
         ) {
             when (val img = device.images) {
                 is DeviceImages.Tws -> Row(
@@ -106,7 +106,7 @@ private fun DeviceItem(
                             painter = painterResource(img.left),
                             contentDescription = null,
                             contentScale = ContentScale.Fit,
-                            modifier = Modifier.fillMaxSize().padding(4.dp),
+                            modifier = Modifier.fillMaxSize().padding(2.dp),
                         )
                     }
                     Box(modifier = Modifier.weight(2f).fillMaxHeight()) {
@@ -114,7 +114,7 @@ private fun DeviceItem(
                             painter = painterResource(img.case),
                             contentDescription = device.name,
                             contentScale = ContentScale.Fit,
-                            modifier = Modifier.fillMaxSize().padding(4.dp),
+                            modifier = Modifier.fillMaxSize(),
                         )
                     }
                     Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
@@ -122,7 +122,7 @@ private fun DeviceItem(
                             painter = painterResource(img.right),
                             contentDescription = null,
                             contentScale = ContentScale.Fit,
-                            modifier = Modifier.fillMaxSize().padding(4.dp),
+                            modifier = Modifier.fillMaxSize().padding(2.dp),
                         )
                     }
                 }
@@ -139,6 +139,7 @@ private fun DeviceItem(
             text = device.name,
             style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,
+            modifier = Modifier.padding(8.dp)
         )
     }
 }
