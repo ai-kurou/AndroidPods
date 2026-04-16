@@ -258,7 +258,7 @@ private fun SettingsItem(
     }
 }
 
-@Preview(showBackground = true, name = "警告なし")
+@Preview(showBackground = true)
 @Composable
 private fun SettingsContentPreviewNoWarning() {
     SettingsContent(
@@ -280,7 +280,7 @@ private fun SettingsContentPreviewNoWarning() {
     )
 }
 
-@Preview(showBackground = true, name = "Bluetooth非対応")
+@Preview(showBackground = true)
 @Composable
 private fun SettingsContentPreviewBluetoothUnavailable() {
     SettingsContent(
@@ -299,7 +299,7 @@ private fun SettingsContentPreviewBluetoothUnavailable() {
     )
 }
 
-@Preview(showBackground = true, name = "権限未許可 + Bluetoothオフ")
+@Preview(showBackground = true)
 @Composable
 private fun SettingsContentPreviewAllWarnings() {
     SettingsContent(
@@ -321,9 +321,9 @@ private fun SettingsContentPreviewAllWarnings() {
     )
 }
 
-@Preview(showBackground = true, widthDp = 700, name = "2列 (Medium)")
+@Preview(showBackground = true, widthDp = 700)
 @Composable
-private fun SettingsContentPreviewMedium() {
+private fun SettingsContentPreviewTwoColumns() {
     SettingsContent(
         permissionStates = mapOf(
             android.Manifest.permission.BLUETOOTH_CONNECT to false,
@@ -343,9 +343,9 @@ private fun SettingsContentPreviewMedium() {
     )
 }
 
-@Preview(showBackground = true, widthDp = 900, name = "3列 (Expanded)")
+@Preview(showBackground = true, widthDp = 900)
 @Composable
-private fun SettingsContentPreviewExpanded() {
+private fun SettingsContentPreviewThreeColumns() {
     SettingsContent(
         permissionStates = mapOf(
             android.Manifest.permission.BLUETOOTH_CONNECT to false,

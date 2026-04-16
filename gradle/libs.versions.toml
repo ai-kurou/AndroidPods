@@ -22,6 +22,7 @@ aboutlibraries = "14.0.0"
 navigationCompose = "2.9.7"
 ktor = "3.4.2"
 roborazzi = "1.59.0"
+composable-preview-scanner = "0.8.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -63,6 +64,7 @@ ktor-client-mock = { group = "io.ktor", name = "ktor-client-mock", version.ref =
 roborazzi = { group = "io.github.takahirom.roborazzi", name = "roborazzi", version.ref = "roborazzi" }
 roborazzi-compose = { group = "io.github.takahirom.roborazzi", name = "roborazzi-compose", version.ref = "roborazzi" }
 roborazzi-junit-rule = { group = "io.github.takahirom.roborazzi", name = "roborazzi-junit-rule", version.ref = "roborazzi" }
+composable-preview-scanner = { group = "io.github.sergio-sastre.ComposablePreviewScanner", name = "android", version.ref = "composable-preview-scanner" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
