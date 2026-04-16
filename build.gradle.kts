@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.aboutlibraries) apply false
     alias(libs.plugins.kover)
+    alias(libs.plugins.roborazzi) apply false
 }
 
 kover {
