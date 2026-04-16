@@ -35,6 +35,7 @@ class SettingsContentTest {
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
+                onRestartServiceClick = {},
                 onUpdateClick = {},
                 onLicensesClick = {},
                 onDevicesClick = {},
@@ -63,6 +64,7 @@ class SettingsContentTest {
                 onPermissionWarningClick = { clicked = true },
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
+                onRestartServiceClick = {},
                 onUpdateClick = {},
                 onLicensesClick = {},
                 onDevicesClick = {},
@@ -89,6 +91,7 @@ class SettingsContentTest {
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
+                onRestartServiceClick = {},
                 onUpdateClick = {},
                 onLicensesClick = {},
                 onDevicesClick = {},
@@ -114,6 +117,7 @@ class SettingsContentTest {
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = { clicked = true },
                 onOverlayToggle = {},
+                onRestartServiceClick = {},
                 onUpdateClick = {},
                 onLicensesClick = {},
                 onDevicesClick = {},
@@ -141,6 +145,7 @@ class SettingsContentTest {
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = { clicked = true },
                 onOverlayToggle = {},
+                onRestartServiceClick = {},
                 onUpdateClick = {},
                 onLicensesClick = {},
                 onDevicesClick = {},
@@ -168,6 +173,7 @@ class SettingsContentTest {
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
+                onRestartServiceClick = {},
                 onUpdateClick = {},
                 onLicensesClick = {},
                 onDevicesClick = { clicked = true },
@@ -193,6 +199,7 @@ class SettingsContentTest {
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
+                onRestartServiceClick = {},
                 onUpdateClick = {},
                 onLicensesClick = { clicked = true },
                 onDevicesClick = {},
@@ -218,6 +225,7 @@ class SettingsContentTest {
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
+                onRestartServiceClick = {},
                 onUpdateClick = {},
                 onLicensesClick = {},
                 onDevicesClick = {},
@@ -243,6 +251,7 @@ class SettingsContentTest {
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
                 onOverlayToggle = { toggledValue = it },
+                onRestartServiceClick = {},
                 onUpdateClick = {},
                 onLicensesClick = {},
                 onDevicesClick = {},
@@ -268,6 +277,7 @@ class SettingsContentTest {
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
                 onOverlayToggle = { toggledValue = it },
+                onRestartServiceClick = {},
                 onUpdateClick = {},
                 onLicensesClick = {},
                 onDevicesClick = {},
@@ -278,6 +288,32 @@ class SettingsContentTest {
         composeTestRule.onNodeWithText("Show battery overlay").performClick()
 
         assertTrue(toggledValue == false)
+    }
+
+    @Test
+    fun `再起動アイテムをタップするとonRestartServiceClickが呼ばれる`() {
+        var clicked = false
+        composeTestRule.setContent {
+            SettingsContent(
+                permissionStates = emptyMap(),
+                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+                overlayEnabled = false,
+                updateAvailable = false,
+                columns = 1,
+                onPermissionWarningClick = {},
+                onBluetoothWarningClick = {},
+                onOverlayToggle = {},
+                onRestartServiceClick = { clicked = true },
+                onUpdateClick = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                onGithubClick = {},
+            )
+        }
+
+        composeTestRule.onNodeWithText("Restart scan service").performClick()
+
+        assertTrue(clicked)
     }
 
     @Test
@@ -293,6 +329,7 @@ class SettingsContentTest {
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
+                onRestartServiceClick = {},
                 onUpdateClick = { clicked = true },
                 onLicensesClick = {},
                 onDevicesClick = {},

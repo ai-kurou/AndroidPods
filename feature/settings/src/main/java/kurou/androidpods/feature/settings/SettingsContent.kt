@@ -44,6 +44,7 @@ internal fun SettingsContent(
     onPermissionWarningClick: () -> Unit,
     onBluetoothWarningClick: () -> Unit,
     onOverlayToggle: (Boolean) -> Unit,
+    onRestartServiceClick: () -> Unit,
     onUpdateClick: () -> Unit,
     onLicensesClick: () -> Unit,
     onDevicesClick: () -> Unit,
@@ -182,6 +183,18 @@ internal fun SettingsContent(
         }
         item(span = { GridItemSpan(1) }) {
             SettingsItem(
+                label = stringResource(R.string.restart_service),
+                icon = painterResource(R.drawable.ic_restart_service),
+                onClick = onRestartServiceClick,
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                )
+            }
+        }
+        item(span = { GridItemSpan(1) }) {
+            SettingsItem(
                 label = stringResource(R.string.compatible_devices),
                 icon = painterResource(R.drawable.ic_compatible_devices),
                 onClick = onDevicesClick,
@@ -273,6 +286,7 @@ private fun SettingsContentPreviewNoWarning() {
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
+        onRestartServiceClick = {},
         onUpdateClick = {},
         onLicensesClick = {},
         onDevicesClick = {},
@@ -292,6 +306,7 @@ private fun SettingsContentPreviewBluetoothUnavailable() {
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
+        onRestartServiceClick = {},
         onUpdateClick = {},
         onLicensesClick = {},
         onDevicesClick = {},
@@ -314,6 +329,7 @@ private fun SettingsContentPreviewAllWarnings() {
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
+        onRestartServiceClick = {},
         onUpdateClick = {},
         onLicensesClick = {},
         onDevicesClick = {},
@@ -336,6 +352,7 @@ private fun SettingsContentPreviewTwoColumns() {
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
+        onRestartServiceClick = {},
         onUpdateClick = {},
         onLicensesClick = {},
         onDevicesClick = {},
@@ -358,6 +375,7 @@ private fun SettingsContentPreviewThreeColumns() {
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
+        onRestartServiceClick = {},
         onUpdateClick = {},
         onLicensesClick = {},
         onDevicesClick = {},
