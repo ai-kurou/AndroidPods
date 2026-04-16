@@ -41,17 +41,9 @@ class PreviewScreenshotTest(
         // name だけ残し（同一関数に複数 @Preview がある場合の区別に必要）、
         // widthDp・showBackground などの冗長なパラメータは除外する
         val idParts = AndroidPreviewScreenshotIdBuilder(preview)
-            .ignoreIdFor("group")
-            .ignoreIdFor("apiLevel")
             .ignoreIdFor("widthDp")
             .ignoreIdFor("heightDp")
-            .ignoreIdFor("locale")
-            .ignoreIdFor("fontScale")
-            .ignoreIdFor("showSystemUi")
             .ignoreIdFor("showBackground")
-            .ignoreIdFor("backgroundColor")
-            .ignoreIdFor("uiMode")
-            .ignoreIdFor("device")
             .build()
             .split('.')
         // name が空のとき → クラス名+関数名 (末尾2要素)
