@@ -190,4 +190,27 @@ class SettingsScreenTest {
         val started = shadowOf(composeTestRule.activity).nextStartedActivityForResult
         assertEquals(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, started?.intent?.action)
     }
+
+    @Test
+    fun `再起動アイテムをタップするとSnackbarが表示される`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        grantRequiredPermissions(context)
+
+        composeTestRule.setContent {
+            SettingsScreen(
+                windowWidthSizeClass = WindowWidthSizeClass.Compact,
+                onStartScanService = {},
+                onStopScanService = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                viewModel = createViewModel(BluetoothAdapter.STATE_ON),
+            )
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Restart scan service").performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Scan service restarted").assertIsDisplayed()
+    }
 }
