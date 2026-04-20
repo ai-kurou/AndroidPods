@@ -25,7 +25,7 @@ import org.robolectric.shadows.ShadowSettings
 
 @HiltAndroidTest
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [35], application = HiltTestApplication::class)
+@Config(sdk = [35], qualifiers = "w360dp-h800dp-port-xxhdpi", application = HiltTestApplication::class)
 class AppScaffoldTest {
 
     @get:Rule(order = 0)
