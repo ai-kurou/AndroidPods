@@ -12,7 +12,7 @@ complexity:
     threshold: 15
   LongMethod:
     active: true
-    threshold: 60
+    threshold: 185
   LongParameterList:
     active: true
     functionThreshold: 8
@@ -78,7 +78,6 @@ formatting:
     active: true
   ImportOrdering:
     active: true
-    layout: "*,java.**,javax.**,kotlin.**,^"
   Indentation:
     active: true
     indentSize: 4
@@ -133,9 +132,9 @@ formatting:
   StringTemplate:
     active: true
   TrailingCommaOnCallSite:
-    active: false
+    active: true
   TrailingCommaOnDeclarationSite:
-    active: false
+    active: true
   Wrapping:
     active: true
     maxLineLength: 120
