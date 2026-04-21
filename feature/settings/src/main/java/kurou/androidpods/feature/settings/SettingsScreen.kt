@@ -23,6 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -54,6 +55,7 @@ fun SettingsScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showSettingsDialog by remember { mutableStateOf(false) }
     var initialRequestDone by remember { mutableStateOf(false) }
+    var isServiceRestarting by remember { mutableStateOf(false) }
 
     // 初期状態を設定
     if (permissionStates.isEmpty()) {
@@ -148,6 +150,7 @@ fun SettingsScreen(
             bluetoothAdapterState = uiState.bluetoothAdapterState,
             overlayEnabled = uiState.overlayEnabled,
             updateAvailable = uiState.updateAvailable,
+            isServiceRestarting = isServiceRestarting,
             columns = columns,
             onPermissionWarningClick = {
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {

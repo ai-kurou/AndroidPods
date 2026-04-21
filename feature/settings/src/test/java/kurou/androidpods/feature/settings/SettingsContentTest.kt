@@ -31,6 +31,7 @@ class SettingsContentTest {
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 overlayEnabled = false,
                 updateAvailable = false,
+                isServiceRestarting = false,
                 columns = 1,
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
@@ -60,6 +61,7 @@ class SettingsContentTest {
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 overlayEnabled = false,
                 updateAvailable = false,
+                isServiceRestarting = false,
                 columns = 1,
                 onPermissionWarningClick = { clicked = true },
                 onBluetoothWarningClick = {},
@@ -87,6 +89,7 @@ class SettingsContentTest {
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 overlayEnabled = false,
                 updateAvailable = false,
+                isServiceRestarting = false,
                 columns = 1,
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
@@ -113,6 +116,7 @@ class SettingsContentTest {
                 bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
                 overlayEnabled = false,
                 updateAvailable = false,
+                isServiceRestarting = false,
                 columns = 1,
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = { clicked = true },
@@ -141,6 +145,7 @@ class SettingsContentTest {
                 bluetoothAdapterState = null,
                 overlayEnabled = false,
                 updateAvailable = false,
+                isServiceRestarting = false,
                 columns = 1,
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = { clicked = true },
@@ -169,6 +174,7 @@ class SettingsContentTest {
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 overlayEnabled = false,
                 updateAvailable = false,
+                isServiceRestarting = false,
                 columns = 1,
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
@@ -195,6 +201,7 @@ class SettingsContentTest {
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 overlayEnabled = false,
                 updateAvailable = false,
+                isServiceRestarting = false,
                 columns = 1,
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
@@ -221,6 +228,7 @@ class SettingsContentTest {
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 overlayEnabled = false,
                 updateAvailable = false,
+                isServiceRestarting = false,
                 columns = 1,
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
@@ -247,6 +255,7 @@ class SettingsContentTest {
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 overlayEnabled = false,
                 updateAvailable = false,
+                isServiceRestarting = false,
                 columns = 1,
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
@@ -273,6 +282,7 @@ class SettingsContentTest {
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 overlayEnabled = true,
                 updateAvailable = false,
+                isServiceRestarting = false,
                 columns = 1,
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
@@ -299,6 +309,7 @@ class SettingsContentTest {
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 overlayEnabled = false,
                 updateAvailable = false,
+                isServiceRestarting = false,
                 columns = 1,
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
@@ -317,6 +328,33 @@ class SettingsContentTest {
     }
 
     @Test
+    fun `isServiceRestartingがtrueのとき再起動アイテムをタップしてもコールバックが呼ばれない`() {
+        var clicked = false
+        composeTestRule.setContent {
+            SettingsContent(
+                permissionStates = emptyMap(),
+                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+                overlayEnabled = false,
+                updateAvailable = false,
+                isServiceRestarting = true,
+                columns = 1,
+                onPermissionWarningClick = {},
+                onBluetoothWarningClick = {},
+                onOverlayToggle = {},
+                onRestartServiceClick = { clicked = true },
+                onUpdateClick = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                onGithubClick = {},
+            )
+        }
+
+        composeTestRule.onNodeWithText("Restart scan service").performClick()
+
+        assertTrue(!clicked)
+    }
+
+    @Test
     fun `アップデートバナーをタップするとonUpdateClickが呼ばれる`() {
         var clicked = false
         composeTestRule.setContent {
@@ -325,6 +363,7 @@ class SettingsContentTest {
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 overlayEnabled = false,
                 updateAvailable = true,
+                isServiceRestarting = false,
                 columns = 1,
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
