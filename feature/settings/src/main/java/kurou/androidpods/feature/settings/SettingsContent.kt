@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -40,6 +41,7 @@ internal fun SettingsContent(
     bluetoothAdapterState: Int?,
     overlayEnabled: Boolean,
     updateAvailable: Boolean,
+    isServiceRestarting: Boolean,
     columns: Int,
     onPermissionWarningClick: () -> Unit,
     onBluetoothWarningClick: () -> Unit,
@@ -186,11 +188,16 @@ internal fun SettingsContent(
                 label = stringResource(R.string.restart_service),
                 icon = painterResource(R.drawable.ic_restart_service),
                 onClick = onRestartServiceClick,
+                enabled = !isServiceRestarting,
             ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                    contentDescription = null,
-                )
+                if (isServiceRestarting) {
+                    CircularProgressIndicator(modifier = Modifier.size(20.dp))
+                } else {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = null,
+                    )
+                }
             }
         }
         item(span = { GridItemSpan(1) }) {
@@ -238,6 +245,7 @@ private fun SettingsItem(
     icon: Painter,
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
+    enabled: Boolean = true,
     trailing: @Composable () -> Unit,
 ) {
     Row(
@@ -246,7 +254,7 @@ private fun SettingsItem(
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant)
-            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+            .then(if (onClick != null && enabled) Modifier.clickable(onClick = onClick) else Modifier)
             .padding(12.dp),
     ) {
         Icon(
@@ -282,6 +290,7 @@ private fun SettingsContentPreviewNoWarning() {
         bluetoothAdapterState = BluetoothAdapter.STATE_ON,
         overlayEnabled = true,
         updateAvailable = false,
+        isServiceRestarting = false,
         columns = 1,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
@@ -302,6 +311,7 @@ private fun SettingsContentPreviewBluetoothUnavailable() {
         bluetoothAdapterState = null,
         overlayEnabled = false,
         updateAvailable = false,
+        isServiceRestarting = false,
         columns = 1,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
@@ -325,6 +335,31 @@ private fun SettingsContentPreviewAllWarnings() {
         bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
         overlayEnabled = false,
         updateAvailable = true,
+        isServiceRestarting = false,
+        columns = 1,
+        onPermissionWarningClick = {},
+        onBluetoothWarningClick = {},
+        onOverlayToggle = {},
+        onRestartServiceClick = {},
+        onUpdateClick = {},
+        onLicensesClick = {},
+        onDevicesClick = {},
+        onGithubClick = {},
+    )
+}
+
+@Preview(showBackground = true, widthDp = 400, heightDp = 700)
+@Composable
+private fun SettingsContentPreviewServiceRestarting() {
+    SettingsContent(
+        permissionStates = mapOf(
+            android.Manifest.permission.BLUETOOTH_CONNECT to true,
+            android.Manifest.permission.BLUETOOTH_SCAN to true,
+        ),
+        bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+        overlayEnabled = true,
+        updateAvailable = false,
+        isServiceRestarting = true,
         columns = 1,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
@@ -348,6 +383,7 @@ private fun SettingsContentPreviewTwoColumns() {
         bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
         overlayEnabled = false,
         updateAvailable = true,
+        isServiceRestarting = false,
         columns = 2,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
@@ -371,6 +407,7 @@ private fun SettingsContentPreviewThreeColumns() {
         bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
         overlayEnabled = false,
         updateAvailable = true,
+        isServiceRestarting = false,
         columns = 3,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
