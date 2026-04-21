@@ -14,7 +14,8 @@ plugins {
 moduleGraphAssert {
     maxHeight = 4
     allowed = arrayOf(
-        ":app -> .*",
+        ":app -> :core:.*",
+        ":app -> :navigation",
         ":navigation -> :feature:.*",
         ":core:service -> :core:domain",
         ":core:service -> :core:data",
@@ -22,12 +23,9 @@ moduleGraphAssert {
         ":feature:.* -> :core:domain",
     )
     restricted = arrayOf(
+        ":app -X> :feature:.*",
         ":feature:.* -X> :core:data",
         ":navigation -X> :core:.*",
-        ":core:data -X> :core:service",
-        ":core:domain -X> :core:data",
-        ":core:domain -X> :core:service",
-        ":core:domain -X> :feature:.*",
     )
 }
 
