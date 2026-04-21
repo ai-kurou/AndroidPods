@@ -144,6 +144,80 @@ class BatteryOverlayViewDelegateTest {
     }
 
     @Test
+    fun `addOverlayView後にviewのalphaとscaleが初期アニメーション値で設定される`() {
+        delegate.addOverlayView()
+
+        val view = fakeWindowOps.lastAddedView!!
+        assertEquals(0f, view.alpha)
+        assertEquals(0.85f, view.scaleX)
+        assertEquals(0.85f, view.scaleY)
+    }
+
+    @Test
+    fun `addOverlayViewのアニメーション完了後にalphaが1でscaleが1になる`() {
+        delegate.addOverlayView()
+
+        shadowOf(android.os.Looper.getMainLooper()).idle()
+
+        val view = fakeWindowOps.lastAddedView!!
+        assertEquals(1f, view.alpha)
+        assertEquals(1f, view.scaleX)
+        assertEquals(1f, view.scaleY)
+    }
+
+    @Test
+    fun `animateHide完了後にviewのalphaが0でscaleが縮小される`() {
+        delegate.addOverlayView()
+        shadowOf(android.os.Looper.getMainLooper()).idle()
+
+        delegate.animateHide {}
+        shadowOf(android.os.Looper.getMainLooper()).idle()
+
+        // onComplete呼び出し後もviewが残っている（removeはonComplete側の責務）
+        // スケールとalphaがアニメーション終端値になっている
+        val view = fakeWindowOps.lastAddedView!!
+        assertEquals(0f, view.alpha)
+        assertEquals(0.85f, view.scaleX)
+        assertEquals(0.85f, view.scaleY)
+    }
+
+    @Test
+    fun `animateHideはviewがない場合にonCompleteを呼ばない`() {
+        var called = false
+        delegate.animateHide { called = true }
+
+        shadowOf(android.os.Looper.getMainLooper()).idle()
+
+        assertFalse(called)
+    }
+
+    @Test
+    fun `updateContentが空リストのとき全カードが削除される`() {
+        delegate.addOverlayView()
+        delegate.updateContent(listOf(baseDevice))
+        assertEquals(1, findCardsContainer().childCount)
+
+        delegate.updateContent(emptyList())
+
+        assertEquals(0, findCardsContainer().childCount)
+    }
+
+    @Test
+    fun `animateHideキャンセル後のupdateContentでscaleとalphaがリセットされる`() {
+        delegate.addOverlayView()
+        shadowOf(android.os.Looper.getMainLooper()).idle()
+
+        delegate.animateHide {}
+        // アニメーション完了前にupdateContent
+        delegate.updateContent(listOf(baseDevice))
+
+        val view = fakeWindowOps.lastAddedView!!
+        assertEquals(1f, view.alpha)
+        assertEquals(1f, view.scaleX)
+        assertEquals(1f, view.scaleY)
+    }
+
+    @Test
     fun `onUserDismissコールバックが設定され呼び出し可能`() {
         var dismissed = false
         delegate.onUserDismiss = { dismissed = true }
