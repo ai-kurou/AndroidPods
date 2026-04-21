@@ -10,17 +10,6 @@ plugins {
     alias(libs.plugins.roborazzi) apply false
 }
 
-kover {
-    reports {
-        filters {
-            excludes {
-                annotatedBy("androidx.compose.ui.tooling.preview.Preview")
-                annotatedBy("dagger.Module")
-            }
-        }
-    }
-}
-
 dependencies {
     kover(project(":app"))
     kover(project(":core:domain"))
