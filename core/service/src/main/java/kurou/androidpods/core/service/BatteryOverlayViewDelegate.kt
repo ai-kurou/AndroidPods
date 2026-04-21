@@ -12,6 +12,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import android.view.animation.DecelerateInterpolator
+import android.view.animation.OvershootInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -35,6 +36,8 @@ internal class BatteryOverlayViewDelegate(
         private const val DRAG_HANDLE_HEIGHT_DP = 4f
         private const val DRAG_HANDLE_MARGIN_TOP_DP = 14f
         private const val ANIM_DURATION_MS = 300L
+        private const val ANIM_SCALE_FROM = 0.85f
+        private const val ANIM_SCALE_TO = 1.0f
         private const val DRAG_THRESHOLD = 10f
     }
 
@@ -104,25 +107,20 @@ internal class BatteryOverlayViewDelegate(
         }
 
         root.alpha = 0f
+        root.scaleX = ANIM_SCALE_FROM
+        root.scaleY = ANIM_SCALE_FROM
         windowOps.addView(root, params)
         overlayView = root
         layoutParams = params
 
-        // レイアウト確定後にアニメーション開始
-        root.post {
-            val slideDistance = TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, CARD_WIDTH_DP + CONTAINER_MARGIN_BOTTOM_DP, dm,
-            )
-            root.translationY = slideDistance
-
-            val slideIn = ObjectAnimator.ofFloat(root, View.TRANSLATION_Y, slideDistance, 0f)
-            val fadeIn = ObjectAnimator.ofFloat(root, View.ALPHA, 0f, 1f)
-            AnimatorSet().apply {
-                playTogether(slideIn, fadeIn)
-                duration = ANIM_DURATION_MS
-                interpolator = DecelerateInterpolator()
-                start()
-            }
+        val scaleX = ObjectAnimator.ofFloat(root, View.SCALE_X, ANIM_SCALE_FROM, ANIM_SCALE_TO)
+        val scaleY = ObjectAnimator.ofFloat(root, View.SCALE_Y, ANIM_SCALE_FROM, ANIM_SCALE_TO)
+        val fadeIn = ObjectAnimator.ofFloat(root, View.ALPHA, 0f, 1f)
+        AnimatorSet().apply {
+            playTogether(scaleX, scaleY, fadeIn)
+            duration = ANIM_DURATION_MS
+            interpolator = OvershootInterpolator(1.2f)
+            start()
         }
     }
 
@@ -192,11 +190,13 @@ internal class BatteryOverlayViewDelegate(
     override fun animateHide(onComplete: () -> Unit) {
         val view = overlayView ?: return
 
-        val slideOut = ObjectAnimator.ofFloat(view, View.TRANSLATION_Y, 0f, view.height.toFloat())
+        val scaleX = ObjectAnimator.ofFloat(view, View.SCALE_X, ANIM_SCALE_TO, ANIM_SCALE_FROM)
+        val scaleY = ObjectAnimator.ofFloat(view, View.SCALE_Y, ANIM_SCALE_TO, ANIM_SCALE_FROM)
         val fadeOut = ObjectAnimator.ofFloat(view, View.ALPHA, 1f, 0f)
         hideAnimator = AnimatorSet().apply {
-            playTogether(slideOut, fadeOut)
+            playTogether(scaleX, scaleY, fadeOut)
             duration = ANIM_DURATION_MS
+            interpolator = DecelerateInterpolator()
             addListener(object : android.animation.AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: android.animation.Animator) {
                     hideAnimator = null
@@ -218,7 +218,8 @@ internal class BatteryOverlayViewDelegate(
             hideAnimator = null
             overlayView?.apply {
                 alpha = 1f
-                translationY = 0f
+                scaleX = ANIM_SCALE_TO
+                scaleY = ANIM_SCALE_TO
             }
         }
 
@@ -246,11 +247,13 @@ internal class BatteryOverlayViewDelegate(
         val view = overlayView ?: return
         onUserDismiss?.invoke()
 
-        val slideOut = ObjectAnimator.ofFloat(view, View.TRANSLATION_Y, 0f, view.height.toFloat())
+        val scaleX = ObjectAnimator.ofFloat(view, View.SCALE_X, ANIM_SCALE_TO, ANIM_SCALE_FROM)
+        val scaleY = ObjectAnimator.ofFloat(view, View.SCALE_Y, ANIM_SCALE_TO, ANIM_SCALE_FROM)
         val fadeOut = ObjectAnimator.ofFloat(view, View.ALPHA, 1f, 0f)
         AnimatorSet().apply {
-            playTogether(slideOut, fadeOut)
+            playTogether(scaleX, scaleY, fadeOut)
             duration = ANIM_DURATION_MS
+            interpolator = DecelerateInterpolator()
             addListener(object : android.animation.AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: android.animation.Animator) {
                     if (overlayView === view) {
