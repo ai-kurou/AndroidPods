@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kover)
     alias(libs.plugins.aboutlibraries)
+    alias(libs.plugins.roborazzi)
 }
 
 android {
@@ -51,4 +52,19 @@ dependencies {
     // Debug
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+}
+
+roborazzi {
+    outputDir.set(file("src/test/snapshots"))
+}
+
+// モジュール毎に記述しないと動作しなかった
+kover {
+    reports {
+        filters {
+            excludes {
+                annotatedBy("androidx.compose.ui.tooling.preview.Preview")
+            }
+        }
+    }
 }
