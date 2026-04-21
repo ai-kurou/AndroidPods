@@ -7,6 +7,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.ParameterizedRobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 import sergio.sastre.composable.preview.scanner.android.AndroidComposablePreviewScanner
@@ -16,7 +17,7 @@ import sergio.sastre.composable.preview.scanner.core.preview.ComposablePreview
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk = [35], qualifiers = "w360dp-h800dp-port-xxhdpi")
+@Config(sdk = [35])
 class PreviewScreenshotTest(
     private val preview: ComposablePreview<AndroidPreviewInfo>,
 ) {
@@ -35,6 +36,14 @@ class PreviewScreenshotTest(
 
     @Test
     fun snapshot() {
+        // @Previewの画面サイズを使う
+        // サイズが指定されていない場合はRobolectricのデフォルトの小さい画面になる
+        val w = preview.previewInfo.widthDp
+        val h = preview.previewInfo.heightDp
+        if (w > 0 && h > 0) {
+            val orientation = if (w > h) "land" else "port"
+            RuntimeEnvironment.setQualifiers("w${w}dp-h${h}dp-$orientation-xxhdpi")
+        }
         composeTestRule.setContent {
             preview.invoke()
         }

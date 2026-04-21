@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
@@ -19,7 +21,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -43,6 +47,8 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
     val permissions = requiredPermissions()
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     val permissionStates = remember { mutableStateMapOf<String, Boolean>() }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -125,9 +131,12 @@ fun SettingsScreen(
         else -> 3
     }
 
+    val restartServiceMessage = stringResource(R.string.restart_service_completed)
+
     Scaffold(
         modifier = modifier,
         contentWindowInsets = WindowInsets(0),
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.app_name)) },
@@ -165,6 +174,13 @@ fun SettingsScreen(
                     "package:${context.packageName}".toUri(),
                 )
                 overlaySettingsLauncher.launch(intent)
+            },
+            onRestartServiceClick = {
+                scope.launch {
+                    onStopScanService()
+                    onStartScanService()
+                    snackbarHostState.showSnackbar(restartServiceMessage)
+                }
             },
             modifier = Modifier.padding(innerPadding),
         )

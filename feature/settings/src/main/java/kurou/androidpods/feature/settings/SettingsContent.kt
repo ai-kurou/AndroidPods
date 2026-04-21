@@ -44,6 +44,7 @@ internal fun SettingsContent(
     onPermissionWarningClick: () -> Unit,
     onBluetoothWarningClick: () -> Unit,
     onOverlayToggle: (Boolean) -> Unit,
+    onRestartServiceClick: () -> Unit,
     onUpdateClick: () -> Unit,
     onLicensesClick: () -> Unit,
     onDevicesClick: () -> Unit,
@@ -182,6 +183,18 @@ internal fun SettingsContent(
         }
         item(span = { GridItemSpan(1) }) {
             SettingsItem(
+                label = stringResource(R.string.restart_service),
+                icon = painterResource(R.drawable.ic_restart_service),
+                onClick = onRestartServiceClick,
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                )
+            }
+        }
+        item(span = { GridItemSpan(1) }) {
+            SettingsItem(
                 label = stringResource(R.string.compatible_devices),
                 icon = painterResource(R.drawable.ic_compatible_devices),
                 onClick = onDevicesClick,
@@ -258,7 +271,7 @@ private fun SettingsItem(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, widthDp = 400, heightDp = 700)
 @Composable
 private fun SettingsContentPreviewNoWarning() {
     SettingsContent(
@@ -273,6 +286,7 @@ private fun SettingsContentPreviewNoWarning() {
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
+        onRestartServiceClick = {},
         onUpdateClick = {},
         onLicensesClick = {},
         onDevicesClick = {},
@@ -280,7 +294,7 @@ private fun SettingsContentPreviewNoWarning() {
     )
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, widthDp = 400, heightDp = 700)
 @Composable
 private fun SettingsContentPreviewBluetoothUnavailable() {
     SettingsContent(
@@ -292,6 +306,7 @@ private fun SettingsContentPreviewBluetoothUnavailable() {
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
+        onRestartServiceClick = {},
         onUpdateClick = {},
         onLicensesClick = {},
         onDevicesClick = {},
@@ -299,7 +314,7 @@ private fun SettingsContentPreviewBluetoothUnavailable() {
     )
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, widthDp = 400, heightDp = 700)
 @Composable
 private fun SettingsContentPreviewAllWarnings() {
     SettingsContent(
@@ -314,6 +329,7 @@ private fun SettingsContentPreviewAllWarnings() {
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
+        onRestartServiceClick = {},
         onUpdateClick = {},
         onLicensesClick = {},
         onDevicesClick = {},
@@ -321,7 +337,7 @@ private fun SettingsContentPreviewAllWarnings() {
     )
 }
 
-@Preview(showBackground = true, widthDp = 700)
+@Preview(showBackground = true, widthDp = 700, heightDp = 400)
 @Composable
 private fun SettingsContentPreviewTwoColumns() {
     SettingsContent(
@@ -336,6 +352,7 @@ private fun SettingsContentPreviewTwoColumns() {
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
+        onRestartServiceClick = {},
         onUpdateClick = {},
         onLicensesClick = {},
         onDevicesClick = {},
@@ -343,7 +360,7 @@ private fun SettingsContentPreviewTwoColumns() {
     )
 }
 
-@Preview(showBackground = true, widthDp = 900)
+@Preview(showBackground = true, widthDp = 900, heightDp = 400)
 @Composable
 private fun SettingsContentPreviewThreeColumns() {
     SettingsContent(
@@ -358,6 +375,7 @@ private fun SettingsContentPreviewThreeColumns() {
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
+        onRestartServiceClick = {},
         onUpdateClick = {},
         onLicensesClick = {},
         onDevicesClick = {},

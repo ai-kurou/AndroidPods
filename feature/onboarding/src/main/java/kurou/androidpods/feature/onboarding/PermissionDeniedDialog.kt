@@ -29,7 +29,7 @@ internal fun PermissionDeniedDialog(
     )
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, widthDp = 400, heightDp = 700)
 @Composable
 private fun PermissionDeniedDialogPreview() {
     PermissionDeniedDialog(onDismiss = {}, onConfirm = {})
