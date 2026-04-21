@@ -80,38 +80,15 @@ fun SettingsScreen(
         initialRequestDone = true
     }
 
-    // 起動時に未許可の権限をリクエスト
-    LaunchedEffect(Unit) {
-        val notGranted = permissions.filter {
-            ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED
-        }
-        if (notGranted.isNotEmpty()) launcher.launch(notGranted.toTypedArray())
-    }
-
-    // 起動時にアップデート確認
-    LaunchedEffect(Unit) {
-        @Suppress("DEPRECATION")
-        val versionName = runCatching {
-            context.packageManager.getPackageInfo(context.packageName, 0).versionName
-        }.getOrNull() ?: return@LaunchedEffect
-        viewModel.checkUpdate(versionName)
-    }
-
-    // アプリ復帰時（ON_RESUME）にスキャン開始、権限状態とアダプタ状態を再チェック
-    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-        permissions.forEach { permission ->
-            permissionStates[permission] =
-                ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
-        }
-        viewModel.refreshOverlayState()
-        onStartScanService()
-        if (initialRequestDone) {
-            val hasNotGranted = permissions.any {
-                ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED
-            }
-            if (hasNotGranted) showSettingsDialog = true
-        }
-    }
+    SettingsEffects(
+        permissions = permissions,
+        initialRequestDone = initialRequestDone,
+        onLaunchPermissions = { launcher.launch(it) },
+        onUpdatePermissionState = { permission, granted -> permissionStates[permission] = granted },
+        onShowSettingsDialog = { showSettingsDialog = true },
+        onStartScanService = onStartScanService,
+        viewModel = viewModel,
+    )
 
     // 設定画面への誘導ダイアログ
     if (showSettingsDialog) {
@@ -135,6 +112,112 @@ fun SettingsScreen(
 
     val restartServiceMessage = stringResource(R.string.restart_service_completed)
 
+    SettingsScaffold(
+        modifier = modifier,
+        snackbarHostState = snackbarHostState,
+        permissionStates = permissionStates,
+        uiState = uiState,
+        isServiceRestarting = isServiceRestarting,
+        columns = columns,
+        onPermissionWarningClick = {
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                data = Uri.fromParts("package", context.packageName, null)
+            }
+            context.startActivity(intent)
+        },
+        onBluetoothWarningClick = {
+            context.startActivity(Intent(Settings.ACTION_BLUETOOTH_SETTINGS))
+        },
+        onUpdateClick = {
+            val intent = Intent(Intent.ACTION_VIEW, "https://github.com/ai-kurou/AndroidPods/releases/latest".toUri())
+            context.startActivity(intent)
+        },
+        onLicensesClick = onLicensesClick,
+        onDevicesClick = onDevicesClick,
+        onGithubClick = {
+            val intent = Intent(Intent.ACTION_VIEW, "https://github.com/ai-kurou/AndroidPods".toUri())
+            context.startActivity(intent)
+        },
+        onOverlayToggle = {
+            val intent = Intent(
+                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                "package:${context.packageName}".toUri(),
+            )
+            overlaySettingsLauncher.launch(intent)
+        },
+        onRestartServiceClick = {
+            scope.launch {
+                onStopScanService()
+                onStartScanService()
+                snackbarHostState.showSnackbar(restartServiceMessage)
+            }
+        },
+    )
+}
+
+@Composable
+private fun SettingsEffects(
+    permissions: List<String>,
+    initialRequestDone: Boolean,
+    onLaunchPermissions: (Array<String>) -> Unit,
+    onUpdatePermissionState: (String, Boolean) -> Unit,
+    onShowSettingsDialog: () -> Unit,
+    onStartScanService: () -> Unit,
+    viewModel: SettingsViewModel,
+) {
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        val notGranted = permissions.filter {
+            ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED
+        }
+        if (notGranted.isNotEmpty()) onLaunchPermissions(notGranted.toTypedArray())
+    }
+
+    LaunchedEffect(Unit) {
+        @Suppress("DEPRECATION")
+        val versionName = runCatching {
+            context.packageManager.getPackageInfo(context.packageName, 0).versionName
+        }.getOrNull() ?: return@LaunchedEffect
+        viewModel.checkUpdate(versionName)
+    }
+
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        permissions.forEach { permission ->
+            onUpdatePermissionState(
+                permission,
+                ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED,
+            )
+        }
+        viewModel.refreshOverlayState()
+        onStartScanService()
+        if (initialRequestDone) {
+            val hasNotGranted = permissions.any {
+                ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED
+            }
+            if (hasNotGranted) onShowSettingsDialog()
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SettingsScaffold(
+    snackbarHostState: SnackbarHostState,
+    permissionStates: Map<String, Boolean>,
+    uiState: SettingsUiState,
+    isServiceRestarting: Boolean,
+    columns: Int,
+    onPermissionWarningClick: () -> Unit,
+    onBluetoothWarningClick: () -> Unit,
+    onUpdateClick: () -> Unit,
+    onLicensesClick: () -> Unit,
+    onDevicesClick: () -> Unit,
+    onGithubClick: () -> Unit,
+    onOverlayToggle: (Boolean) -> Unit,
+    onRestartServiceClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Scaffold(
         modifier = modifier,
         contentWindowInsets = WindowInsets(0),
@@ -152,39 +235,14 @@ fun SettingsScreen(
             updateAvailable = uiState.updateAvailable,
             isServiceRestarting = isServiceRestarting,
             columns = columns,
-            onPermissionWarningClick = {
-                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                    data = Uri.fromParts("package", context.packageName, null)
-                }
-                context.startActivity(intent)
-            },
-            onBluetoothWarningClick = {
-                context.startActivity(Intent(Settings.ACTION_BLUETOOTH_SETTINGS))
-            },
-            onUpdateClick = {
-                val intent = Intent(Intent.ACTION_VIEW, "https://github.com/ai-kurou/AndroidPods/releases/latest".toUri())
-                context.startActivity(intent)
-            },
+            onPermissionWarningClick = onPermissionWarningClick,
+            onBluetoothWarningClick = onBluetoothWarningClick,
+            onUpdateClick = onUpdateClick,
             onLicensesClick = onLicensesClick,
             onDevicesClick = onDevicesClick,
-            onGithubClick = {
-                val intent = Intent(Intent.ACTION_VIEW, "https://github.com/ai-kurou/AndroidPods".toUri())
-                context.startActivity(intent)
-            },
-            onOverlayToggle = {
-                val intent = Intent(
-                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                    "package:${context.packageName}".toUri(),
-                )
-                overlaySettingsLauncher.launch(intent)
-            },
-            onRestartServiceClick = {
-                scope.launch {
-                    onStopScanService()
-                    onStartScanService()
-                    snackbarHostState.showSnackbar(restartServiceMessage)
-                }
-            },
+            onGithubClick = onGithubClick,
+            onOverlayToggle = onOverlayToggle,
+            onRestartServiceClick = onRestartServiceClick,
             modifier = Modifier.padding(innerPadding),
         )
     }

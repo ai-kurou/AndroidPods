@@ -65,110 +65,21 @@ internal fun SettingsContent(
     ) {
         if (hasNotGranted) {
             item(span = { GridItemSpan(maxLineSpan) }) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(MaterialTheme.colorScheme.errorContainer)
-                        .clickable(onClick = onPermissionWarningClick)
-                        .padding(12.dp),
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Warning,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onErrorContainer,
-                        modifier = Modifier.size(20.dp),
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = stringResource(R.string.permission_warning),
-                        color = MaterialTheme.colorScheme.onErrorContainer,
-                        modifier = Modifier.weight(1f),
-                    )
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onErrorContainer,
-                    )
-                }
+                PermissionWarningBanner(onClick = onPermissionWarningClick)
             }
         }
         if (isBluetoothUnavailable || isBluetoothOff) {
             item(span = { GridItemSpan(maxLineSpan) }) {
-                val backgroundColor = if (isBluetoothUnavailable)
-                    MaterialTheme.colorScheme.error
-                else
-                    MaterialTheme.colorScheme.errorContainer
-                val contentColor = if (isBluetoothUnavailable)
-                    MaterialTheme.colorScheme.onError
-                else
-                    MaterialTheme.colorScheme.onErrorContainer
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(backgroundColor)
-                        .then(
-                            if (isBluetoothOff) Modifier.clickable(onClick = onBluetoothWarningClick)
-                            else Modifier
-                        )
-                        .padding(12.dp),
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Warning,
-                        contentDescription = null,
-                        tint = contentColor,
-                        modifier = Modifier.size(20.dp),
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = stringResource(
-                            if (isBluetoothUnavailable) R.string.bluetooth_not_supported
-                            else R.string.bluetooth_warning
-                        ),
-                        color = contentColor,
-                        modifier = Modifier.weight(1f),
-                    )
-                    if (isBluetoothOff)
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                            contentDescription = null,
-                            tint = contentColor,
-                        )
-                }
+                BluetoothWarningBanner(
+                    isBluetoothUnavailable = isBluetoothUnavailable,
+                    isBluetoothOff = isBluetoothOff,
+                    onBluetoothWarningClick = onBluetoothWarningClick,
+                )
             }
         }
         if (updateAvailable) {
             item(span = { GridItemSpan(maxLineSpan) }) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(MaterialTheme.colorScheme.primaryContainer)
-                        .clickable(onClick = onUpdateClick)
-                        .padding(12.dp),
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Warning,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                        modifier = Modifier.size(20.dp),
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = stringResource(R.string.update_available),
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        modifier = Modifier.weight(1f),
-                    )
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                    )
-                }
+                UpdateAvailableBanner(onClick = onUpdateClick)
             }
         }
         item(span = { GridItemSpan(1) }) {
@@ -236,6 +147,118 @@ internal fun SettingsContent(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun PermissionWarningBanner(onClick: () -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .background(MaterialTheme.colorScheme.errorContainer)
+            .clickable(onClick = onClick)
+            .padding(12.dp),
+    ) {
+        Icon(
+            imageVector = Icons.Filled.Warning,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onErrorContainer,
+            modifier = Modifier.size(20.dp),
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = stringResource(R.string.permission_warning),
+            color = MaterialTheme.colorScheme.onErrorContainer,
+            modifier = Modifier.weight(1f),
+        )
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onErrorContainer,
+        )
+    }
+}
+
+@Composable
+private fun BluetoothWarningBanner(
+    isBluetoothUnavailable: Boolean,
+    isBluetoothOff: Boolean,
+    onBluetoothWarningClick: () -> Unit,
+) {
+    val backgroundColor = if (isBluetoothUnavailable)
+        MaterialTheme.colorScheme.error
+    else
+        MaterialTheme.colorScheme.errorContainer
+    val contentColor = if (isBluetoothUnavailable)
+        MaterialTheme.colorScheme.onError
+    else
+        MaterialTheme.colorScheme.onErrorContainer
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .background(backgroundColor)
+            .then(
+                if (isBluetoothOff) Modifier.clickable(onClick = onBluetoothWarningClick)
+                else Modifier
+            )
+            .padding(12.dp),
+    ) {
+        Icon(
+            imageVector = Icons.Filled.Warning,
+            contentDescription = null,
+            tint = contentColor,
+            modifier = Modifier.size(20.dp),
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = stringResource(
+                if (isBluetoothUnavailable) R.string.bluetooth_not_supported
+                else R.string.bluetooth_warning
+            ),
+            color = contentColor,
+            modifier = Modifier.weight(1f),
+        )
+        if (isBluetoothOff)
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = null,
+                tint = contentColor,
+            )
+    }
+}
+
+@Composable
+private fun UpdateAvailableBanner(onClick: () -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .background(MaterialTheme.colorScheme.primaryContainer)
+            .clickable(onClick = onClick)
+            .padding(12.dp),
+    ) {
+        Icon(
+            imageVector = Icons.Filled.Warning,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+            modifier = Modifier.size(20.dp),
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = stringResource(R.string.update_available),
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            modifier = Modifier.weight(1f),
+        )
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+        )
     }
 }
 
