@@ -1,8 +1,10 @@
 package kurou.androidpods.ui.theme
 
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.junit4.createComposeRule
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -85,5 +87,31 @@ class ThemeTest {
                 assertEquals(Typography.bodyLarge.letterSpacing, bodyLarge.letterSpacing)
             }
         }
+    }
+
+    @Test
+    @Config(sdk = [31])
+    fun `Android12以上でdynamicColorオンのライトテーマはcolorSchemeが設定される`() {
+        var primary = Color.Unspecified
+        composeTestRule.setContent {
+            AndroidPodsTheme(darkTheme = false, dynamicColor = true) {
+                primary = MaterialTheme.colorScheme.primary
+            }
+        }
+        assertNotEquals(Color.Unspecified, primary)
+        assertNotEquals(Purple40, primary)
+    }
+
+    @Test
+    @Config(sdk = [31])
+    fun `Android12以上でdynamicColorオンのダークテーマはcolorSchemeが設定される`() {
+        var primary = Color.Unspecified
+        composeTestRule.setContent {
+            AndroidPodsTheme(darkTheme = true, dynamicColor = true) {
+                primary = MaterialTheme.colorScheme.primary
+            }
+        }
+        assertNotEquals(Color.Unspecified, primary)
+        assertNotEquals(Purple80, primary)
     }
 }
