@@ -8,6 +8,27 @@ plugins {
     alias(libs.plugins.aboutlibraries) apply false
     alias(libs.plugins.kover)
     alias(libs.plugins.roborazzi) apply false
+    alias(libs.plugins.modules.graph.assert)
+}
+
+moduleGraphAssert {
+    maxHeight = 4
+    allowed = arrayOf(
+        ":app -> .*",
+        ":navigation -> :feature:.*",
+        ":core:service -> :core:domain",
+        ":core:service -> :core:data",
+        ":core:data -> :core:domain",
+        ":feature:.* -> :core:domain",
+    )
+    restricted = arrayOf(
+        ":feature:.* -X> :core:data",
+        ":navigation -X> :core:.*",
+        ":core:data -X> :core:service",
+        ":core:domain -X> :core:data",
+        ":core:domain -X> :core:service",
+        ":core:domain -X> :feature:.*",
+    )
 }
 
 dependencies {
