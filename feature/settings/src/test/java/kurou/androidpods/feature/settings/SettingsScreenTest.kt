@@ -209,6 +209,7 @@ class SettingsScreenTest {
         composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithText("Restart scan service").performClick()
+        composeTestRule.mainClock.advanceTimeBy(5001)
         composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithText("Scan service restarted").assertIsDisplayed()

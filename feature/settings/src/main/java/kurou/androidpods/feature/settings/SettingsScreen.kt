@@ -147,8 +147,11 @@ fun SettingsScreen(
         },
         onRestartServiceClick = {
             scope.launch {
+                isServiceRestarting = true
                 onStopScanService()
                 onStartScanService()
+                delay(5000)
+                isServiceRestarting = false
                 snackbarHostState.showSnackbar(restartServiceMessage)
             }
         },
