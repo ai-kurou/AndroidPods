@@ -9,6 +9,24 @@ plugins {
     alias(libs.plugins.kover)
     alias(libs.plugins.roborazzi) apply false
     alias(libs.plugins.modules.graph.assert)
+    alias(libs.plugins.detekt)
+}
+
+detekt {
+    config.setFrom(files("$rootDir/config/detekt/detekt.yml"))
+    buildUponDefaultConfig = true
+    allRules = false
+    autoCorrect = false
+}
+
+subprojects {
+    apply(plugin = "io.gitlab.arturbosch.detekt")
+    tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+        ignoreFailures = true
+    }
+    dependencies {
+        "detektPlugins"(rootProject.libs.detekt.formatting)
+    }
 }
 
 moduleGraphAssert {
