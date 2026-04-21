@@ -29,6 +29,117 @@ moduleGraphAssert {
     )
 }
 
+tasks.register("generateModuleGraphImages") {
+    group = "documentation"
+    description = "Generates SVG module dependency graphs and updates each module's README.md"
+
+    doLast {
+        val dotBinary = listOf("/opt/homebrew/bin/dot", "/usr/bin/dot", "/usr/local/bin/dot")
+            .firstOrNull { File(it).exists() }
+            ?: error("Graphviz 'dot' not found. Install: brew install graphviz (Mac) / apt-get install graphviz (Linux)")
+
+        val graphsDir = file("docs/graphs")
+        graphsDir.mkdirs()
+
+        fun runCommand(vararg args: String, dir: File = rootDir) {
+            val result = ProcessBuilder(*args)
+                .directory(dir)
+                .inheritIO()
+                .start()
+                .waitFor()
+            check(result == 0) { "Command failed (exit $result): ${args.joinToString(" ")}" }
+        }
+
+        // ライブラリのタスクで全体グラフの .gv を生成
+        val fullGvFile = file("$graphsDir/full-graph.gv")
+        runCommand("./gradlew", "generateModulesGraphvizText",
+            "-Pmodules.graph.output.gv=${fullGvFile.absolutePath}")
+
+        // .gv をパースしてエッジ一覧を取得
+        // 各行は `"from" -> "to"` または `"from" -> "to" [attrs]` の形式
+        val fullGv = fullGvFile.readText()
+        val edgeRegex = Regex(""""(:[^"]+)"\s*->\s*"(:[^"]+)"(.*)""")
+        val parsedEdges = edgeRegex.findAll(fullGv).map { m ->
+            Triple(m.groupValues[1], m.groupValues[2], m.groupValues[3].trim())
+        }.toList()
+
+        // 全体グラフ → SVG
+        runCommand(dotBinary, "-Tsvg", fullGvFile.absolutePath, "-o", "$graphsDir/full-graph.svg")
+        println("Generated: docs/graphs/full-graph.svg")
+
+        // モジュール別: 隣接エッジのみ含む部分グラフを生成して SVG に変換
+        val allModules = (parsedEdges.map { it.first } + parsedEdges.map { it.second }).toSet()
+        allModules.forEach { module ->
+            val neighborhood = parsedEdges
+                .filter { (f, t, _) -> f == module || t == module }
+                .flatMap { (f, t, _) -> listOf(f, t) }
+                .toSet()
+            val subEdges = parsedEdges.filter { (f, t, _) -> f in neighborhood && t in neighborhood }
+
+            val gvContent = buildString {
+                appendLine("digraph G {")
+                subEdges.forEach { (from, to, attrs) ->
+                    val attrPart = if (attrs.isNotEmpty()) " $attrs" else ""
+                    appendLine("  \"$from\" -> \"$to\"$attrPart")
+                }
+                append("}")
+            }
+
+            val svgName = module.removePrefix(":").replace(":", "-")
+            val moduleGvFile = file("$graphsDir/$svgName.gv")
+            moduleGvFile.writeText(gvContent)
+
+            runCommand(dotBinary, "-Tsvg", moduleGvFile.absolutePath, "-o", "$graphsDir/$svgName.svg")
+            println("Generated: docs/graphs/$svgName.svg")
+        }
+
+        // README を更新（SVG 画像を埋め込む）
+        val startMarker = "<!-- MODULE-GRAPH-START -->"
+        val endMarker = "<!-- MODULE-GRAPH-END -->"
+
+        fun upsertReadme(readmeFile: File, svgRelativePath: String, heading: String) {
+            val imgTag = "![Module Graph]($svgRelativePath)"
+            val block = "$startMarker\n$heading\n\n$imgTag\n$endMarker"
+            if (readmeFile.exists()) {
+                val original = readmeFile.readText()
+                val updated = if (original.contains(startMarker)) {
+                    original.replace(
+                        Regex("""$startMarker.*?$endMarker""", RegexOption.DOT_MATCHES_ALL),
+                        block
+                    )
+                } else {
+                    original.trimEnd() + "\n\n$block\n"
+                }
+                readmeFile.writeText(updated)
+            } else {
+                readmeFile.writeText("# ${readmeFile.parentFile.name}\n\n$block\n")
+            }
+        }
+
+        // ルート README
+        upsertReadme(file("README.md"), "docs/graphs/full-graph.svg", "## Module Graph")
+        println("Updated: README.md")
+
+        // モジュール別 README
+        rootProject.subprojects.forEach { proj ->
+            val svgName = proj.path.removePrefix(":").replace(":", "-")
+            val svgFile = file("$graphsDir/$svgName.svg")
+            if (!svgFile.exists()) return@forEach
+
+            val readmeFile = proj.file("README.md")
+            val relPath = readmeFile.parentFile.toPath()
+                .relativize(svgFile.toPath())
+                .toString()
+                .replace('\\', '/')
+
+            upsertReadme(readmeFile, relPath, "## Module Dependencies")
+            println("Updated: ${proj.path}/README.md")
+        }
+
+        println("\nDone. Commit docs/graphs/ and any updated README.md files.")
+    }
+}
+
 dependencies {
     kover(project(":app"))
     kover(project(":core:domain"))

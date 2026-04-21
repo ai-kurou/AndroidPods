@@ -58,6 +58,9 @@ export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
 
 # モジュール間の依存ルールを検証
 ./gradlew assertModuleGraph
+
+# 各モジュールのREADME.mdにSVG依存グラフを生成・更新（Graphviz要）
+./gradlew generateModuleGraphImages
 ```
 
 ## アーキテクチャ
