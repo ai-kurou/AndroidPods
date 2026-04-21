@@ -23,7 +23,7 @@ internal fun BluetoothUnavailableDialog(
     )
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, widthDp = 400, heightDp = 700)
 @Composable
 private fun BluetoothUnavailableDialogPreview() {
     BluetoothUnavailableDialog(onDismiss = {})

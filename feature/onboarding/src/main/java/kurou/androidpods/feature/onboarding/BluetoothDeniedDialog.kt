@@ -29,7 +29,7 @@ internal fun BluetoothDeniedDialog(
     )
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, widthDp = 400, heightDp = 700)
 @Composable
 private fun BluetoothDeniedDialogPreview() {
     BluetoothDeniedDialog(onDismiss = {}, onConfirm = {})

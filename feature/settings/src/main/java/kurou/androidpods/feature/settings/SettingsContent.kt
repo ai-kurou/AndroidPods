@@ -271,7 +271,7 @@ private fun SettingsItem(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, widthDp = 400, heightDp = 700)
 @Composable
 private fun SettingsContentPreviewNoWarning() {
     SettingsContent(
@@ -294,7 +294,7 @@ private fun SettingsContentPreviewNoWarning() {
     )
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, widthDp = 400, heightDp = 700)
 @Composable
 private fun SettingsContentPreviewBluetoothUnavailable() {
     SettingsContent(
@@ -314,7 +314,7 @@ private fun SettingsContentPreviewBluetoothUnavailable() {
     )
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, widthDp = 400, heightDp = 700)
 @Composable
 private fun SettingsContentPreviewAllWarnings() {
     SettingsContent(
@@ -337,7 +337,7 @@ private fun SettingsContentPreviewAllWarnings() {
     )
 }
 
-@Preview(showBackground = true, widthDp = 700)
+@Preview(showBackground = true, widthDp = 700, heightDp = 400)
 @Composable
 private fun SettingsContentPreviewTwoColumns() {
     SettingsContent(
@@ -360,7 +360,7 @@ private fun SettingsContentPreviewTwoColumns() {
     )
 }
 
-@Preview(showBackground = true, widthDp = 900)
+@Preview(showBackground = true, widthDp = 900, heightDp = 400)
 @Composable
 private fun SettingsContentPreviewThreeColumns() {
     SettingsContent(
