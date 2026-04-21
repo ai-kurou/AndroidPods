@@ -55,11 +55,14 @@ export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
 
 # スクリーンショットを検証（CIと同等）
 ./gradlew verifyRoborazziDebug
+
+# モジュール間の依存ルールを検証
+./gradlew assertModuleGraph
 ```
 
 ## アーキテクチャ
 
-マルチモジュール構成のクリーンアーキテクチャ。依存方向: `app` → `feature:*` → `core:domain` ← `core:data`
+マルチモジュール構成のクリーンアーキテクチャ。依存方向: `app` → `navigation` → `feature:*` → `core:domain` ← `core:data`
 
 - **`:core:domain`** — リポジトリのインターフェースとUseCase。Android Framework非依存。
 - **`:core:data`** — リポジトリの実装とHilt DIモジュール(`DataModule`)。`@Binds`でインターフェースと実装をバインド。
@@ -117,11 +120,13 @@ Koverでカバレッジを計測し、CIでCodecovにアップロードする。
 ## CI
 
 PR時に `.github/workflows/pull-request.yml` が実行される:
+- **module-graph-assert ジョブ**: `assertModuleGraph` でモジュール間の依存ルールを検証
 - **unit-test ジョブ**: `koverXmlReport` → Codecov へアップロード
 - **screenshot-test ジョブ**: `verifyRoborazziDebug` でスクリーンショットを比較。差分が出た場合は `**/build/outputs/roborazzi/*.png` をアーティファクトとしてアップロード
 - **instrumented-test ジョブ**: Android エミュレータ（API 36）で `connectedDebugAndroidTest`
 
 main へのマージ時に `.github/workflows/on-main-merge.yml` が実行される:
+- **module-graph-assert ジョブ**: `assertModuleGraph` でモジュール間の依存ルールを検証
 - **unit-test ジョブ**: `koverXmlReport` → Codecov へアップロード（`koverXmlReport` がコンパイル・テスト・カバレッジ計測を包含するため `assembleDebug` は不要）
 - **instrumented-test ジョブ**: Android エミュレータ（API 36）で `connectedDebugAndroidTest`
 
