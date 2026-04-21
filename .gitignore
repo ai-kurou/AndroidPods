@@ -36,3 +36,6 @@ google-services.json
 # Claude Code local settings
 .claude/settings.local.json
 .claude/worktrees/
+
+# Module graph intermediate files
+docs/graphs/*.gv

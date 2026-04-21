@@ -11,3 +11,9 @@ You are welcome to fork and modify for personal use.
 ## Screenshots
 
 <img src="https://github.com/user-attachments/assets/5787a1d4-dbc7-41fa-8897-5e6b2a9e8977" width="400">
+
+<!-- MODULE-GRAPH-START -->
+## Module Graph
+
+![Module Graph](docs/graphs/full-graph.svg)
+<!-- MODULE-GRAPH-END -->
