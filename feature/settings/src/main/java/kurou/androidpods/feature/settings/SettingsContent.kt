@@ -1,6 +1,7 @@
 package kurou.androidpods.feature.settings
 
 import android.bluetooth.BluetoothAdapter
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -130,16 +131,18 @@ internal fun SettingsContent(
                 )
             }
         }
-        item(span = { GridItemSpan(1) }) {
-            SettingsItem(
-                label = stringResource(R.string.dynamic_color_label),
-                icon = painterResource(R.drawable.ic_dynamic_color),
-                onClick = { onDynamicColorToggle(!themeSettings.useDynamicColor) },
-            ) {
-                Switch(
-                    checked = themeSettings.useDynamicColor,
-                    onCheckedChange = onDynamicColorToggle,
-                )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            item(span = { GridItemSpan(1) }) {
+                SettingsItem(
+                    label = stringResource(R.string.dynamic_color_label),
+                    icon = painterResource(R.drawable.ic_dynamic_color),
+                    onClick = { onDynamicColorToggle(!themeSettings.useDynamicColor) },
+                ) {
+                    Switch(
+                        checked = themeSettings.useDynamicColor,
+                        onCheckedChange = onDynamicColorToggle,
+                    )
+                }
             }
         }
         item(span = { GridItemSpan(1) }) {

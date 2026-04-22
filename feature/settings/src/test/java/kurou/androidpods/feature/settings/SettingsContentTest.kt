@@ -517,4 +517,32 @@ class SettingsContentTest {
 
         assertEquals(false, toggledValue)
     }
+
+    @Test
+    @Config(sdk = [30])
+    fun `Android12未満ではダイナミックカラーアイテムが表示されない`() {
+        composeTestRule.setContent {
+            SettingsContent(
+                permissionStates = emptyMap(),
+                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+                overlayEnabled = false,
+                updateAvailable = false,
+                isServiceRestarting = false,
+                columns = 1,
+                themeSettings = ThemeSettings(),
+                onPermissionWarningClick = {},
+                onBluetoothWarningClick = {},
+                onOverlayToggle = {},
+                onRestartServiceClick = {},
+                onThemeModeClick = {},
+                onDynamicColorToggle = {},
+                onUpdateClick = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                onGithubClick = {},
+            )
+        }
+
+        composeTestRule.onNodeWithText("Dynamic Color").assertDoesNotExist()
+    }
 }
