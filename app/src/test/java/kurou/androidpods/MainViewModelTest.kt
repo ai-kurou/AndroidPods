@@ -15,6 +15,8 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kurou.androidpods.core.domain.FirstLaunchUseCase
+import kurou.androidpods.core.domain.ThemeSettings
+import kurou.androidpods.core.domain.ThemeSettingsUseCase
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -27,13 +29,16 @@ class MainViewModelTest {
 
     private val testDispatcher = UnconfinedTestDispatcher()
     private val fakeFlow = MutableStateFlow(true)
+    private val fakeThemeFlow = MutableStateFlow(ThemeSettings())
     private val firstLaunchUseCase = mockk<FirstLaunchUseCase>(relaxUnitFun = true)
+    private val themeSettingsUseCase = mockk<ThemeSettingsUseCase>()
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         every { firstLaunchUseCase.observe() } returns fakeFlow
-        viewModel = MainViewModel(firstLaunchUseCase)
+        every { themeSettingsUseCase.observe() } returns fakeThemeFlow
+        viewModel = MainViewModel(firstLaunchUseCase, themeSettingsUseCase)
     }
 
     @After
@@ -46,7 +51,8 @@ class MainViewModelTest {
     fun `初期状態はnullを返す`() {
         assertNull(viewModel.isFirstLaunch.value)
         verify(exactly = 1) { firstLaunchUseCase.observe() }
-        confirmVerified(firstLaunchUseCase)
+        verify(exactly = 1) { themeSettingsUseCase.observe() }
+        confirmVerified(firstLaunchUseCase, themeSettingsUseCase)
     }
 
     @Test
@@ -57,7 +63,8 @@ class MainViewModelTest {
         assertEquals(true, viewModel.isFirstLaunch.value)
         job.cancel()
         verify(exactly = 1) { firstLaunchUseCase.observe() }
-        confirmVerified(firstLaunchUseCase)
+        verify(exactly = 1) { themeSettingsUseCase.observe() }
+        confirmVerified(firstLaunchUseCase, themeSettingsUseCase)
     }
 
     @Test
@@ -68,7 +75,8 @@ class MainViewModelTest {
         assertEquals(false, viewModel.isFirstLaunch.value)
         job.cancel()
         verify(exactly = 1) { firstLaunchUseCase.observe() }
-        confirmVerified(firstLaunchUseCase)
+        verify(exactly = 1) { themeSettingsUseCase.observe() }
+        confirmVerified(firstLaunchUseCase, themeSettingsUseCase)
     }
 
     @Test
@@ -76,7 +84,8 @@ class MainViewModelTest {
         viewModel.markAsLaunched()
 
         verify(exactly = 1) { firstLaunchUseCase.observe() }
+        verify(exactly = 1) { themeSettingsUseCase.observe() }
         coVerify(exactly = 1) { firstLaunchUseCase.markAsLaunched() }
-        confirmVerified(firstLaunchUseCase)
+        confirmVerified(firstLaunchUseCase, themeSettingsUseCase)
     }
 }
