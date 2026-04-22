@@ -8,7 +8,6 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -23,7 +22,6 @@ internal val Context.themeDataStore by preferencesDataStore(name = "theme_settin
 
 @Singleton
 internal class ThemeSettingsRepositoryImpl @Inject constructor(
-    @ApplicationContext private val context: Context,
     private val dataStore: DataStore<Preferences>,
 ) : ThemeSettingsRepository {
 

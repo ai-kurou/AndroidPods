@@ -1,6 +1,7 @@
 package kurou.androidpods.core.data
 
 import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.test.core.app.ApplicationProvider
 import kotlinx.coroutines.flow.Flow
@@ -12,18 +13,30 @@ import kurou.androidpods.core.domain.ThemeSettings
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import java.io.File
 import java.io.IOException
+import java.util.UUID
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [35])
 class ThemeSettingsRepositoryImplTest {
 
-    private val context = ApplicationProvider.getApplicationContext<android.app.Application>()
-    private val repository = ThemeSettingsRepositoryImpl(context, context.themeDataStore)
+    private lateinit var repository: ThemeSettingsRepositoryImpl
+
+    @Before
+    fun setUp() {
+        val context = ApplicationProvider.getApplicationContext<android.app.Application>()
+        // テスト間でDataStoreが共有されてフレイキーになる可能性を無くす
+        val dataStore = PreferenceDataStoreFactory.create {
+            File(context.filesDir, "datastore/test_theme_${UUID.randomUUID()}.preferences_pb")
+        }
+        repository = ThemeSettingsRepositoryImpl(dataStore)
+    }
 
     @Test
     fun `デフォルト値はSYSTEMテーマとDynamicColorON`() = runTest {
@@ -37,9 +50,9 @@ class ThemeSettingsRepositoryImplTest {
         val ioExceptionDataStore = object : DataStore<Preferences> {
             override val data: Flow<Preferences> = flow { throw IOException("Test IOException") }
             override suspend fun updateData(transform: suspend (Preferences) -> Preferences): Preferences =
-                throw kotlinx.io.IOException("Test IOException")
+                throw IOException("Test IOException")
         }
-        val repositoryWithError = ThemeSettingsRepositoryImpl(context, ioExceptionDataStore)
+        val repositoryWithError = ThemeSettingsRepositoryImpl(ioExceptionDataStore)
 
         val settings = repositoryWithError.observe().first()
 
@@ -53,7 +66,7 @@ class ThemeSettingsRepositoryImplTest {
             override suspend fun updateData(transform: suspend (Preferences) -> Preferences): Preferences =
                 throw RuntimeException("Test RuntimeException")
         }
-        val repositoryWithError = ThemeSettingsRepositoryImpl(context, runtimeExceptionDataStore)
+        val repositoryWithError = ThemeSettingsRepositoryImpl(runtimeExceptionDataStore)
 
         var thrownException: Throwable? = null
         try {

@@ -1,10 +1,12 @@
 package kurou.androidpods.feature.settings
 
 import android.bluetooth.BluetoothAdapter
+import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.confirmVerified
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import io.mockk.unmockkAll
 import io.mockk.verify
@@ -135,7 +137,7 @@ class SettingsViewModelTest {
     @Test
     fun `updateThemeSettingsでUseCaseのupdateが呼ばれる`() = runTest {
         val settings = ThemeSettings(themeMode = ThemeMode.LIGHT, useDynamicColor = true)
-        coEvery { themeSettingsUseCase.update(settings) } returns Unit
+        coEvery { themeSettingsUseCase.update(settings) } just Runs
 
         viewModel.updateThemeSettings(settings)
 

@@ -6,6 +6,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
@@ -210,6 +211,7 @@ class SettingsContentTest {
             )
         }
 
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Compatible devices"))
         composeTestRule.onNodeWithText("Compatible devices").performClick()
 
         assertTrue(clicked)
@@ -240,6 +242,7 @@ class SettingsContentTest {
             )
         }
 
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Open Source Licenses"))
         composeTestRule.onNodeWithText("Open Source Licenses").performClick()
 
         assertTrue(clicked)
@@ -270,7 +273,7 @@ class SettingsContentTest {
             )
         }
 
-        composeTestRule.onNode(hasScrollAction()).performScrollToNode(hasText("GitHub Repository"))
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("GitHub Repository"))
         composeTestRule.onNodeWithText("GitHub Repository").performClick()
 
         assertTrue(clicked)
@@ -301,6 +304,7 @@ class SettingsContentTest {
             )
         }
 
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Show battery overlay"))
         composeTestRule.onNodeWithText("Show battery overlay").performClick()
 
         assertTrue(toggledValue == true)
@@ -331,6 +335,7 @@ class SettingsContentTest {
             )
         }
 
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Show battery overlay"))
         composeTestRule.onNodeWithText("Show battery overlay").performClick()
 
         assertTrue(toggledValue == false)
@@ -361,6 +366,7 @@ class SettingsContentTest {
             )
         }
 
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Restart scan service"))
         composeTestRule.onNodeWithText("Restart scan service").performClick()
 
         assertTrue(clicked)
@@ -391,6 +397,7 @@ class SettingsContentTest {
             )
         }
 
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Restart scan service"))
         composeTestRule.onNodeWithText("Restart scan service").performClick()
 
         assertTrue(!clicked)
@@ -453,6 +460,7 @@ class SettingsContentTest {
             )
         }
 
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Theme"))
         composeTestRule.onNodeWithText("Theme").performClick()
 
         assertTrue(clicked)
@@ -483,6 +491,7 @@ class SettingsContentTest {
             )
         }
 
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Dynamic Color"))
         composeTestRule.onNodeWithText("Dynamic Color").performClick()
 
         assertEquals(true, toggledValue)
@@ -513,6 +522,7 @@ class SettingsContentTest {
             )
         }
 
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Dynamic Color"))
         composeTestRule.onNodeWithText("Dynamic Color").performClick()
 
         assertEquals(false, toggledValue)
