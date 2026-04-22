@@ -12,9 +12,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.test.core.app.ApplicationProvider
 import io.mockk.coEvery
 import io.mockk.every
@@ -26,6 +29,7 @@ import kurou.androidpods.core.domain.CheckUpdateUseCase
 import kurou.androidpods.core.domain.GetAppleDevicesUseCase
 import kurou.androidpods.core.domain.GetBluetoothAdapterStateUseCase
 import kurou.androidpods.core.domain.GetOverlaySettingsUseCase
+import kurou.androidpods.core.domain.ThemeMode
 import kurou.androidpods.core.domain.ThemeSettings
 import kurou.androidpods.core.domain.ThemeSettingsUseCase
 import org.junit.After
@@ -68,6 +72,7 @@ class SettingsScreenTest {
         every { overlayUseCase.isEnabled() } returns false
         coEvery { checkUpdateUseCase(any()) } returns false
         every { themeSettingsUseCase.observe() } returns MutableStateFlow(ThemeSettings())
+        coEvery { themeSettingsUseCase.update(any()) } returns Unit
         return SettingsViewModel(btUseCase, appleDevicesUseCase, overlayUseCase, checkUpdateUseCase, themeSettingsUseCase)
     }
 
@@ -163,6 +168,7 @@ class SettingsScreenTest {
         }
         composeTestRule.waitForIdle()
 
+        composeTestRule.onNodeWithTag("settings_grid").performScrollToNode(hasText("GitHub Repository"))
         composeTestRule.onNodeWithText("GitHub Repository").performClick()
         composeTestRule.waitForIdle()
 
@@ -217,5 +223,54 @@ class SettingsScreenTest {
         composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithText("Scan service restarted").assertIsDisplayed()
+    }
+
+    @Test
+    fun `テーマアイテムをタップするとダイアログが表示される`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        grantRequiredPermissions(context)
+
+        composeTestRule.setContent {
+            SettingsScreen(
+                windowWidthSizeClass = WindowWidthSizeClass.Compact,
+                onStartScanService = {},
+                onStopScanService = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                viewModel = createViewModel(BluetoothAdapter.STATE_ON),
+            )
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Theme").performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Light").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Dark").assertIsDisplayed()
+    }
+
+    @Test
+    fun `ダイアログでモードを選択するとダイアログが閉じる`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        grantRequiredPermissions(context)
+
+        composeTestRule.setContent {
+            SettingsScreen(
+                windowWidthSizeClass = WindowWidthSizeClass.Compact,
+                onStartScanService = {},
+                onStopScanService = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                viewModel = createViewModel(BluetoothAdapter.STATE_ON),
+            )
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Theme").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Dark").performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Light").assertDoesNotExist()
     }
 }
