@@ -31,7 +31,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -68,7 +67,7 @@ internal fun SettingsContent(
         columns = GridCells.Fixed(columns),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = modifier.fillMaxSize().padding(16.dp).testTag("settings_grid"),
+        modifier = modifier.fillMaxSize().padding(16.dp),
     ) {
         if (hasNotGranted) {
             item(span = { GridItemSpan(maxLineSpan) }) {

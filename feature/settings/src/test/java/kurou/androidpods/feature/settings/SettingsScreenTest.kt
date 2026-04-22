@@ -12,9 +12,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
@@ -168,7 +168,7 @@ class SettingsScreenTest {
         }
         composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithTag("settings_grid").performScrollToNode(hasText("GitHub Repository"))
+        composeTestRule.onNode(hasScrollAction()).performScrollToNode(hasText("GitHub Repository"))
         composeTestRule.onNodeWithText("GitHub Repository").performClick()
         composeTestRule.waitForIdle()
 
