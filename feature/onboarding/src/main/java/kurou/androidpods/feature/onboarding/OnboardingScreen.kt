@@ -4,12 +4,14 @@ import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
@@ -97,77 +99,109 @@ fun OnboardingScreen(
         }
     }
 
-    if (showPermissionDeniedDialog) {
-        PermissionDeniedDialog(
-            onDismiss = { showPermissionDeniedDialog = false },
-            onConfirm = {
-                showPermissionDeniedDialog = false
-                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                    data = Uri.fromParts("package", context.packageName, null)
-                }
-                context.startActivity(intent)
-            },
-        )
-    }
-
-    if (showBluetoothUnavailableDialog) {
-        BluetoothUnavailableDialog(
-            onDismiss = {
-                showBluetoothUnavailableDialog = false
-                onComplete()
-            },
-        )
-    }
-
-    if (showBluetoothDeniedDialog) {
-        BluetoothDeniedDialog(
-            onDismiss = { showBluetoothDeniedDialog = false },
-            onConfirm = {
-                showBluetoothDeniedDialog = false
-                context.startActivity(Intent(Settings.ACTION_BLUETOOTH_SETTINGS))
-            },
-        )
-    }
+    OnboardingDialogs(
+        showPermissionDeniedDialog = showPermissionDeniedDialog,
+        showBluetoothUnavailableDialog = showBluetoothUnavailableDialog,
+        showBluetoothDeniedDialog = showBluetoothDeniedDialog,
+        onDismissPermissionDenied = { showPermissionDeniedDialog = false },
+        onConfirmPermissionDenied = {
+            showPermissionDeniedDialog = false
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                data = Uri.fromParts("package", context.packageName, null)
+            }
+            context.startActivity(intent)
+        },
+        onDismissBluetoothUnavailable = {
+            showBluetoothUnavailableDialog = false
+            onComplete()
+        },
+        onDismissBluetoothDenied = { showBluetoothDeniedDialog = false },
+        onConfirmBluetoothDenied = {
+            showBluetoothDeniedDialog = false
+            context.startActivity(Intent(Settings.ACTION_BLUETOOTH_SETTINGS))
+        },
+    )
 
     OnboardingContent(
         pagerState = pagerState,
         onButtonClick = {
-            when (pagerState.currentPage) {
-                PERMISSION_PAGE -> {
-                    permissionLauncher?.launch(requiredPermissions())
-                }
-                OVERLAY_PAGE -> {
-                    if (Settings.canDrawOverlays(context)) {
-                        coroutineScope.launch {
-                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                        }
-                    } else {
-                        val intent = Intent(
-                            Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                            "package:${context.packageName}".toUri(),
-                        )
-                        overlayPermissionLauncher?.launch(intent)
-                    }
-                }
-                BLUETOOTH_PAGE -> {
-                    when {
-                        bluetoothAdapter == null -> {
-                            showBluetoothUnavailableDialog = true
-                        }
-
-                        bluetoothAdapter.isEnabled -> onComplete()
-                        else -> bluetoothEnableLauncher?.launch(
-                            Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE),
-                        )
-                    }
-                }
-                else -> {
+            handleOnboardingButtonClick(
+                page = pagerState.currentPage,
+                context = context,
+                bluetoothAdapter = bluetoothAdapter,
+                permissionLauncher = permissionLauncher,
+                overlayPermissionLauncher = overlayPermissionLauncher,
+                bluetoothEnableLauncher = bluetoothEnableLauncher,
+                onComplete = onComplete,
+                onBluetoothUnavailable = { showBluetoothUnavailableDialog = true },
+                onScrollToNextPage = {
                     coroutineScope.launch {
                         pagerState.animateScrollToPage(pagerState.currentPage + 1)
                     }
-                }
-            }
+                },
+            )
         },
         modifier = modifier,
     )
+}
+
+@Composable
+private fun OnboardingDialogs(
+    showPermissionDeniedDialog: Boolean,
+    showBluetoothUnavailableDialog: Boolean,
+    showBluetoothDeniedDialog: Boolean,
+    onDismissPermissionDenied: () -> Unit,
+    onConfirmPermissionDenied: () -> Unit,
+    onDismissBluetoothUnavailable: () -> Unit,
+    onDismissBluetoothDenied: () -> Unit,
+    onConfirmBluetoothDenied: () -> Unit,
+) {
+    if (showPermissionDeniedDialog) {
+        PermissionDeniedDialog(
+            onDismiss = onDismissPermissionDenied,
+            onConfirm = onConfirmPermissionDenied,
+        )
+    }
+    if (showBluetoothUnavailableDialog) {
+        BluetoothUnavailableDialog(onDismiss = onDismissBluetoothUnavailable)
+    }
+    if (showBluetoothDeniedDialog) {
+        BluetoothDeniedDialog(
+            onDismiss = onDismissBluetoothDenied,
+            onConfirm = onConfirmBluetoothDenied,
+        )
+    }
+}
+
+private fun handleOnboardingButtonClick(
+    page: Int,
+    context: Context,
+    bluetoothAdapter: BluetoothAdapter?,
+    permissionLauncher: ActivityResultLauncher<Array<String>>?,
+    overlayPermissionLauncher: ActivityResultLauncher<Intent>?,
+    bluetoothEnableLauncher: ActivityResultLauncher<Intent>?,
+    onComplete: () -> Unit,
+    onBluetoothUnavailable: () -> Unit,
+    onScrollToNextPage: () -> Unit,
+) {
+    when (page) {
+        PERMISSION_PAGE -> permissionLauncher?.launch(requiredPermissions())
+        OVERLAY_PAGE -> {
+            if (Settings.canDrawOverlays(context)) {
+                onScrollToNextPage()
+            } else {
+                val intent = Intent(
+                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    "package:${context.packageName}".toUri(),
+                )
+                overlayPermissionLauncher?.launch(intent)
+            }
+        }
+        BLUETOOTH_PAGE -> when {
+            bluetoothAdapter == null -> onBluetoothUnavailable()
+            bluetoothAdapter.isEnabled -> onComplete()
+            else -> bluetoothEnableLauncher?.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
+        }
+        else -> onScrollToNextPage()
+    }
 }
