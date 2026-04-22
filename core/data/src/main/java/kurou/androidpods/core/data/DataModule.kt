@@ -9,6 +9,7 @@ import kurou.androidpods.core.domain.CompatibleDeviceRepository
 import kurou.androidpods.core.domain.FirstLaunchRepository
 import kurou.androidpods.core.domain.AppleDeviceRepository
 import kurou.androidpods.core.domain.OverlaySettingsRepository
+import kurou.androidpods.core.domain.ThemeSettingsRepository
 import kurou.androidpods.core.domain.UpdateRepository
 
 @Module
@@ -43,4 +44,9 @@ abstract class DataModule {
     internal abstract fun bindUpdateRepository(
         impl: UpdateRepositoryImpl,
     ): UpdateRepository
+
+    @Binds
+    internal abstract fun bindThemeSettingsRepository(
+        impl: ThemeSettingsRepositoryImpl,
+    ): ThemeSettingsRepository
 }
