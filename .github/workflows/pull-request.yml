@@ -20,6 +20,9 @@ jobs:
 
       - run: ./gradlew detekt
 
+      - name: Fail if detekt would have auto-corrected files
+        run: git diff --exit-code
+
   module-graph-assert:
     runs-on: ubuntu-latest
 
