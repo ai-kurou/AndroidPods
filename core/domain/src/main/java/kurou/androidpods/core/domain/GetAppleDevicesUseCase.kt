@@ -7,6 +7,8 @@ class GetAppleDevicesUseCase @Inject constructor(
     private val repository: AppleDeviceRepository,
 ) {
     fun observe(): Flow<Map<String, AppleDevice>> = repository.observeDevices()
+
     fun startScan() = repository.startScan()
+
     fun stopScan() = repository.stopScan()
 }

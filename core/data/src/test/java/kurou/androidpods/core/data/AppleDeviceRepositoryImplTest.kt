@@ -1,14 +1,13 @@
 package kurou.androidpods.core.data
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
-import org.junit.Assert.assertFalse
 import org.junit.Test
 
 class AppleDeviceRepositoryImplTest {
-
     private val testAddress = "AA:BB:CC:DD:EE:FF"
     private val testRssi = -45
 
@@ -20,15 +19,16 @@ class AppleDeviceRepositoryImplTest {
         byte5: Byte = 0x00,
         byte6: Byte = 0x99.toByte(),
         byte7: Byte = 0x07,
-    ): ByteArray = ByteArray(27).apply {
-        this[0] = type
-        this[1] = length
-        this[3] = modelHigh
-        this[4] = modelLow
-        this[5] = byte5
-        this[6] = byte6
-        this[7] = byte7
-    }
+    ): ByteArray =
+        ByteArray(27).apply {
+            this[0] = type
+            this[1] = length
+            this[3] = modelHigh
+            this[4] = modelLow
+            this[5] = byte5
+            this[6] = byte6
+            this[7] = byte7
+        }
 
     @Test
     fun `サイズが27でないとnullを返す`() {
@@ -106,9 +106,9 @@ class AppleDeviceRepositoryImplTest {
         // ただし flipped=false のとき: left=lowerCharging(bit1), right=upperCharging(bit0)
         val data = buildData(byte5 = 0x20, byte7 = 0x37)
         val device = parseProximityPairingData(data, testAddress, testRssi)!!
-        assertTrue(device.leftCharging)   // bit1=1
-        assertTrue(device.rightCharging)  // bit0=1
-        assertFalse(device.caseCharging)  // bit2=0
+        assertTrue(device.leftCharging) // bit1=1
+        assertTrue(device.rightCharging) // bit0=1
+        assertFalse(device.caseCharging) // bit2=0
         assertEquals(7, device.caseBattery) // 下位ニブル=7
     }
 

@@ -11,6 +11,5 @@ import javax.inject.Singleton
 internal class OverlaySettingsRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : OverlaySettingsRepository {
-
     override fun isEnabled(): Boolean = Settings.canDrawOverlays(context)
 }

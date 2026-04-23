@@ -25,10 +25,11 @@ class DevicesViewModelTest {
     private val testDispatcher = UnconfinedTestDispatcher()
     private val getCompatibleDevicesUseCase = mockk<GetCompatibleDevicesUseCase>()
 
-    private val devices = listOf(
-        CompatibleDevice(name = "AirPods Pro (2nd Gen)", images = null),
-        CompatibleDevice(name = "AirPods Max", images = DeviceImages.Single(body = 0)),
-    )
+    private val devices =
+        listOf(
+            CompatibleDevice(name = "AirPods Pro (2nd Gen)", images = null),
+            CompatibleDevice(name = "AirPods Max", images = DeviceImages.Single(body = 0)),
+        )
 
     @Before
     fun setUp() {

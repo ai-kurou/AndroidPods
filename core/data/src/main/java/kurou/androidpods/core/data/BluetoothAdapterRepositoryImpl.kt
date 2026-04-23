@@ -7,10 +7,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kurou.androidpods.core.domain.BluetoothAdapterRepository
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kurou.androidpods.core.domain.BluetoothAdapterRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -21,25 +21,31 @@ internal class BluetoothAdapterRepositoryImpl @Inject constructor(
     private val bluetoothAdapter: BluetoothAdapter? =
         (context.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager)?.adapter
 
-    override fun observeAdapterState(): Flow<Int?> = callbackFlow {
-        trySend(bluetoothAdapter?.state)
+    override fun observeAdapterState(): Flow<Int?> =
+        callbackFlow {
+            trySend(bluetoothAdapter?.state)
 
-        val receiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                if (intent.action == BluetoothAdapter.ACTION_STATE_CHANGED) {
-                    val state = intent.getIntExtra(
-                        BluetoothAdapter.EXTRA_STATE,
-                        BluetoothAdapter.ERROR,
-                    )
-                    trySend(state)
+            val receiver =
+                object : BroadcastReceiver() {
+                    override fun onReceive(
+                        context: Context,
+                        intent: Intent,
+                    ) {
+                        if (intent.action == BluetoothAdapter.ACTION_STATE_CHANGED) {
+                            val state =
+                                intent.getIntExtra(
+                                    BluetoothAdapter.EXTRA_STATE,
+                                    BluetoothAdapter.ERROR,
+                                )
+                            trySend(state)
+                        }
+                    }
                 }
-            }
-        }
-        val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
-        context.registerReceiver(receiver, filter)
+            val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
+            context.registerReceiver(receiver, filter)
 
-        awaitClose { context.unregisterReceiver(receiver) }
-    }
+            awaitClose { context.unregisterReceiver(receiver) }
+        }
 
     override fun getCurrentState(): Int? = bluetoothAdapter?.state
 }

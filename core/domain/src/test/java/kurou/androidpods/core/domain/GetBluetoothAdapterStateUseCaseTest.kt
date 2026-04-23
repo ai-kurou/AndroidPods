@@ -11,12 +11,10 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 
 class GetBluetoothAdapterStateUseCaseTest {
-
     private lateinit var useCase: GetBluetoothAdapterStateUseCase
     private val repository = mockk<BluetoothAdapterRepository>()
 
@@ -31,16 +29,17 @@ class GetBluetoothAdapterStateUseCaseTest {
     }
 
     @Test
-    fun `observeがrepositoryのobserveAdapterStateのFlowを返す`() = runTest {
-        val fakeFlow = MutableStateFlow<Int?>(BluetoothAdapter.STATE_ON)
-        every { repository.observeAdapterState() } returns fakeFlow
+    fun `observeがrepositoryのobserveAdapterStateのFlowを返す`() =
+        runTest {
+            val fakeFlow = MutableStateFlow<Int?>(BluetoothAdapter.STATE_ON)
+            every { repository.observeAdapterState() } returns fakeFlow
 
-        val result = useCase.observe().first()
+            val result = useCase.observe().first()
 
-        assertEquals(BluetoothAdapter.STATE_ON, result)
-        verify(exactly = 1) { repository.observeAdapterState() }
-        confirmVerified(repository)
-    }
+            assertEquals(BluetoothAdapter.STATE_ON, result)
+            verify(exactly = 1) { repository.observeAdapterState() }
+            confirmVerified(repository)
+        }
 
     @Test
     fun `currentがrepositoryのgetCurrentStateの値を返す`() {

@@ -3,9 +3,9 @@ package kurou.androidpods.core.service
 import kurou.androidpods.core.domain.AppleDevice
 
 internal class BatteryOverlayManager(private val delegate: OverlayViewDelegate) {
-
     /** dismiss時点の各デバイスの lidOpenCounter。同じカウンター値の間は再表示しない */
     private val dismissedLidCounters = mutableMapOf<String, Int>()
+
     /** 現在オーバーレイに表示中のデバイスキーと lidOpenCounter */
     private var currentDevices = emptyMap<String, Int>()
 
@@ -28,12 +28,13 @@ internal class BatteryOverlayManager(private val delegate: OverlayViewDelegate) 
         }
 
         // dismissed済み かつ lidOpenCounter が変わっていないデバイスを除外
-        val visibleDevices = devices.filter { device ->
-            val key = device.modelCode.toString()
-            val dismissedCounter = dismissedLidCounters[key]
-            // dismissedされていない、または蓋が新たに開かれた（カウンターが変化した）場合は表示
-            dismissedCounter == null || device.lidOpenCounter != dismissedCounter
-        }
+        val visibleDevices =
+            devices.filter { device ->
+                val key = device.modelCode.toString()
+                val dismissedCounter = dismissedLidCounters[key]
+                // dismissedされていない、または蓋が新たに開かれた（カウンターが変化した）場合は表示
+                dismissedCounter == null || device.lidOpenCounter != dismissedCounter
+            }
 
         if (visibleDevices.isEmpty()) {
             hide()

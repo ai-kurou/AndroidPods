@@ -21,19 +21,19 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [35])
 class BatteryOverlayViewDelegateTest {
-
     private lateinit var fakeWindowOps: FakeOverlayWindowOperations
     private lateinit var delegate: BatteryOverlayViewDelegate
 
-    private val baseDevice = AppleDevice(
-        address = "00:00:00:00:00:00",
-        modelName = "AirPods Pro",
-        modelCode = 0,
-        rssi = -50,
-        leftBattery = 5,
-        rightBattery = 5,
-        caseBattery = 5,
-    )
+    private val baseDevice =
+        AppleDevice(
+            address = "00:00:00:00:00:00",
+            modelName = "AirPods Pro",
+            modelCode = 0,
+            rssi = -50,
+            leftBattery = 5,
+            rightBattery = 5,
+            caseBattery = 5,
+        )
 
     @Before
     fun setUp() {
@@ -250,17 +250,19 @@ class BatteryOverlayViewDelegateTest {
 
     @Test
     fun `TWSデバイスでデバイス名とバッテリーテキストが正しく表示される`() {
-        val twsDevice = baseDevice.copy(
-            modelName = "AirPods Pro 2",
-            leftBattery = 8,
-            rightBattery = 6,
-            caseBattery = 3,
-            images = DeviceImages.Tws(
-                left = android.R.drawable.ic_menu_info_details,
-                right = android.R.drawable.ic_menu_info_details,
-                case = android.R.drawable.ic_menu_info_details,
-            ),
-        )
+        val twsDevice =
+            baseDevice.copy(
+                modelName = "AirPods Pro 2",
+                leftBattery = 8,
+                rightBattery = 6,
+                caseBattery = 3,
+                images =
+                    DeviceImages.Tws(
+                        left = android.R.drawable.ic_menu_info_details,
+                        right = android.R.drawable.ic_menu_info_details,
+                        case = android.R.drawable.ic_menu_info_details,
+                    ),
+            )
         delegate.addOverlayView()
         delegate.updateContent(listOf(twsDevice))
 
@@ -273,14 +275,16 @@ class BatteryOverlayViewDelegateTest {
 
     @Test
     fun `Singleデバイスでデバイス名とバッテリーテキストが正しく表示される`() {
-        val singleDevice = baseDevice.copy(
-            modelName = "AirPods Max",
-            isSingle = true,
-            leftBattery = 9,
-            images = DeviceImages.Single(
-                body = android.R.drawable.ic_menu_info_details,
-            ),
-        )
+        val singleDevice =
+            baseDevice.copy(
+                modelName = "AirPods Max",
+                isSingle = true,
+                leftBattery = 9,
+                images =
+                    DeviceImages.Single(
+                        body = android.R.drawable.ic_menu_info_details,
+                    ),
+            )
         delegate.addOverlayView()
         delegate.updateContent(listOf(singleDevice))
 
@@ -291,12 +295,13 @@ class BatteryOverlayViewDelegateTest {
 
     @Test
     fun `画像なしTWSデバイスでバッテリーサマリーが正しく表示される`() {
-        val textOnlyDevice = baseDevice.copy(
-            modelName = "Unknown TWS",
-            leftBattery = 5,
-            rightBattery = 7,
-            caseBattery = null,
-        )
+        val textOnlyDevice =
+            baseDevice.copy(
+                modelName = "Unknown TWS",
+                leftBattery = 5,
+                rightBattery = 7,
+                caseBattery = null,
+            )
         delegate.addOverlayView()
         delegate.updateContent(listOf(textOnlyDevice))
 
@@ -307,11 +312,12 @@ class BatteryOverlayViewDelegateTest {
 
     @Test
     fun `画像なしSingleデバイスでバッテリーテキストのみ表示される`() {
-        val textOnlySingle = baseDevice.copy(
-            modelName = "Unknown Single",
-            isSingle = true,
-            leftBattery = 10,
-        )
+        val textOnlySingle =
+            baseDevice.copy(
+                modelName = "Unknown Single",
+                isSingle = true,
+                leftBattery = 10,
+            )
         delegate.addOverlayView()
         delegate.updateContent(listOf(textOnlySingle))
 
@@ -371,7 +377,10 @@ private class FakeOverlayWindowOperations : OverlayWindowOperations {
 
     override fun canDrawOverlays(): Boolean = canDrawOverlaysResult
 
-    override fun addView(view: View, params: WindowManager.LayoutParams) {
+    override fun addView(
+        view: View,
+        params: WindowManager.LayoutParams,
+    ) {
         addViewCount++
         lastAddedView = view
         lastAddedParams = params
@@ -381,7 +390,10 @@ private class FakeOverlayWindowOperations : OverlayWindowOperations {
         removeViewCount++
     }
 
-    override fun updateViewLayout(view: View, params: WindowManager.LayoutParams) {
+    override fun updateViewLayout(
+        view: View,
+        params: WindowManager.LayoutParams,
+    ) {
         updateLayoutCount++
     }
 }

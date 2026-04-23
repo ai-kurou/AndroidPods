@@ -52,13 +52,14 @@ class SettingsViewModelTest {
         every { getAppleDevicesUseCase.observe() } returns fakeAppleDevicesFlow
         every { getOverlaySettingsUseCase.isEnabled() } returns false
         every { themeSettingsUseCase.observe() } returns fakeThemeSettingsFlow
-        viewModel = SettingsViewModel(
-            getBluetoothAdapterStateUseCase,
-            getAppleDevicesUseCase,
-            getOverlaySettingsUseCase,
-            checkUpdateUseCase,
-            themeSettingsUseCase,
-        )
+        viewModel =
+            SettingsViewModel(
+                getBluetoothAdapterStateUseCase,
+                getAppleDevicesUseCase,
+                getOverlaySettingsUseCase,
+                checkUpdateUseCase,
+                themeSettingsUseCase,
+            )
     }
 
     @After
@@ -68,23 +69,30 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun `refreshOverlayStateでisEnabledの最新値が反映される`() = runTest {
-        // combineはすべてのupstreamが1回以上emitするまで値を出さないため、
-        // bluetoothFlowに初期値を流してcombineを動作可能にする
-        fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
-        assertEquals(false, viewModel.uiState.value.overlayEnabled)
+    fun `refreshOverlayStateでisEnabledの最新値が反映される`() =
+        runTest {
+            // combineはすべてのupstreamが1回以上emitするまで値を出さないため、
+            // bluetoothFlowに初期値を流してcombineを動作可能にする
+            fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
+            assertEquals(false, viewModel.uiState.value.overlayEnabled)
 
-        every { getOverlaySettingsUseCase.isEnabled() } returns true
-        viewModel.refreshOverlayState()
+            every { getOverlaySettingsUseCase.isEnabled() } returns true
+            viewModel.refreshOverlayState()
 
-        assertEquals(true, viewModel.uiState.value.overlayEnabled)
-        verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
-        verify(exactly = 1) { getAppleDevicesUseCase.observe() }
-        // コンストラクタで1回 + refreshOverlayState()で1回 = 合計2回
-        verify(exactly = 2) { getOverlaySettingsUseCase.isEnabled() }
-        verify(exactly = 1) { themeSettingsUseCase.observe() }
-        confirmVerified(getBluetoothAdapterStateUseCase, getAppleDevicesUseCase, getOverlaySettingsUseCase, checkUpdateUseCase, themeSettingsUseCase)
-    }
+            assertEquals(true, viewModel.uiState.value.overlayEnabled)
+            verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
+            verify(exactly = 1) { getAppleDevicesUseCase.observe() }
+            // コンストラクタで1回 + refreshOverlayState()で1回 = 合計2回
+            verify(exactly = 2) { getOverlaySettingsUseCase.isEnabled() }
+            verify(exactly = 1) { themeSettingsUseCase.observe() }
+            confirmVerified(
+                getBluetoothAdapterStateUseCase,
+                getAppleDevicesUseCase,
+                getOverlaySettingsUseCase,
+                checkUpdateUseCase,
+                themeSettingsUseCase,
+            )
+        }
 
     @Test
     fun `startScanとstopScanでUseCaseのメソッドが呼ばれる`() {
@@ -97,55 +105,82 @@ class SettingsViewModelTest {
         verify(exactly = 1) { getAppleDevicesUseCase.stopScan() }
         verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
         verify(exactly = 1) { themeSettingsUseCase.observe() }
-        confirmVerified(getBluetoothAdapterStateUseCase, getAppleDevicesUseCase, getOverlaySettingsUseCase, checkUpdateUseCase, themeSettingsUseCase)
+        confirmVerified(
+            getBluetoothAdapterStateUseCase,
+            getAppleDevicesUseCase,
+            getOverlaySettingsUseCase,
+            checkUpdateUseCase,
+            themeSettingsUseCase,
+        )
     }
 
     @Test
-    fun `checkUpdateがtrueを返すとupdateAvailableがtrueになる`() = runTest {
-        fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
-        val version = "0.1.0"
-        coEvery { checkUpdateUseCase(version) } returns true
+    fun `checkUpdateがtrueを返すとupdateAvailableがtrueになる`() =
+        runTest {
+            fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
+            val version = "0.1.0"
+            coEvery { checkUpdateUseCase(version) } returns true
 
-        viewModel.checkUpdate(version)
+            viewModel.checkUpdate(version)
 
-        assertEquals(true, viewModel.uiState.value.updateAvailable)
-        verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
-        verify(exactly = 1) { getAppleDevicesUseCase.observe() }
-        verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
-        verify(exactly = 1) { themeSettingsUseCase.observe() }
-        coVerify(exactly = 1) { checkUpdateUseCase(version) }
-        confirmVerified(getBluetoothAdapterStateUseCase, getAppleDevicesUseCase, getOverlaySettingsUseCase, checkUpdateUseCase, themeSettingsUseCase)
-    }
-
-    @Test
-    fun `checkUpdateがfalseを返すとupdateAvailableがfalseのまま`() = runTest {
-        fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
-        val version = "0.1.0"
-        coEvery { checkUpdateUseCase(version) } returns false
-
-        viewModel.checkUpdate(version)
-
-        assertEquals(false, viewModel.uiState.value.updateAvailable)
-        verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
-        verify(exactly = 1) { getAppleDevicesUseCase.observe() }
-        verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
-        verify(exactly = 1) { themeSettingsUseCase.observe() }
-        coVerify(exactly = 1) { checkUpdateUseCase(version) }
-        confirmVerified(getBluetoothAdapterStateUseCase, getAppleDevicesUseCase, getOverlaySettingsUseCase, checkUpdateUseCase, themeSettingsUseCase)
-    }
+            assertEquals(true, viewModel.uiState.value.updateAvailable)
+            verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
+            verify(exactly = 1) { getAppleDevicesUseCase.observe() }
+            verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
+            verify(exactly = 1) { themeSettingsUseCase.observe() }
+            coVerify(exactly = 1) { checkUpdateUseCase(version) }
+            confirmVerified(
+                getBluetoothAdapterStateUseCase,
+                getAppleDevicesUseCase,
+                getOverlaySettingsUseCase,
+                checkUpdateUseCase,
+                themeSettingsUseCase,
+            )
+        }
 
     @Test
-    fun `updateThemeSettingsでUseCaseのupdateが呼ばれる`() = runTest {
-        val settings = ThemeSettings(themeMode = ThemeMode.LIGHT, useDynamicColor = true)
-        coEvery { themeSettingsUseCase.update(settings) } just Runs
+    fun `checkUpdateがfalseを返すとupdateAvailableがfalseのまま`() =
+        runTest {
+            fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
+            val version = "0.1.0"
+            coEvery { checkUpdateUseCase(version) } returns false
 
-        viewModel.updateThemeSettings(settings)
+            viewModel.checkUpdate(version)
 
-        verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
-        verify(exactly = 1) { getAppleDevicesUseCase.observe() }
-        verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
-        verify(exactly = 1) { themeSettingsUseCase.observe() }
-        coVerify(exactly = 1) { themeSettingsUseCase.update(settings) }
-        confirmVerified(getBluetoothAdapterStateUseCase, getAppleDevicesUseCase, getOverlaySettingsUseCase, checkUpdateUseCase, themeSettingsUseCase)
-    }
+            assertEquals(false, viewModel.uiState.value.updateAvailable)
+            verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
+            verify(exactly = 1) { getAppleDevicesUseCase.observe() }
+            verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
+            verify(exactly = 1) { themeSettingsUseCase.observe() }
+            coVerify(exactly = 1) { checkUpdateUseCase(version) }
+            confirmVerified(
+                getBluetoothAdapterStateUseCase,
+                getAppleDevicesUseCase,
+                getOverlaySettingsUseCase,
+                checkUpdateUseCase,
+                themeSettingsUseCase,
+            )
+        }
+
+    @Test
+    fun `updateThemeSettingsでUseCaseのupdateが呼ばれる`() =
+        runTest {
+            val settings = ThemeSettings(themeMode = ThemeMode.LIGHT, useDynamicColor = true)
+            coEvery { themeSettingsUseCase.update(settings) } just Runs
+
+            viewModel.updateThemeSettings(settings)
+
+            verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
+            verify(exactly = 1) { getAppleDevicesUseCase.observe() }
+            verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
+            verify(exactly = 1) { themeSettingsUseCase.observe() }
+            coVerify(exactly = 1) { themeSettingsUseCase.update(settings) }
+            confirmVerified(
+                getBluetoothAdapterStateUseCase,
+                getAppleDevicesUseCase,
+                getOverlaySettingsUseCase,
+                checkUpdateUseCase,
+                themeSettingsUseCase,
+            )
+        }
 }

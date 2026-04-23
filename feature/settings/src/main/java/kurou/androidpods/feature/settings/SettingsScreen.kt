@@ -6,13 +6,12 @@ import android.net.Uri
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.RadioButton
@@ -22,7 +21,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
-import androidx.compose.ui.Alignment
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,19 +30,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.core.net.toUri
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kurou.androidpods.core.domain.ThemeMode
-import kurou.androidpods.core.domain.ThemeSettings
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,20 +76,22 @@ fun SettingsScreen(
         }
     }
 
-    val overlaySettingsLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartActivityForResult(),
-    ) {
-        viewModel.refreshOverlayState()
-    }
-
-    val launcher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { results ->
-        results.forEach { (permission, granted) ->
-            permissionStates[permission] = granted
+    val overlaySettingsLauncher =
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+        ) {
+            viewModel.refreshOverlayState()
         }
-        initialRequestDone = true
-    }
+
+    val launcher =
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions(),
+        ) { results ->
+            results.forEach { (permission, granted) ->
+                permissionStates[permission] = granted
+            }
+            initialRequestDone = true
+        }
 
     SettingsEffects(
         permissions = permissions,
@@ -108,9 +109,10 @@ fun SettingsScreen(
             onDismiss = { showSettingsDialog = false },
             onConfirm = {
                 showSettingsDialog = false
-                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                    data = Uri.fromParts("package", context.packageName, null)
-                }
+                val intent =
+                    Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = Uri.fromParts("package", context.packageName, null)
+                    }
                 context.startActivity(intent)
             },
         )
@@ -127,11 +129,12 @@ fun SettingsScreen(
         )
     }
 
-    val columns = when (windowWidthSizeClass) {
-        WindowWidthSizeClass.Compact -> 1
-        WindowWidthSizeClass.Medium -> 2
-        else -> 3
-    }
+    val columns =
+        when (windowWidthSizeClass) {
+            WindowWidthSizeClass.Compact -> 1
+            WindowWidthSizeClass.Medium -> 2
+            else -> 3
+        }
 
     val restartServiceMessage = stringResource(R.string.restart_service_completed)
 
@@ -143,9 +146,10 @@ fun SettingsScreen(
         isServiceRestarting = isServiceRestarting,
         columns = columns,
         onPermissionWarningClick = {
-            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                data = Uri.fromParts("package", context.packageName, null)
-            }
+            val intent =
+                Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.fromParts("package", context.packageName, null)
+                }
             context.startActivity(intent)
         },
         onBluetoothWarningClick = {
@@ -162,10 +166,11 @@ fun SettingsScreen(
             context.startActivity(intent)
         },
         onOverlayToggle = {
-            val intent = Intent(
-                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                "package:${context.packageName}".toUri(),
-            )
+            val intent =
+                Intent(
+                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    "package:${context.packageName}".toUri(),
+                )
             overlaySettingsLauncher.launch(intent)
         },
         onRestartServiceClick = {
@@ -198,17 +203,19 @@ private fun SettingsEffects(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        val notGranted = permissions.filter {
-            ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED
-        }
+        val notGranted =
+            permissions.filter {
+                ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED
+            }
         if (notGranted.isNotEmpty()) onLaunchPermissions(notGranted.toTypedArray())
     }
 
     LaunchedEffect(Unit) {
         @Suppress("DEPRECATION")
-        val versionName = runCatching {
-            context.packageManager.getPackageInfo(context.packageName, 0).versionName
-        }.getOrNull() ?: return@LaunchedEffect
+        val versionName =
+            runCatching {
+                context.packageManager.getPackageInfo(context.packageName, 0).versionName
+            }.getOrNull() ?: return@LaunchedEffect
         viewModel.checkUpdate(versionName)
     }
 
@@ -222,9 +229,10 @@ private fun SettingsEffects(
         viewModel.refreshOverlayState()
         onStartScanService()
         if (initialRequestDone) {
-            val hasNotGranted = permissions.any {
-                ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED
-            }
+            val hasNotGranted =
+                permissions.any {
+                    ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED
+                }
             if (hasNotGranted) onShowSettingsDialog()
         }
     }
@@ -297,10 +305,11 @@ private fun ThemeModeDialog(
                 ThemeMode.entries.forEach { mode ->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onModeSelected(mode) }
-                            .padding(vertical = 4.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .clickable { onModeSelected(mode) }
+                                .padding(vertical = 4.dp),
                     ) {
                         RadioButton(
                             selected = mode == currentMode,

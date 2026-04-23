@@ -10,8 +10,6 @@ import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.os.SystemClock
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kurou.androidpods.core.domain.AppleDevice
-import kurou.androidpods.core.domain.AppleDeviceRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -21,6 +19,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kurou.androidpods.core.domain.AppleDevice
+import kurou.androidpods.core.domain.AppleDeviceRepository
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -28,6 +28,7 @@ import javax.inject.Singleton
 // --- BLE Manufacturer Specific Data の定数 ---
 // Apple の Bluetooth SIG 登録企業ID
 private const val APPLE_COMPANY_ID = 0x004C
+
 // AirPods等が発信する「Proximity Pairing」プロトコルの識別子とデータ長
 private const val PROXIMITY_PAIRING_TYPE: Byte = 0x07
 private const val PROXIMITY_PAIRING_LENGTH: Byte = 0x19
@@ -36,6 +37,7 @@ private const val AIRPODS_DATA_LENGTH = 27
 // --- デバイス管理の定数 ---
 // この時間(ms)ビーコンを受信しなかったデバイスは「範囲外」として一覧から除去する
 private const val DEVICE_TIMEOUT_MS = 5_000L
+
 // 範囲外デバイスの除去処理を実行する間隔(ms)
 private const val CLEANUP_INTERVAL_MS = 1_000L
 
@@ -53,15 +55,17 @@ private const val CLEANUP_INTERVAL_MS = 1_000L
 internal class AppleDeviceRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : AppleDeviceRepository {
-
     private val bluetoothManager =
         context.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
 
     private var scanner: BluetoothLeScanner? = null
+
     /** 検出中のデバイス一覧。キーはモデルコードの文字列表現 */
     private val _devices = MutableStateFlow<Map<String, AppleDevice>>(emptyMap())
+
     /** 各デバイスのビーコンを最後に受信した時刻（SystemClock.elapsedRealtime ベース） */
     private val lastSeenAt = ConcurrentHashMap<String, Long>()
+
     /** 範囲外デバイスの定期クリーンアップ用スコープ */
     private val scope = CoroutineScope(Dispatchers.Default)
     private var cleanupJob: Job? = null
@@ -71,17 +75,21 @@ internal class AppleDeviceRepositoryImpl @Inject constructor(
      * reportDelay > 0 に設定しているため通常は [onBatchScanResults] が呼ばれるが、
      * 端末によっては [onScanResult] が呼ばれるケースもあるため両方をハンドルする。
      */
-    private val scanCallback = object : ScanCallback() {
-        override fun onScanResult(callbackType: Int, result: ScanResult) {
-            handleResult(result)
-        }
-
-        override fun onBatchScanResults(results: MutableList<ScanResult>) {
-            for (result in results) {
+    private val scanCallback =
+        object : ScanCallback() {
+            override fun onScanResult(
+                callbackType: Int,
+                result: ScanResult,
+            ) {
                 handleResult(result)
             }
+
+            override fun onBatchScanResults(results: MutableList<ScanResult>) {
+                for (result in results) {
+                    handleResult(result)
+                }
+            }
         }
-    }
 
     /**
      * スキャン結果1件を処理する。
@@ -126,23 +134,29 @@ internal class AppleDeviceRepositoryImpl @Inject constructor(
         // --- スキャンフィルタの構築 ---
         // 27バイトの Manufacturer Specific Data のうち先頭2バイト（type と length）だけを
         // マスクで比較し、Proximity Pairing プロトコルのビーコンのみを通す
-        val manufacturerData = ByteArray(AIRPODS_DATA_LENGTH).apply {
-            this[0] = PROXIMITY_PAIRING_TYPE  // 0x07
-            this[1] = PROXIMITY_PAIRING_LENGTH // 0x19
-        }
-        val manufacturerDataMask = ByteArray(AIRPODS_DATA_LENGTH).apply {
-            this[0] = 0xFF.toByte() // 先頭2バイトのみ完全一致で比較
-            this[1] = 0xFF.toByte()
-        }
-        val filter = ScanFilter.Builder()
-            .setManufacturerData(APPLE_COMPANY_ID, manufacturerData, manufacturerDataMask)
-            .build()
+        val manufacturerData =
+            ByteArray(AIRPODS_DATA_LENGTH).apply {
+                this[0] = PROXIMITY_PAIRING_TYPE // 0x07
+                this[1] = PROXIMITY_PAIRING_LENGTH // 0x19
+            }
+        val manufacturerDataMask =
+            ByteArray(AIRPODS_DATA_LENGTH).apply {
+                this[0] = 0xFF.toByte() // 先頭2バイトのみ完全一致で比較
+                this[1] = 0xFF.toByte()
+            }
+        val filter =
+            ScanFilter
+                .Builder()
+                .setManufacturerData(APPLE_COMPANY_ID, manufacturerData, manufacturerDataMask)
+                .build()
 
         // reportDelay=1ms に設定。0 だと一部端末でビーコンを取りこぼす問題がある
-        val settings = ScanSettings.Builder()
-            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-            .setReportDelay(1)
-            .build()
+        val settings =
+            ScanSettings
+                .Builder()
+                .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+                .setReportDelay(1)
+                .build()
 
         try {
             btScanner.startScan(listOf(filter), settings, scanCallback)
@@ -151,12 +165,13 @@ internal class AppleDeviceRepositoryImpl @Inject constructor(
 
         // 一定間隔で、ビーコンが途絶えたデバイスを一覧から除去するジョブを起動
         cleanupJob?.cancel()
-        cleanupJob = scope.launch {
-            while (isActive) {
-                delay(CLEANUP_INTERVAL_MS)
-                removeStaleDevices()
+        cleanupJob =
+            scope.launch {
+                while (isActive) {
+                    delay(CLEANUP_INTERVAL_MS)
+                    removeStaleDevices()
+                }
             }
-        }
     }
 
     /** BLE スキャンを停止し、検出済みデバイスの一覧をクリアする。 */
@@ -212,7 +227,11 @@ internal class AppleDeviceRepositoryImpl @Inject constructor(
  *
  * @return パース成功時は [AppleDevice]、データが Proximity Pairing 形式でなければ null
  */
-internal fun parseProximityPairingData(data: ByteArray, address: String, rssi: Int): AppleDevice? {
+internal fun parseProximityPairingData(
+    data: ByteArray,
+    address: String,
+    rssi: Int,
+): AppleDevice? {
     if (data.size != AIRPODS_DATA_LENGTH || data[0] != PROXIMITY_PAIRING_TYPE) return null
 
     // data[3..4] からモデルコード（16bit）を組み立てる

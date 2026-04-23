@@ -14,7 +14,6 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [35])
 class PermissionDeniedDialogTest {
-
     @get:Rule
     val composeTestRule = createComposeRule()
 
@@ -25,7 +24,10 @@ class PermissionDeniedDialogTest {
         }
 
         composeTestRule.onNodeWithText("Permission Required").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Bluetooth permissions were denied. Please grant them in Settings.").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(
+                "Bluetooth permissions were denied. Please grant them in Settings.",
+            ).assertIsDisplayed()
     }
 
     @Test

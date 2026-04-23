@@ -18,7 +18,6 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [35])
 class OnboardingContentTest {
-
     @get:Rule
     val composeTestRule = createComposeRule()
 
@@ -38,10 +37,11 @@ class OnboardingContentTest {
     @Test
     fun `ページ1はGrant Permissionボタンとアニメーションが表示される`() {
         composeTestRule.setContent {
-            val pagerState = rememberPagerState(
-                initialPage = PERMISSION_PAGE,
-                pageCount = { PAGE_COUNT },
-            )
+            val pagerState =
+                rememberPagerState(
+                    initialPage = PERMISSION_PAGE,
+                    pageCount = { PAGE_COUNT },
+                )
             OnboardingContent(
                 pagerState = pagerState,
                 onButtonClick = {},
@@ -55,10 +55,11 @@ class OnboardingContentTest {
     @Test
     fun `ページ2はAllow Overlayボタンとアニメーションが表示される`() {
         composeTestRule.setContent {
-            val pagerState = rememberPagerState(
-                initialPage = OVERLAY_PAGE,
-                pageCount = { PAGE_COUNT },
-            )
+            val pagerState =
+                rememberPagerState(
+                    initialPage = OVERLAY_PAGE,
+                    pageCount = { PAGE_COUNT },
+                )
             OnboardingContent(
                 pagerState = pagerState,
                 onButtonClick = {},
@@ -72,10 +73,11 @@ class OnboardingContentTest {
     @Test
     fun `ページ3はEnable Bluetoothボタンとアニメーションが表示される`() {
         composeTestRule.setContent {
-            val pagerState = rememberPagerState(
-                initialPage = BLUETOOTH_PAGE,
-                pageCount = { PAGE_COUNT },
-            )
+            val pagerState =
+                rememberPagerState(
+                    initialPage = BLUETOOTH_PAGE,
+                    pageCount = { PAGE_COUNT },
+                )
             OnboardingContent(
                 pagerState = pagerState,
                 onButtonClick = {},

@@ -27,11 +27,12 @@ fun DevicesScreen(
     viewModel: DevicesViewModel = hiltViewModel(),
 ) {
     val devices by viewModel.devices.collectAsStateWithLifecycle()
-    val columns = when (windowWidthSizeClass) {
-        WindowWidthSizeClass.Compact -> 2
-        WindowWidthSizeClass.Medium -> 3
-        else -> 4
-    }
+    val columns =
+        when (windowWidthSizeClass) {
+            WindowWidthSizeClass.Compact -> 2
+            WindowWidthSizeClass.Medium -> 3
+            else -> 4
+        }
 
     Scaffold(
         modifier = modifier,

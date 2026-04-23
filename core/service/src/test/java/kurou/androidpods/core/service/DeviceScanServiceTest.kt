@@ -1,7 +1,7 @@
 package kurou.androidpods.core.service
 
-import android.bluetooth.BluetoothAdapter
 import android.app.NotificationManager
+import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -35,22 +35,22 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [35], application = HiltTestApplication::class)
 class DeviceScanServiceTest {
-
     @get:Rule
     val hiltRule = HiltAndroidRule(this)
 
     private val testDispatcher = UnconfinedTestDispatcher()
     private lateinit var controller: ServiceController<DeviceScanService>
 
-    private val baseDevice = AppleDevice(
-        address = "00:00:00:00:00:00",
-        modelName = "AirPods Pro",
-        modelCode = 0,
-        rssi = -50,
-        leftBattery = 5,
-        rightBattery = 5,
-        caseBattery = 5,
-    )
+    private val baseDevice =
+        AppleDevice(
+            address = "00:00:00:00:00:00",
+            modelName = "AirPods Pro",
+            modelCode = 0,
+            rssi = -50,
+            leftBattery = 5,
+            rightBattery = 5,
+            caseBattery = 5,
+        )
 
     @Before
     fun setUp() {
@@ -122,12 +122,13 @@ class DeviceScanServiceTest {
     fun `デバイス更新時に通知テキストが更新される`() {
         controller.create().startCommand(0, 0)
 
-        val device = baseDevice.copy(
-            address = "AA:BB:CC:DD:EE:FF",
-            leftBattery = 8,
-            rightBattery = 7,
-            caseBattery = 5,
-        )
+        val device =
+            baseDevice.copy(
+                address = "AA:BB:CC:DD:EE:FF",
+                leftBattery = 8,
+                rightBattery = 7,
+                caseBattery = 5,
+            )
         fakeDevicesFlow.tryEmit(mapOf(device.address to device))
 
         val context = ApplicationProvider.getApplicationContext<Context>()
@@ -180,17 +181,19 @@ class DeviceScanServiceTest {
 
     @Test
     fun `非singleデバイスはL R Caseを表示する`() {
-        val result = formatDevicesSummary(
-            listOf(baseDevice.copy(leftBattery = 5, rightBattery = 7, caseBattery = 3)),
-        )
+        val result =
+            formatDevicesSummary(
+                listOf(baseDevice.copy(leftBattery = 5, rightBattery = 7, caseBattery = 3)),
+            )
         assertEquals("AirPods Pro — L:55% R:75% Case:35%", result)
     }
 
     @Test
     fun `バッテリーがnullの場合はハイフンを表示する`() {
-        val result = formatDevicesSummary(
-            listOf(baseDevice.copy(leftBattery = null, rightBattery = null, caseBattery = null)),
-        )
+        val result =
+            formatDevicesSummary(
+                listOf(baseDevice.copy(leftBattery = null, rightBattery = null, caseBattery = null)),
+            )
         assertEquals("AirPods Pro — L:-- R:-- Case:--", result)
     }
 
@@ -208,10 +211,11 @@ class DeviceScanServiceTest {
 
     @Test
     fun `複数デバイスは改行区切りで表示する`() {
-        val devices = listOf(
-            baseDevice.copy(leftBattery = 5, rightBattery = 7, caseBattery = 3),
-            baseDevice.copy(modelName = "AirPods Max", isSingle = true, leftBattery = 8),
-        )
+        val devices =
+            listOf(
+                baseDevice.copy(leftBattery = 5, rightBattery = 7, caseBattery = 3),
+                baseDevice.copy(modelName = "AirPods Max", isSingle = true, leftBattery = 8),
+            )
         val result = formatDevicesSummary(devices)
         assertEquals("AirPods Pro — L:55% R:75% Case:35%\nAirPods Max — 85%", result)
     }
@@ -226,30 +230,30 @@ class DeviceScanServiceTest {
 
     @Test
     fun `非充電時の各レベルで正しいアイコンを返す`() {
-        assertEquals(R.drawable.icon_battery_5_19, batteryIconRes(0, false))   // 5%
-        assertEquals(R.drawable.icon_battery_5_19, batteryIconRes(1, false))   // 15%
-        assertEquals(R.drawable.icon_battery_20_39, batteryIconRes(2, false))  // 25%
-        assertEquals(R.drawable.icon_battery_20_39, batteryIconRes(3, false))  // 35%
-        assertEquals(R.drawable.icon_battery_40_59, batteryIconRes(4, false))  // 45%
-        assertEquals(R.drawable.icon_battery_40_59, batteryIconRes(5, false))  // 55%
-        assertEquals(R.drawable.icon_battery_60_79, batteryIconRes(6, false))  // 65%
-        assertEquals(R.drawable.icon_battery_60_79, batteryIconRes(7, false))  // 75%
-        assertEquals(R.drawable.icon_battery_80_94, batteryIconRes(8, false))  // 85%
+        assertEquals(R.drawable.icon_battery_5_19, batteryIconRes(0, false)) // 5%
+        assertEquals(R.drawable.icon_battery_5_19, batteryIconRes(1, false)) // 15%
+        assertEquals(R.drawable.icon_battery_20_39, batteryIconRes(2, false)) // 25%
+        assertEquals(R.drawable.icon_battery_20_39, batteryIconRes(3, false)) // 35%
+        assertEquals(R.drawable.icon_battery_40_59, batteryIconRes(4, false)) // 45%
+        assertEquals(R.drawable.icon_battery_40_59, batteryIconRes(5, false)) // 55%
+        assertEquals(R.drawable.icon_battery_60_79, batteryIconRes(6, false)) // 65%
+        assertEquals(R.drawable.icon_battery_60_79, batteryIconRes(7, false)) // 75%
+        assertEquals(R.drawable.icon_battery_80_94, batteryIconRes(8, false)) // 85%
         assertEquals(R.drawable.icon_battery_95_100, batteryIconRes(9, false)) // 95%
     }
 
     @Test
     fun `充電中の各レベルで正しいアイコンを返す`() {
-        assertEquals(R.drawable.icon_battery_charging_0_19, batteryIconRes(0, true))   // 5%
-        assertEquals(R.drawable.icon_battery_charging_0_19, batteryIconRes(1, true))   // 15%
-        assertEquals(R.drawable.icon_battery_charging_20_39, batteryIconRes(2, true))  // 25%
-        assertEquals(R.drawable.icon_battery_charging_20_39, batteryIconRes(3, true))  // 35%
-        assertEquals(R.drawable.icon_battery_charging_40_59, batteryIconRes(4, true))  // 45%
-        assertEquals(R.drawable.icon_battery_charging_40_59, batteryIconRes(5, true))  // 55%
-        assertEquals(R.drawable.icon_battery_charging_60_79, batteryIconRes(6, true))  // 65%
-        assertEquals(R.drawable.icon_battery_charging_60_79, batteryIconRes(7, true))  // 75%
-        assertEquals(R.drawable.icon_battery_charging_80_94, batteryIconRes(8, true))  // 85%
-        assertEquals(R.drawable.icon_battery_charging_95_99, batteryIconRes(9, true))  // 95%
+        assertEquals(R.drawable.icon_battery_charging_0_19, batteryIconRes(0, true)) // 5%
+        assertEquals(R.drawable.icon_battery_charging_0_19, batteryIconRes(1, true)) // 15%
+        assertEquals(R.drawable.icon_battery_charging_20_39, batteryIconRes(2, true)) // 25%
+        assertEquals(R.drawable.icon_battery_charging_20_39, batteryIconRes(3, true)) // 35%
+        assertEquals(R.drawable.icon_battery_charging_40_59, batteryIconRes(4, true)) // 45%
+        assertEquals(R.drawable.icon_battery_charging_40_59, batteryIconRes(5, true)) // 55%
+        assertEquals(R.drawable.icon_battery_charging_60_79, batteryIconRes(6, true)) // 65%
+        assertEquals(R.drawable.icon_battery_charging_60_79, batteryIconRes(7, true)) // 75%
+        assertEquals(R.drawable.icon_battery_charging_80_94, batteryIconRes(8, true)) // 85%
+        assertEquals(R.drawable.icon_battery_charging_95_99, batteryIconRes(9, true)) // 95%
     }
 
     @Test
@@ -266,25 +270,29 @@ class DeviceScanServiceTest {
 
     @Test
     fun `TWSデバイスのRemoteViewsが正しいレイアウトを使用する`() {
-        val tws = baseDevice.copy(
-            images = DeviceImages.Tws(
-                left = android.R.drawable.ic_menu_gallery,
-                right = android.R.drawable.ic_menu_gallery,
-                case = android.R.drawable.ic_menu_gallery,
-            ),
-        )
+        val tws =
+            baseDevice.copy(
+                images =
+                    DeviceImages.Tws(
+                        left = android.R.drawable.ic_menu_gallery,
+                        right = android.R.drawable.ic_menu_gallery,
+                        case = android.R.drawable.ic_menu_gallery,
+                    ),
+            )
         val remoteViews = buildDeviceRemoteViews(testPackageName, tws)
         assertEquals(R.layout.notification_device_tws, remoteViews.layoutId)
     }
 
     @Test
     fun `SingleデバイスのRemoteViewsが正しいレイアウトを使用する`() {
-        val single = baseDevice.copy(
-            isSingle = true,
-            images = DeviceImages.Single(
-                body = android.R.drawable.ic_menu_gallery,
-            ),
-        )
+        val single =
+            baseDevice.copy(
+                isSingle = true,
+                images =
+                    DeviceImages.Single(
+                        body = android.R.drawable.ic_menu_gallery,
+                    ),
+            )
         val remoteViews = buildDeviceRemoteViews(testPackageName, single)
         assertEquals(R.layout.notification_device_single, remoteViews.layoutId)
     }
@@ -297,10 +305,11 @@ class DeviceScanServiceTest {
 
     @Test
     fun `折りたたみビューが正しいレイアウトを使用する`() {
-        val devices = listOf(
-            baseDevice.copy(modelName = "Device A"),
-            baseDevice.copy(modelName = "Device B"),
-        )
+        val devices =
+            listOf(
+                baseDevice.copy(modelName = "Device A"),
+                baseDevice.copy(modelName = "Device B"),
+            )
         val collapsedView = buildCollapsedRemoteViews(testPackageName, devices)
         assertEquals(R.layout.notification_collapsed, collapsedView.layoutId)
     }
@@ -321,11 +330,12 @@ class DeviceScanServiceTest {
 
     @Test
     fun `展開ビューが全デバイス分の子ビューを含む`() {
-        val devices = listOf(
-            baseDevice.copy(modelName = "Device A"),
-            baseDevice.copy(modelName = "Device B"),
-            baseDevice.copy(modelName = "Device C"),
-        )
+        val devices =
+            listOf(
+                baseDevice.copy(modelName = "Device A"),
+                baseDevice.copy(modelName = "Device B"),
+                baseDevice.copy(modelName = "Device C"),
+            )
         val expandedView = buildExpandedRemoteViews(testPackageName, devices)
         assertEquals(R.layout.notification_expanded, expandedView.layoutId)
     }
@@ -334,17 +344,19 @@ class DeviceScanServiceTest {
     fun `デバイス更新時に展開ビューが通知に設定される`() {
         controller.create().startCommand(0, 0)
 
-        val tws = baseDevice.copy(
-            address = "AA:BB:CC:DD:EE:FF",
-            leftBattery = 8,
-            rightBattery = 7,
-            caseBattery = 5,
-            images = DeviceImages.Tws(
-                left = android.R.drawable.ic_menu_gallery,
-                right = android.R.drawable.ic_menu_gallery,
-                case = android.R.drawable.ic_menu_gallery,
-            ),
-        )
+        val tws =
+            baseDevice.copy(
+                address = "AA:BB:CC:DD:EE:FF",
+                leftBattery = 8,
+                rightBattery = 7,
+                caseBattery = 5,
+                images =
+                    DeviceImages.Tws(
+                        left = android.R.drawable.ic_menu_gallery,
+                        right = android.R.drawable.ic_menu_gallery,
+                        case = android.R.drawable.ic_menu_gallery,
+                    ),
+            )
         fakeDevicesFlow.tryEmit(mapOf(tws.address to tws))
 
         val context = ApplicationProvider.getApplicationContext<Context>()

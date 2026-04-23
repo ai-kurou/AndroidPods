@@ -27,7 +27,6 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.unmockkAll
 import kotlinx.coroutines.flow.MutableStateFlow
-import kurou.androidpods.core.domain.AppleDevice
 import kurou.androidpods.core.domain.CheckUpdateUseCase
 import kurou.androidpods.core.domain.GetAppleDevicesUseCase
 import kurou.androidpods.core.domain.GetBluetoothAdapterStateUseCase
@@ -47,7 +46,6 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [35])
 class SettingsScreenTest {
-
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
@@ -75,7 +73,13 @@ class SettingsScreenTest {
         every { overlayUseCase.isEnabled() } returns false
         every { themeSettingsUseCase.observe() } returns MutableStateFlow(ThemeSettings())
         coEvery { themeSettingsUseCase.update(ThemeSettings(themeMode = ThemeMode.DARK)) } just Runs
-        return SettingsViewModel(btUseCase, appleDevicesUseCase, overlayUseCase, checkUpdateUseCase, themeSettingsUseCase)
+        return SettingsViewModel(
+            btUseCase,
+            appleDevicesUseCase,
+            overlayUseCase,
+            checkUpdateUseCase,
+            themeSettingsUseCase,
+        )
     }
 
     @Test
@@ -118,9 +122,10 @@ class SettingsScreenTest {
         }
         composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithText(
-            "Some required permissions are not granted. Please grant all permissions."
-        ).performClick()
+        composeTestRule
+            .onNodeWithText(
+                "Some required permissions are not granted. Please grant all permissions.",
+            ).performClick()
         composeTestRule.waitForIdle()
 
         val started = shadowOf(composeTestRule.activity).nextStartedActivity
@@ -144,9 +149,10 @@ class SettingsScreenTest {
         }
         composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithText(
-            "Bluetooth is off. Please enable Bluetooth."
-        ).performClick()
+        composeTestRule
+            .onNodeWithText(
+                "Bluetooth is off. Please enable Bluetooth.",
+            ).performClick()
         composeTestRule.waitForIdle()
 
         val started = shadowOf(composeTestRule.activity).nextStartedActivity

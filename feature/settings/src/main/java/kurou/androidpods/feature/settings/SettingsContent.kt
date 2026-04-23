@@ -187,12 +187,13 @@ internal fun SettingsContent(
 private fun PermissionWarningBanner(onClick: () -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.errorContainer)
-            .clickable(onClick = onClick)
-            .padding(12.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+                .background(MaterialTheme.colorScheme.errorContainer)
+                .clickable(onClick = onClick)
+                .padding(12.dp),
     ) {
         Icon(
             imageVector = Icons.Filled.Warning,
@@ -220,25 +221,32 @@ private fun BluetoothWarningBanner(
     isBluetoothOff: Boolean,
     onBluetoothWarningClick: () -> Unit,
 ) {
-    val backgroundColor = if (isBluetoothUnavailable)
-        MaterialTheme.colorScheme.error
-    else
-        MaterialTheme.colorScheme.errorContainer
-    val contentColor = if (isBluetoothUnavailable)
-        MaterialTheme.colorScheme.onError
-    else
-        MaterialTheme.colorScheme.onErrorContainer
+    val backgroundColor =
+        if (isBluetoothUnavailable) {
+            MaterialTheme.colorScheme.error
+        } else {
+            MaterialTheme.colorScheme.errorContainer
+        }
+    val contentColor =
+        if (isBluetoothUnavailable) {
+            MaterialTheme.colorScheme.onError
+        } else {
+            MaterialTheme.colorScheme.onErrorContainer
+        }
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
-            .background(backgroundColor)
-            .then(
-                if (isBluetoothOff) Modifier.clickable(onClick = onBluetoothWarningClick)
-                else Modifier
-            )
-            .padding(12.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+                .background(backgroundColor)
+                .then(
+                    if (isBluetoothOff) {
+                        Modifier.clickable(onClick = onBluetoothWarningClick)
+                    } else {
+                        Modifier
+                    },
+                ).padding(12.dp),
     ) {
         Icon(
             imageVector = Icons.Filled.Warning,
@@ -248,19 +256,24 @@ private fun BluetoothWarningBanner(
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = stringResource(
-                if (isBluetoothUnavailable) R.string.bluetooth_not_supported
-                else R.string.bluetooth_warning
-            ),
+            text =
+                stringResource(
+                    if (isBluetoothUnavailable) {
+                        R.string.bluetooth_not_supported
+                    } else {
+                        R.string.bluetooth_warning
+                    },
+                ),
             color = contentColor,
             modifier = Modifier.weight(1f),
         )
-        if (isBluetoothOff)
+        if (isBluetoothOff) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = null,
                 tint = contentColor,
             )
+        }
     }
 }
 
@@ -268,12 +281,13 @@ private fun BluetoothWarningBanner(
 private fun UpdateAvailableBanner(onClick: () -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.primaryContainer)
-            .clickable(onClick = onClick)
-            .padding(12.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+                .background(MaterialTheme.colorScheme.primaryContainer)
+                .clickable(onClick = onClick)
+                .padding(12.dp),
     ) {
         Icon(
             imageVector = Icons.Filled.Warning,
@@ -306,12 +320,13 @@ private fun SettingsItem(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .then(if (onClick != null && enabled) Modifier.clickable(onClick = onClick) else Modifier)
-            .padding(12.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .then(if (onClick != null && enabled) Modifier.clickable(onClick = onClick) else Modifier)
+                .padding(12.dp),
     ) {
         Icon(
             painter = icon,
@@ -335,20 +350,22 @@ private fun SettingsItem(
     }
 }
 
-internal fun ThemeMode.toStringRes(): Int = when (this) {
-    ThemeMode.SYSTEM -> R.string.theme_mode_system
-    ThemeMode.LIGHT -> R.string.theme_mode_light
-    ThemeMode.DARK -> R.string.theme_mode_dark
-}
+internal fun ThemeMode.toStringRes(): Int =
+    when (this) {
+        ThemeMode.SYSTEM -> R.string.theme_mode_system
+        ThemeMode.LIGHT -> R.string.theme_mode_light
+        ThemeMode.DARK -> R.string.theme_mode_dark
+    }
 
 @Preview(showBackground = true, widthDp = 400, heightDp = 700)
 @Composable
 private fun SettingsContentPreviewNoWarning() {
     SettingsContent(
-        permissionStates = mapOf(
-            android.Manifest.permission.BLUETOOTH_CONNECT to true,
-            android.Manifest.permission.BLUETOOTH_SCAN to true,
-        ),
+        permissionStates =
+            mapOf(
+                android.Manifest.permission.BLUETOOTH_CONNECT to true,
+                android.Manifest.permission.BLUETOOTH_SCAN to true,
+            ),
         bluetoothAdapterState = BluetoothAdapter.STATE_ON,
         overlayEnabled = true,
         updateAvailable = false,
@@ -396,10 +413,11 @@ private fun SettingsContentPreviewBluetoothUnavailable() {
 @Composable
 private fun SettingsContentPreviewAllWarnings() {
     SettingsContent(
-        permissionStates = mapOf(
-            android.Manifest.permission.BLUETOOTH_CONNECT to false,
-            android.Manifest.permission.BLUETOOTH_SCAN to false,
-        ),
+        permissionStates =
+            mapOf(
+                android.Manifest.permission.BLUETOOTH_CONNECT to false,
+                android.Manifest.permission.BLUETOOTH_SCAN to false,
+            ),
         bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
         overlayEnabled = false,
         updateAvailable = true,
@@ -423,10 +441,11 @@ private fun SettingsContentPreviewAllWarnings() {
 @Composable
 private fun SettingsContentPreviewServiceRestarting() {
     SettingsContent(
-        permissionStates = mapOf(
-            android.Manifest.permission.BLUETOOTH_CONNECT to true,
-            android.Manifest.permission.BLUETOOTH_SCAN to true,
-        ),
+        permissionStates =
+            mapOf(
+                android.Manifest.permission.BLUETOOTH_CONNECT to true,
+                android.Manifest.permission.BLUETOOTH_SCAN to true,
+            ),
         bluetoothAdapterState = BluetoothAdapter.STATE_ON,
         overlayEnabled = true,
         updateAvailable = false,
@@ -450,10 +469,11 @@ private fun SettingsContentPreviewServiceRestarting() {
 @Composable
 private fun SettingsContentPreviewTwoColumns() {
     SettingsContent(
-        permissionStates = mapOf(
-            android.Manifest.permission.BLUETOOTH_CONNECT to false,
-            android.Manifest.permission.BLUETOOTH_SCAN to false,
-        ),
+        permissionStates =
+            mapOf(
+                android.Manifest.permission.BLUETOOTH_CONNECT to false,
+                android.Manifest.permission.BLUETOOTH_SCAN to false,
+            ),
         bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
         overlayEnabled = false,
         updateAvailable = true,
@@ -477,10 +497,11 @@ private fun SettingsContentPreviewTwoColumns() {
 @Composable
 private fun SettingsContentPreviewThreeColumns() {
     SettingsContent(
-        permissionStates = mapOf(
-            android.Manifest.permission.BLUETOOTH_CONNECT to false,
-            android.Manifest.permission.BLUETOOTH_SCAN to false,
-        ),
+        permissionStates =
+            mapOf(
+                android.Manifest.permission.BLUETOOTH_CONNECT to false,
+                android.Manifest.permission.BLUETOOTH_SCAN to false,
+            ),
         bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
         overlayEnabled = false,
         updateAvailable = true,

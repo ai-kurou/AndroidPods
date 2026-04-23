@@ -13,7 +13,6 @@ import org.junit.Before
 import org.junit.Test
 
 class OverlaySettingsRepositoryImplTest {
-
     private val context = mockk<Context>()
     private val repository = OverlaySettingsRepositoryImpl(context)
 
