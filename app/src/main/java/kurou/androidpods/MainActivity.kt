@@ -8,6 +8,7 @@ import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSiz
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.getValue
+import androidx.core.view.WindowCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
@@ -25,7 +26,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             val viewModel: MainViewModel = hiltViewModel()
             val isFirstLaunch by viewModel.isFirstLaunch.collectAsStateWithLifecycle()
-            val themeSettings by viewModel.themeSettings.collectAsStateWithLifecycle()
+            val themeSettings = viewModel.themeSettings.collectAsStateWithLifecycle().value
+                ?: return@setContent
             val darkTheme = when (themeSettings.themeMode) {
                 ThemeMode.LIGHT -> false
                 ThemeMode.DARK -> true
@@ -35,6 +37,14 @@ class MainActivity : ComponentActivity() {
                 darkTheme = darkTheme,
                 dynamicColor = themeSettings.useDynamicColor,
             ) {
+                val window = this@MainActivity.window
+                androidx.compose.runtime.SideEffect {
+                    WindowCompat.getInsetsController(window, window.decorView).apply {
+                        isAppearanceLightStatusBars = !darkTheme
+                        isAppearanceLightNavigationBars = !darkTheme
+                    }
+                }
+
                 val windowSizeClass = calculateWindowSizeClass(this@MainActivity)
 
                 AppScaffold(

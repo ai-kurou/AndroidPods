@@ -276,6 +276,6 @@ class SettingsScreenTest {
         composeTestRule.onNodeWithText("Dark").performClick()
         composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithText("Light").assertIsNotDisplayed()
+        composeTestRule.onNodeWithText("Light").assertDoesNotExist()
     }
 }
