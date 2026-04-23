@@ -8,12 +8,21 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.ui.unit.dp
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.ui.Alignment
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,6 +43,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.core.net.toUri
+import kurou.androidpods.core.domain.ThemeMode
+import kurou.androidpods.core.domain.ThemeSettings
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,6 +65,7 @@ fun SettingsScreen(
     val permissionStates = remember { mutableStateMapOf<String, Boolean>() }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showSettingsDialog by remember { mutableStateOf(false) }
+    var showThemeModeDialog by remember { mutableStateOf(false) }
     var initialRequestDone by remember { mutableStateOf(false) }
     var isServiceRestarting by remember { mutableStateOf(false) }
 
@@ -100,6 +112,17 @@ fun SettingsScreen(
                     data = Uri.fromParts("package", context.packageName, null)
                 }
                 context.startActivity(intent)
+            },
+        )
+    }
+
+    if (showThemeModeDialog) {
+        ThemeModeDialog(
+            currentMode = uiState.themeSettings.themeMode,
+            onDismiss = { showThemeModeDialog = false },
+            onModeSelected = { mode ->
+                viewModel.updateThemeSettings(uiState.themeSettings.copy(themeMode = mode))
+                showThemeModeDialog = false
             },
         )
     }
@@ -154,6 +177,10 @@ fun SettingsScreen(
                 isServiceRestarting = false
                 snackbarHostState.showSnackbar(restartServiceMessage)
             }
+        },
+        onThemeModeClick = { showThemeModeDialog = true },
+        onDynamicColorToggle = { enabled ->
+            viewModel.updateThemeSettings(uiState.themeSettings.copy(useDynamicColor = enabled))
         },
     )
 }
@@ -219,6 +246,8 @@ private fun SettingsScaffold(
     onGithubClick: () -> Unit,
     onOverlayToggle: (Boolean) -> Unit,
     onRestartServiceClick: () -> Unit,
+    onThemeModeClick: () -> Unit,
+    onDynamicColorToggle: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -238,6 +267,7 @@ private fun SettingsScaffold(
             updateAvailable = uiState.updateAvailable,
             isServiceRestarting = isServiceRestarting,
             columns = columns,
+            themeSettings = uiState.themeSettings,
             onPermissionWarningClick = onPermissionWarningClick,
             onBluetoothWarningClick = onBluetoothWarningClick,
             onUpdateClick = onUpdateClick,
@@ -246,7 +276,46 @@ private fun SettingsScaffold(
             onGithubClick = onGithubClick,
             onOverlayToggle = onOverlayToggle,
             onRestartServiceClick = onRestartServiceClick,
+            onThemeModeClick = onThemeModeClick,
+            onDynamicColorToggle = onDynamicColorToggle,
             modifier = Modifier.padding(innerPadding),
         )
     }
+}
+
+@Composable
+private fun ThemeModeDialog(
+    currentMode: ThemeMode,
+    onDismiss: () -> Unit,
+    onModeSelected: (ThemeMode) -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.theme_mode_label)) },
+        text = {
+            Column {
+                ThemeMode.entries.forEach { mode ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onModeSelected(mode) }
+                            .padding(vertical = 4.dp),
+                    ) {
+                        RadioButton(
+                            selected = mode == currentMode,
+                            onClick = { onModeSelected(mode) },
+                        )
+                        Text(stringResource(mode.toStringRes()))
+                    }
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(android.R.string.cancel))
+            }
+        },
+    )
 }

@@ -1,6 +1,7 @@
 package kurou.androidpods.feature.settings
 
 import android.bluetooth.BluetoothAdapter
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -34,6 +35,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kurou.androidpods.core.domain.ThemeMode
+import kurou.androidpods.core.domain.ThemeSettings
 
 @Composable
 internal fun SettingsContent(
@@ -43,10 +46,13 @@ internal fun SettingsContent(
     updateAvailable: Boolean,
     isServiceRestarting: Boolean,
     columns: Int,
+    themeSettings: ThemeSettings,
     onPermissionWarningClick: () -> Unit,
     onBluetoothWarningClick: () -> Unit,
     onOverlayToggle: (Boolean) -> Unit,
     onRestartServiceClick: () -> Unit,
+    onThemeModeClick: () -> Unit,
+    onDynamicColorToggle: (Boolean) -> Unit,
     onUpdateClick: () -> Unit,
     onLicensesClick: () -> Unit,
     onDevicesClick: () -> Unit,
@@ -107,6 +113,33 @@ internal fun SettingsContent(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                         contentDescription = null,
+                    )
+                }
+            }
+        }
+        item(span = { GridItemSpan(1) }) {
+            SettingsItem(
+                label = stringResource(R.string.theme_mode_label),
+                icon = painterResource(R.drawable.ic_theme),
+                onClick = onThemeModeClick,
+            ) {
+                Text(
+                    text = stringResource(themeSettings.themeMode.toStringRes()),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            item(span = { GridItemSpan(1) }) {
+                SettingsItem(
+                    label = stringResource(R.string.dynamic_color_label),
+                    icon = painterResource(R.drawable.ic_dynamic_color),
+                    onClick = { onDynamicColorToggle(!themeSettings.useDynamicColor) },
+                ) {
+                    Switch(
+                        checked = themeSettings.useDynamicColor,
+                        onCheckedChange = onDynamicColorToggle,
                     )
                 }
             }
@@ -302,6 +335,12 @@ private fun SettingsItem(
     }
 }
 
+internal fun ThemeMode.toStringRes(): Int = when (this) {
+    ThemeMode.SYSTEM -> R.string.theme_mode_system
+    ThemeMode.LIGHT -> R.string.theme_mode_light
+    ThemeMode.DARK -> R.string.theme_mode_dark
+}
+
 @Preview(showBackground = true, widthDp = 400, heightDp = 700)
 @Composable
 private fun SettingsContentPreviewNoWarning() {
@@ -319,6 +358,9 @@ private fun SettingsContentPreviewNoWarning() {
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
         onRestartServiceClick = {},
+        themeSettings = ThemeSettings(),
+        onThemeModeClick = {},
+        onDynamicColorToggle = {},
         onUpdateClick = {},
         onLicensesClick = {},
         onDevicesClick = {},
@@ -340,6 +382,9 @@ private fun SettingsContentPreviewBluetoothUnavailable() {
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
         onRestartServiceClick = {},
+        themeSettings = ThemeSettings(),
+        onThemeModeClick = {},
+        onDynamicColorToggle = {},
         onUpdateClick = {},
         onLicensesClick = {},
         onDevicesClick = {},
@@ -364,6 +409,9 @@ private fun SettingsContentPreviewAllWarnings() {
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
         onRestartServiceClick = {},
+        themeSettings = ThemeSettings(),
+        onThemeModeClick = {},
+        onDynamicColorToggle = {},
         onUpdateClick = {},
         onLicensesClick = {},
         onDevicesClick = {},
@@ -388,6 +436,9 @@ private fun SettingsContentPreviewServiceRestarting() {
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
         onRestartServiceClick = {},
+        themeSettings = ThemeSettings(),
+        onThemeModeClick = {},
+        onDynamicColorToggle = {},
         onUpdateClick = {},
         onLicensesClick = {},
         onDevicesClick = {},
@@ -412,6 +463,9 @@ private fun SettingsContentPreviewTwoColumns() {
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
         onRestartServiceClick = {},
+        themeSettings = ThemeSettings(),
+        onThemeModeClick = {},
+        onDynamicColorToggle = {},
         onUpdateClick = {},
         onLicensesClick = {},
         onDevicesClick = {},
@@ -436,6 +490,9 @@ private fun SettingsContentPreviewThreeColumns() {
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
         onRestartServiceClick = {},
+        themeSettings = ThemeSettings(),
+        onThemeModeClick = {},
+        onDynamicColorToggle = {},
         onUpdateClick = {},
         onLicensesClick = {},
         onDevicesClick = {},

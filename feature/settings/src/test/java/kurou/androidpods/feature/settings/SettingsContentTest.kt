@@ -3,9 +3,15 @@ package kurou.androidpods.feature.settings
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasScrollAction
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
+import kurou.androidpods.core.domain.ThemeSettings
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -37,6 +43,9 @@ class SettingsContentTest {
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
                 onRestartServiceClick = {},
+                themeSettings = ThemeSettings(),
+                onThemeModeClick = {},
+                onDynamicColorToggle = {},
                 onUpdateClick = {},
                 onLicensesClick = {},
                 onDevicesClick = {},
@@ -67,6 +76,9 @@ class SettingsContentTest {
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
                 onRestartServiceClick = {},
+                themeSettings = ThemeSettings(),
+                onThemeModeClick = {},
+                onDynamicColorToggle = {},
                 onUpdateClick = {},
                 onLicensesClick = {},
                 onDevicesClick = {},
@@ -95,6 +107,9 @@ class SettingsContentTest {
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
                 onRestartServiceClick = {},
+                themeSettings = ThemeSettings(),
+                onThemeModeClick = {},
+                onDynamicColorToggle = {},
                 onUpdateClick = {},
                 onLicensesClick = {},
                 onDevicesClick = {},
@@ -122,6 +137,9 @@ class SettingsContentTest {
                 onBluetoothWarningClick = { clicked = true },
                 onOverlayToggle = {},
                 onRestartServiceClick = {},
+                themeSettings = ThemeSettings(),
+                onThemeModeClick = {},
+                onDynamicColorToggle = {},
                 onUpdateClick = {},
                 onLicensesClick = {},
                 onDevicesClick = {},
@@ -151,6 +169,9 @@ class SettingsContentTest {
                 onBluetoothWarningClick = { clicked = true },
                 onOverlayToggle = {},
                 onRestartServiceClick = {},
+                themeSettings = ThemeSettings(),
+                onThemeModeClick = {},
+                onDynamicColorToggle = {},
                 onUpdateClick = {},
                 onLicensesClick = {},
                 onDevicesClick = {},
@@ -180,6 +201,9 @@ class SettingsContentTest {
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
                 onRestartServiceClick = {},
+                themeSettings = ThemeSettings(),
+                onThemeModeClick = {},
+                onDynamicColorToggle = {},
                 onUpdateClick = {},
                 onLicensesClick = {},
                 onDevicesClick = { clicked = true },
@@ -187,6 +211,7 @@ class SettingsContentTest {
             )
         }
 
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Compatible devices"))
         composeTestRule.onNodeWithText("Compatible devices").performClick()
 
         assertTrue(clicked)
@@ -207,6 +232,9 @@ class SettingsContentTest {
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
                 onRestartServiceClick = {},
+                themeSettings = ThemeSettings(),
+                onThemeModeClick = {},
+                onDynamicColorToggle = {},
                 onUpdateClick = {},
                 onLicensesClick = { clicked = true },
                 onDevicesClick = {},
@@ -214,6 +242,7 @@ class SettingsContentTest {
             )
         }
 
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Open Source Licenses"))
         composeTestRule.onNodeWithText("Open Source Licenses").performClick()
 
         assertTrue(clicked)
@@ -234,6 +263,9 @@ class SettingsContentTest {
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
                 onRestartServiceClick = {},
+                themeSettings = ThemeSettings(),
+                onThemeModeClick = {},
+                onDynamicColorToggle = {},
                 onUpdateClick = {},
                 onLicensesClick = {},
                 onDevicesClick = {},
@@ -241,6 +273,7 @@ class SettingsContentTest {
             )
         }
 
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("GitHub Repository"))
         composeTestRule.onNodeWithText("GitHub Repository").performClick()
 
         assertTrue(clicked)
@@ -261,6 +294,9 @@ class SettingsContentTest {
                 onBluetoothWarningClick = {},
                 onOverlayToggle = { toggledValue = it },
                 onRestartServiceClick = {},
+                themeSettings = ThemeSettings(),
+                onThemeModeClick = {},
+                onDynamicColorToggle = {},
                 onUpdateClick = {},
                 onLicensesClick = {},
                 onDevicesClick = {},
@@ -268,6 +304,7 @@ class SettingsContentTest {
             )
         }
 
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Show battery overlay"))
         composeTestRule.onNodeWithText("Show battery overlay").performClick()
 
         assertTrue(toggledValue == true)
@@ -288,6 +325,9 @@ class SettingsContentTest {
                 onBluetoothWarningClick = {},
                 onOverlayToggle = { toggledValue = it },
                 onRestartServiceClick = {},
+                themeSettings = ThemeSettings(),
+                onThemeModeClick = {},
+                onDynamicColorToggle = {},
                 onUpdateClick = {},
                 onLicensesClick = {},
                 onDevicesClick = {},
@@ -295,6 +335,7 @@ class SettingsContentTest {
             )
         }
 
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Show battery overlay"))
         composeTestRule.onNodeWithText("Show battery overlay").performClick()
 
         assertTrue(toggledValue == false)
@@ -315,6 +356,9 @@ class SettingsContentTest {
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
                 onRestartServiceClick = { clicked = true },
+                themeSettings = ThemeSettings(),
+                onThemeModeClick = {},
+                onDynamicColorToggle = {},
                 onUpdateClick = {},
                 onLicensesClick = {},
                 onDevicesClick = {},
@@ -322,6 +366,7 @@ class SettingsContentTest {
             )
         }
 
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Restart scan service"))
         composeTestRule.onNodeWithText("Restart scan service").performClick()
 
         assertTrue(clicked)
@@ -342,6 +387,9 @@ class SettingsContentTest {
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
                 onRestartServiceClick = { clicked = true },
+                themeSettings = ThemeSettings(),
+                onThemeModeClick = {},
+                onDynamicColorToggle = {},
                 onUpdateClick = {},
                 onLicensesClick = {},
                 onDevicesClick = {},
@@ -349,6 +397,7 @@ class SettingsContentTest {
             )
         }
 
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Restart scan service"))
         composeTestRule.onNodeWithText("Restart scan service").performClick()
 
         assertTrue(!clicked)
@@ -369,6 +418,9 @@ class SettingsContentTest {
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
                 onRestartServiceClick = {},
+                themeSettings = ThemeSettings(),
+                onThemeModeClick = {},
+                onDynamicColorToggle = {},
                 onUpdateClick = { clicked = true },
                 onLicensesClick = {},
                 onDevicesClick = {},
@@ -381,5 +433,126 @@ class SettingsContentTest {
         ).performClick()
 
         assertTrue(clicked)
+    }
+
+    @Test
+    fun `テーマアイテムをタップするとonThemeModeClickが呼ばれる`() {
+        var clicked = false
+        composeTestRule.setContent {
+            SettingsContent(
+                permissionStates = emptyMap(),
+                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+                overlayEnabled = false,
+                updateAvailable = false,
+                isServiceRestarting = false,
+                columns = 1,
+                themeSettings = ThemeSettings(),
+                onPermissionWarningClick = {},
+                onBluetoothWarningClick = {},
+                onOverlayToggle = {},
+                onRestartServiceClick = {},
+                onThemeModeClick = { clicked = true },
+                onDynamicColorToggle = {},
+                onUpdateClick = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                onGithubClick = {},
+            )
+        }
+
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Theme"))
+        composeTestRule.onNodeWithText("Theme").performClick()
+
+        assertTrue(clicked)
+    }
+
+    @Test
+    fun `ダイナミックカラーがオフのときタップするとtrueでonDynamicColorToggleが呼ばれる`() {
+        var toggledValue: Boolean? = null
+        composeTestRule.setContent {
+            SettingsContent(
+                permissionStates = emptyMap(),
+                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+                overlayEnabled = false,
+                updateAvailable = false,
+                isServiceRestarting = false,
+                columns = 1,
+                themeSettings = ThemeSettings(useDynamicColor = false),
+                onPermissionWarningClick = {},
+                onBluetoothWarningClick = {},
+                onOverlayToggle = {},
+                onRestartServiceClick = {},
+                onThemeModeClick = {},
+                onDynamicColorToggle = { toggledValue = it },
+                onUpdateClick = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                onGithubClick = {},
+            )
+        }
+
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Dynamic Color"))
+        composeTestRule.onNodeWithText("Dynamic Color").performClick()
+
+        assertEquals(true, toggledValue)
+    }
+
+    @Test
+    fun `ダイナミックカラーがオンのときタップするとfalseでonDynamicColorToggleが呼ばれる`() {
+        var toggledValue: Boolean? = null
+        composeTestRule.setContent {
+            SettingsContent(
+                permissionStates = emptyMap(),
+                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+                overlayEnabled = false,
+                updateAvailable = false,
+                isServiceRestarting = false,
+                columns = 1,
+                themeSettings = ThemeSettings(useDynamicColor = true),
+                onPermissionWarningClick = {},
+                onBluetoothWarningClick = {},
+                onOverlayToggle = {},
+                onRestartServiceClick = {},
+                onThemeModeClick = {},
+                onDynamicColorToggle = { toggledValue = it },
+                onUpdateClick = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                onGithubClick = {},
+            )
+        }
+
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Dynamic Color"))
+        composeTestRule.onNodeWithText("Dynamic Color").performClick()
+
+        assertEquals(false, toggledValue)
+    }
+
+    @Test
+    @Config(sdk = [30])
+    fun `Android12未満ではダイナミックカラーアイテムが表示されない`() {
+        composeTestRule.setContent {
+            SettingsContent(
+                permissionStates = emptyMap(),
+                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+                overlayEnabled = false,
+                updateAvailable = false,
+                isServiceRestarting = false,
+                columns = 1,
+                themeSettings = ThemeSettings(),
+                onPermissionWarningClick = {},
+                onBluetoothWarningClick = {},
+                onOverlayToggle = {},
+                onRestartServiceClick = {},
+                onThemeModeClick = {},
+                onDynamicColorToggle = {},
+                onUpdateClick = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                onGithubClick = {},
+            )
+        }
+
+        composeTestRule.onNodeWithText("Dynamic Color").assertDoesNotExist()
     }
 }

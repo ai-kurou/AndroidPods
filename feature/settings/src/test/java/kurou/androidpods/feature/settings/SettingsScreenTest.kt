@@ -12,12 +12,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.hasScrollAction
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.test.core.app.ApplicationProvider
+import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import io.mockk.unmockkAll
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,6 +33,8 @@ import kurou.androidpods.core.domain.CheckUpdateUseCase
 import kurou.androidpods.core.domain.GetAppleDevicesUseCase
 import kurou.androidpods.core.domain.GetBluetoothAdapterStateUseCase
 import kurou.androidpods.core.domain.GetOverlaySettingsUseCase
+import kurou.androidpods.core.domain.ThemeSettings
+import kurou.androidpods.core.domain.ThemeSettingsUseCase
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -46,6 +55,7 @@ class SettingsScreenTest {
     private val appleDevicesUseCase = mockk<GetAppleDevicesUseCase>(relaxUnitFun = true)
     private val overlayUseCase = mockk<GetOverlaySettingsUseCase>()
     private val checkUpdateUseCase = mockk<CheckUpdateUseCase>()
+    private val themeSettingsUseCase = mockk<ThemeSettingsUseCase>()
 
     @After
     fun tearDown() {
@@ -64,7 +74,9 @@ class SettingsScreenTest {
         every { appleDevicesUseCase.observe() } returns MutableStateFlow<Map<String, AppleDevice>>(emptyMap())
         every { overlayUseCase.isEnabled() } returns false
         coEvery { checkUpdateUseCase(any()) } returns false
-        return SettingsViewModel(btUseCase, appleDevicesUseCase, overlayUseCase, checkUpdateUseCase)
+        every { themeSettingsUseCase.observe() } returns MutableStateFlow(ThemeSettings())
+        coEvery { themeSettingsUseCase.update(any()) } just Runs
+        return SettingsViewModel(btUseCase, appleDevicesUseCase, overlayUseCase, checkUpdateUseCase, themeSettingsUseCase)
     }
 
     @Test
@@ -159,6 +171,7 @@ class SettingsScreenTest {
         }
         composeTestRule.waitForIdle()
 
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("GitHub Repository"))
         composeTestRule.onNodeWithText("GitHub Repository").performClick()
         composeTestRule.waitForIdle()
 
@@ -213,5 +226,56 @@ class SettingsScreenTest {
         composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithText("Scan service restarted").assertIsDisplayed()
+    }
+
+    @Test
+    fun `テーマアイテムをタップするとダイアログが表示される`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        grantRequiredPermissions(context)
+
+        composeTestRule.setContent {
+            SettingsScreen(
+                windowWidthSizeClass = WindowWidthSizeClass.Compact,
+                onStartScanService = {},
+                onStopScanService = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                viewModel = createViewModel(BluetoothAdapter.STATE_ON),
+            )
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Theme"))
+        composeTestRule.onNodeWithText("Theme").performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Light").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Dark").assertIsDisplayed()
+    }
+
+    @Test
+    fun `ダイアログでモードを選択するとダイアログが閉じる`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        grantRequiredPermissions(context)
+
+        composeTestRule.setContent {
+            SettingsScreen(
+                windowWidthSizeClass = WindowWidthSizeClass.Compact,
+                onStartScanService = {},
+                onStopScanService = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                viewModel = createViewModel(BluetoothAdapter.STATE_ON),
+            )
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Theme"))
+        composeTestRule.onNodeWithText("Theme").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Dark").performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Light").assertIsNotDisplayed()
     }
 }

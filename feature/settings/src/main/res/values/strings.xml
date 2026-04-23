@@ -25,4 +25,9 @@
     <string name="update_available">A new version is available. Tap to update.</string>
     <string name="restart_service">Restart scan service</string>
     <string name="restart_service_completed">Scan service restarted</string>
+    <string name="theme_mode_label">Theme</string>
+    <string name="theme_mode_system">System</string>
+    <string name="theme_mode_light">Light</string>
+    <string name="theme_mode_dark">Dark</string>
+    <string name="dynamic_color_label">Dynamic Color</string>
 </resources>
