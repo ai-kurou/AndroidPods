@@ -12,7 +12,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -33,6 +32,7 @@ import kurou.androidpods.core.domain.CheckUpdateUseCase
 import kurou.androidpods.core.domain.GetAppleDevicesUseCase
 import kurou.androidpods.core.domain.GetBluetoothAdapterStateUseCase
 import kurou.androidpods.core.domain.GetOverlaySettingsUseCase
+import kurou.androidpods.core.domain.ThemeMode
 import kurou.androidpods.core.domain.ThemeSettings
 import kurou.androidpods.core.domain.ThemeSettingsUseCase
 import org.junit.After
@@ -71,11 +71,10 @@ class SettingsScreenTest {
 
     private fun createViewModel(bluetoothAdapterState: Int): SettingsViewModel {
         every { btUseCase.observe() } returns MutableStateFlow(bluetoothAdapterState)
-        every { appleDevicesUseCase.observe() } returns MutableStateFlow<Map<String, AppleDevice>>(emptyMap())
+        every { appleDevicesUseCase.observe() } returns MutableStateFlow(emptyMap())
         every { overlayUseCase.isEnabled() } returns false
-        coEvery { checkUpdateUseCase(any()) } returns false
         every { themeSettingsUseCase.observe() } returns MutableStateFlow(ThemeSettings())
-        coEvery { themeSettingsUseCase.update(any()) } just Runs
+        coEvery { themeSettingsUseCase.update(ThemeSettings(themeMode = ThemeMode.DARK)) } just Runs
         return SettingsViewModel(btUseCase, appleDevicesUseCase, overlayUseCase, checkUpdateUseCase, themeSettingsUseCase)
     }
 
