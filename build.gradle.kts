@@ -12,17 +12,22 @@ plugins {
     alias(libs.plugins.detekt)
 }
 
+val isCI = System.getenv("CI") != null
+
 detekt {
     config.setFrom(files("$rootDir/config/detekt/detekt.yml"))
     buildUponDefaultConfig = true
     allRules = false
-    autoCorrect = false
+    autoCorrect = !isCI
 }
 
 subprojects {
     apply(plugin = "io.gitlab.arturbosch.detekt")
+    extensions.configure<io.gitlab.arturbosch.detekt.extensions.DetektExtension> {
+        autoCorrect = !isCI
+    }
     tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
-        ignoreFailures = true
+        ignoreFailures = false
     }
     dependencies {
         "detektPlugins"(rootProject.libs.detekt.formatting)

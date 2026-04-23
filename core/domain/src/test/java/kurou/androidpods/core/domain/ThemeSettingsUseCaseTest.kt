@@ -14,7 +14,6 @@ import org.junit.Before
 import org.junit.Test
 
 class ThemeSettingsUseCaseTest {
-
     private lateinit var useCase: ThemeSettingsUseCase
     private val repository = mockk<ThemeSettingsRepository>(relaxUnitFun = true)
 
@@ -29,23 +28,25 @@ class ThemeSettingsUseCaseTest {
     }
 
     @Test
-    fun `observeがrepositoryのobserveのFlowを返す`() = runTest {
-        val expected = ThemeSettings(ThemeMode.DARK, useDynamicColor = false)
-        val fakeFlow = MutableStateFlow(expected)
-        every { repository.observe() } returns fakeFlow
+    fun `observeがrepositoryのobserveのFlowを返す`() =
+        runTest {
+            val expected = ThemeSettings(ThemeMode.DARK, useDynamicColor = false)
+            val fakeFlow = MutableStateFlow(expected)
+            every { repository.observe() } returns fakeFlow
 
-        val result = useCase.observe().first()
+            val result = useCase.observe().first()
 
-        assertEquals(expected, result)
-    }
+            assertEquals(expected, result)
+        }
 
     @Test
-    fun `updateでrepositoryのupdateが呼ばれる`() = runTest {
-        val settings = ThemeSettings(ThemeMode.LIGHT, useDynamicColor = true)
+    fun `updateでrepositoryのupdateが呼ばれる`() =
+        runTest {
+            val settings = ThemeSettings(ThemeMode.LIGHT, useDynamicColor = true)
 
-        useCase.update(settings)
+            useCase.update(settings)
 
-        coVerify(exactly = 1) { repository.update(settings) }
-        confirmVerified(repository)
-    }
+            coVerify(exactly = 1) { repository.update(settings) }
+            confirmVerified(repository)
+        }
 }

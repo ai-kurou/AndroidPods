@@ -13,16 +13,15 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import kurou.androidpods.feature.onboarding.R as OnboardingR
-import kurou.androidpods.feature.settings.R as SettingsR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import kurou.androidpods.feature.onboarding.R as OnboardingR
+import kurou.androidpods.feature.settings.R as SettingsR
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class MainActivityTest {
-
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
 
@@ -31,15 +30,16 @@ class MainActivityTest {
 
     @get:Rule(order = 2)
     val grantPermissionRule: GrantPermissionRule =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             GrantPermissionRule.grant(
                 android.Manifest.permission.BLUETOOTH_CONNECT,
                 android.Manifest.permission.BLUETOOTH_SCAN,
             )
-        else
+        } else {
             GrantPermissionRule.grant(
                 android.Manifest.permission.ACCESS_FINE_LOCATION,
             )
+        }
 
     @Test
     fun `MainActivityが起動してボタンを4回押してDevicesScreenが表示される`() {
@@ -53,8 +53,10 @@ class MainActivityTest {
         // (GrantPermissionRuleで権限は自動付与済み)
         val grantPermissionText = activity.getString(OnboardingR.string.onboarding_button_grant_permission)
         composeTestRule.waitUntil(timeoutMillis = 5_000) {
-            composeTestRule.onAllNodesWithText(grantPermissionText)
-                .fetchSemanticsNodes().isNotEmpty()
+            composeTestRule
+                .onAllNodesWithText(grantPermissionText)
+                .fetchSemanticsNodes()
+                .isNotEmpty()
         }
         composeTestRule.onNodeWithText(grantPermissionText).performClick()
 
@@ -62,15 +64,19 @@ class MainActivityTest {
         // canDrawOverlays==trueなら直接次ページへ、falseなら設定画面が開くので戻るボタンで閉じる
         val allowOverlayText = activity.getString(OnboardingR.string.onboarding_button_allow_overlay)
         composeTestRule.waitUntil(timeoutMillis = 5_000) {
-            composeTestRule.onAllNodesWithText(allowOverlayText)
-                .fetchSemanticsNodes().isNotEmpty()
+            composeTestRule
+                .onAllNodesWithText(allowOverlayText)
+                .fetchSemanticsNodes()
+                .isNotEmpty()
         }
 
         val canDrawOverlays = Settings.canDrawOverlays(activity)
         composeTestRule.onNodeWithText(allowOverlayText).performClick()
         if (!canDrawOverlays) {
             Thread.sleep(1_000)
-            InstrumentationRegistry.getInstrumentation().uiAutomation
+            InstrumentationRegistry
+                .getInstrumentation()
+                .uiAutomation
                 .performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK)
         }
 
@@ -88,24 +94,30 @@ class MainActivityTest {
             // BluetoothアダプタありだがBluetoothオフになっている場合はここで失敗するが許容する。
             // Bluetoothはオンでテストを実行し、InstrumentedTestでは画面遷移のみ確認できれば良いため。
             composeTestRule.waitUntil(timeoutMillis = 5_000) {
-                composeTestRule.onAllNodesWithText(enableBluetoothText)
-                    .fetchSemanticsNodes().isNotEmpty()
+                composeTestRule
+                    .onAllNodesWithText(enableBluetoothText)
+                    .fetchSemanticsNodes()
+                    .isNotEmpty()
             }
             composeTestRule.onNodeWithText(enableBluetoothText).performClick()
         }
 
         val overlaySettingLabel = activity.getString(SettingsR.string.overlay_setting_label)
         composeTestRule.waitUntil(timeoutMillis = 5_000) {
-            composeTestRule.onAllNodesWithText(overlaySettingLabel)
-                .fetchSemanticsNodes().isNotEmpty()
+            composeTestRule
+                .onAllNodesWithText(overlaySettingLabel)
+                .fetchSemanticsNodes()
+                .isNotEmpty()
         }
 
         val compatibleDevices = activity.getString(SettingsR.string.compatible_devices)
         composeTestRule.onNodeWithText(compatibleDevices).performClick()
 
         composeTestRule.waitUntil(timeoutMillis = 5_000) {
-            composeTestRule.onAllNodesWithText(compatibleDevices)
-                .fetchSemanticsNodes().isNotEmpty()
+            composeTestRule
+                .onAllNodesWithText(compatibleDevices)
+                .fetchSemanticsNodes()
+                .isNotEmpty()
         }
 
         composeTestRule.activityRule.scenario.onActivity {
@@ -116,8 +128,10 @@ class MainActivityTest {
         composeTestRule.onNodeWithText(openSourceLicenses).performClick()
 
         composeTestRule.waitUntil(timeoutMillis = 5_000) {
-            composeTestRule.onAllNodesWithText(openSourceLicenses)
-                .fetchSemanticsNodes().isNotEmpty()
+            composeTestRule
+                .onAllNodesWithText(openSourceLicenses)
+                .fetchSemanticsNodes()
+                .isNotEmpty()
         }
 
         composeTestRule.activityRule.scenario.onActivity {

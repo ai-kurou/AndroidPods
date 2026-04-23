@@ -39,9 +39,10 @@ fun LicensesScreen(
         },
     ) { innerPadding ->
         LicensesContent(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
         )
     }
 }

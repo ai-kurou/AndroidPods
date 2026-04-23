@@ -56,36 +56,39 @@ class MainViewModelTest {
     }
 
     @Test
-    fun `初回起動時はisFirstLaunchがtrueのUiStateが反映される`() = runTest {
-        fakeFlow.value = true
+    fun `初回起動時はisFirstLaunchがtrueのUiStateが反映される`() =
+        runTest {
+            fakeFlow.value = true
 
-        val job = launch(testDispatcher) { viewModel.uiState.collect {} }
-        assertEquals(true, viewModel.uiState.value.isFirstLaunch)
-        job.cancel()
-        verify(exactly = 1) { firstLaunchUseCase.observe() }
-        verify(exactly = 1) { themeSettingsUseCase.observe() }
-        confirmVerified(firstLaunchUseCase, themeSettingsUseCase)
-    }
-
-    @Test
-    fun `2回目以降はisFirstLaunchがfalseのUiStateが反映される`() = runTest {
-        fakeFlow.value = false
-
-        val job = launch(testDispatcher) { viewModel.uiState.collect {} }
-        assertEquals(false, viewModel.uiState.value.isFirstLaunch)
-        job.cancel()
-        verify(exactly = 1) { firstLaunchUseCase.observe() }
-        verify(exactly = 1) { themeSettingsUseCase.observe() }
-        confirmVerified(firstLaunchUseCase, themeSettingsUseCase)
-    }
+            val job = launch(testDispatcher) { viewModel.uiState.collect {} }
+            assertEquals(true, viewModel.uiState.value.isFirstLaunch)
+            job.cancel()
+            verify(exactly = 1) { firstLaunchUseCase.observe() }
+            verify(exactly = 1) { themeSettingsUseCase.observe() }
+            confirmVerified(firstLaunchUseCase, themeSettingsUseCase)
+        }
 
     @Test
-    fun `markAsLaunchedでUseCaseのmarkAsLaunchedが呼ばれる`() = runTest {
-        viewModel.markAsLaunched()
+    fun `2回目以降はisFirstLaunchがfalseのUiStateが反映される`() =
+        runTest {
+            fakeFlow.value = false
 
-        verify(exactly = 1) { firstLaunchUseCase.observe() }
-        verify(exactly = 1) { themeSettingsUseCase.observe() }
-        coVerify(exactly = 1) { firstLaunchUseCase.markAsLaunched() }
-        confirmVerified(firstLaunchUseCase, themeSettingsUseCase)
-    }
+            val job = launch(testDispatcher) { viewModel.uiState.collect {} }
+            assertEquals(false, viewModel.uiState.value.isFirstLaunch)
+            job.cancel()
+            verify(exactly = 1) { firstLaunchUseCase.observe() }
+            verify(exactly = 1) { themeSettingsUseCase.observe() }
+            confirmVerified(firstLaunchUseCase, themeSettingsUseCase)
+        }
+
+    @Test
+    fun `markAsLaunchedでUseCaseのmarkAsLaunchedが呼ばれる`() =
+        runTest {
+            viewModel.markAsLaunched()
+
+            verify(exactly = 1) { firstLaunchUseCase.observe() }
+            verify(exactly = 1) { themeSettingsUseCase.observe() }
+            coVerify(exactly = 1) { firstLaunchUseCase.markAsLaunched() }
+            confirmVerified(firstLaunchUseCase, themeSettingsUseCase)
+        }
 }

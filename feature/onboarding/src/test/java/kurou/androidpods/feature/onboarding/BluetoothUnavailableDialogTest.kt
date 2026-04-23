@@ -14,7 +14,6 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [35])
 class BluetoothUnavailableDialogTest {
-
     @get:Rule
     val composeTestRule = createComposeRule()
 
@@ -25,7 +24,10 @@ class BluetoothUnavailableDialogTest {
         }
 
         composeTestRule.onNodeWithText("Bluetooth Unavailable").assertIsDisplayed()
-        composeTestRule.onNodeWithText("This device does not have Bluetooth, so this app cannot be used.").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(
+                "This device does not have Bluetooth, so this app cannot be used.",
+            ).assertIsDisplayed()
     }
 
     @Test

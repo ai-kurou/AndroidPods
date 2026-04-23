@@ -4,14 +4,14 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kurou.androidpods.core.domain.AppleDevice
 import kurou.androidpods.core.domain.AppleDeviceRepository
 import kurou.androidpods.core.domain.BluetoothAdapterRepository
 import kurou.androidpods.core.domain.FirstLaunchRepository
 import kurou.androidpods.core.domain.OverlaySettingsRepository
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.emptyFlow
 import javax.inject.Singleton
 
 val fakeDevicesFlow = MutableSharedFlow<Map<String, AppleDevice>>(extraBufferCapacity = 1)
@@ -29,14 +29,20 @@ fun resetFakeRepository() {
 @Module
 @InstallIn(SingletonComponent::class)
 object FakeRepositoryModule {
-
     @Provides
     @Singleton
     fun provideAppleDeviceRepository(): AppleDeviceRepository =
         object : AppleDeviceRepository {
             override fun observeDevices(): Flow<Map<String, AppleDevice>> = fakeDevicesFlow
-            override fun startScan() { startScanCalled = true; startScanCount++ }
-            override fun stopScan() { stopScanCalled = true }
+
+            override fun startScan() {
+                startScanCalled = true
+                startScanCount++
+            }
+
+            override fun stopScan() {
+                stopScanCalled = true
+            }
         }
 
     @Provides
@@ -44,6 +50,7 @@ object FakeRepositoryModule {
     fun provideBluetoothAdapterRepository(): BluetoothAdapterRepository =
         object : BluetoothAdapterRepository {
             override fun observeAdapterState(): Flow<Int?> = fakeBluetoothStateFlow
+
             override fun getCurrentState(): Int? = null
         }
 
@@ -52,6 +59,7 @@ object FakeRepositoryModule {
     fun provideFirstLaunchRepository(): FirstLaunchRepository =
         object : FirstLaunchRepository {
             override fun observeIsFirstLaunch(): Flow<Boolean> = emptyFlow()
+
             override suspend fun markAsLaunched() {}
         }
 

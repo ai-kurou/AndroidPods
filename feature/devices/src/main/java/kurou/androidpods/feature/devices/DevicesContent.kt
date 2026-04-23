@@ -47,14 +47,15 @@ internal fun DevicesContent(
     }
 }
 
-private val previewDevices = listOf(
-    CompatibleDevice(name = "AirPods Pro (2nd Gen)", images = null),
-    CompatibleDevice(name = "AirPods (4th Gen)", images = null),
-    CompatibleDevice(name = "AirPods Max", images = null),
-    CompatibleDevice(name = "Beats Studio Buds+", images = null),
-    CompatibleDevice(name = "Powerbeats Pro", images = null),
-    CompatibleDevice(name = "Beats Solo3", images = null),
-)
+private val previewDevices =
+    listOf(
+        CompatibleDevice(name = "AirPods Pro (2nd Gen)", images = null),
+        CompatibleDevice(name = "AirPods (4th Gen)", images = null),
+        CompatibleDevice(name = "AirPods Max", images = null),
+        CompatibleDevice(name = "Beats Studio Buds+", images = null),
+        CompatibleDevice(name = "Powerbeats Pro", images = null),
+        CompatibleDevice(name = "Beats Solo3", images = null),
+    )
 
 @Preview(showBackground = true, widthDp = 400, heightDp = 700)
 @Composable
@@ -81,59 +82,68 @@ private fun DeviceItem(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-            .clip(RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .padding(12.dp),
+        modifier =
+            modifier
+                .clip(RoundedCornerShape(8.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .padding(12.dp),
     ) {
         Box(
             modifier = Modifier.fillMaxWidth().weight(1f).padding(8.dp),
         ) {
             when (val img = device.images) {
-                is DeviceImages.Tws -> Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxSize().padding(16.dp),
-                ) {
-                    Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
-                        Image(
-                            painter = painterResource(img.left),
-                            contentDescription = null,
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier.fillMaxSize().padding(2.dp),
-                        )
-                    }
-                    Box(modifier = Modifier.weight(2f).fillMaxHeight()) {
-                        Image(
-                            painter = painterResource(img.case),
-                            contentDescription = device.name,
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier.fillMaxSize(),
-                        )
-                    }
-                    Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
-                        Image(
-                            painter = painterResource(img.right),
-                            contentDescription = null,
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier.fillMaxSize().padding(2.dp),
-                        )
+                is DeviceImages.Tws -> {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxSize().padding(16.dp),
+                    ) {
+                        Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                            Image(
+                                painter = painterResource(img.left),
+                                contentDescription = null,
+                                contentScale = ContentScale.Fit,
+                                modifier = Modifier.fillMaxSize().padding(2.dp),
+                            )
+                        }
+                        Box(modifier = Modifier.weight(2f).fillMaxHeight()) {
+                            Image(
+                                painter = painterResource(img.case),
+                                contentDescription = device.name,
+                                contentScale = ContentScale.Fit,
+                                modifier = Modifier.fillMaxSize(),
+                            )
+                        }
+                        Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                            Image(
+                                painter = painterResource(img.right),
+                                contentDescription = null,
+                                contentScale = ContentScale.Fit,
+                                modifier = Modifier.fillMaxSize().padding(2.dp),
+                            )
+                        }
                     }
                 }
-                is DeviceImages.Single -> Image(
-                    painter = painterResource(img.body),
-                    contentDescription = device.name,
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier.fillMaxSize(),
-                )
-                null -> Unit
+
+                is DeviceImages.Single -> {
+                    Image(
+                        painter = painterResource(img.body),
+                        contentDescription = device.name,
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
+
+                null -> {
+                    Unit
+                }
             }
         }
         Text(
             text = device.name,
             style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier.padding(8.dp),
         )
     }
 }

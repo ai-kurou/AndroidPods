@@ -14,7 +14,6 @@ import org.junit.Before
 import org.junit.Test
 
 class GetAppleDevicesUseCaseTest {
-
     private lateinit var useCase: GetAppleDevicesUseCase
     private val repository = mockk<AppleDeviceRepository>(relaxUnitFun = true)
 
@@ -29,25 +28,27 @@ class GetAppleDevicesUseCaseTest {
     }
 
     @Test
-    fun `observeがrepositoryのobserveDevicesのFlowを返す`() = runTest {
-        val device = AppleDevice(
-            address = "AA:BB:CC:DD:EE:FF",
-            modelName = "AirPods Pro",
-            modelCode = 0x2002,
-            rssi = -60,
-            leftBattery = 80,
-            rightBattery = 75,
-            caseBattery = 90,
-        )
-        val fakeFlow = MutableStateFlow(mapOf("AA:BB:CC:DD:EE:FF" to device))
-        every { repository.observeDevices() } returns fakeFlow
+    fun `observeがrepositoryのobserveDevicesのFlowを返す`() =
+        runTest {
+            val device =
+                AppleDevice(
+                    address = "AA:BB:CC:DD:EE:FF",
+                    modelName = "AirPods Pro",
+                    modelCode = 0x2002,
+                    rssi = -60,
+                    leftBattery = 80,
+                    rightBattery = 75,
+                    caseBattery = 90,
+                )
+            val fakeFlow = MutableStateFlow(mapOf("AA:BB:CC:DD:EE:FF" to device))
+            every { repository.observeDevices() } returns fakeFlow
 
-        val result = useCase.observe().first()
+            val result = useCase.observe().first()
 
-        assertEquals(mapOf("AA:BB:CC:DD:EE:FF" to device), result)
-        verify(exactly = 1) { repository.observeDevices() }
-        confirmVerified(repository)
-    }
+            assertEquals(mapOf("AA:BB:CC:DD:EE:FF" to device), result)
+            verify(exactly = 1) { repository.observeDevices() }
+            confirmVerified(repository)
+        }
 
     @Test
     fun `startScanでrepositoryのstartScanが呼ばれる`() {

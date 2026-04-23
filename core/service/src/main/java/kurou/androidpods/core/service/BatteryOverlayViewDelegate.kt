@@ -1,8 +1,8 @@
 package kurou.androidpods.core.service
 
-import android.annotation.SuppressLint
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.PixelFormat
 import android.util.TypedValue
@@ -25,7 +25,6 @@ internal class BatteryOverlayViewDelegate(
     private val context: Context,
     private val windowOps: OverlayWindowOperations = DefaultOverlayWindowOperations(context),
 ) : OverlayViewDelegate {
-
     companion object {
         private const val CARD_WIDTH_DP = 280f
         private const val CARD_SPACING_DP = 12f
@@ -57,54 +56,81 @@ internal class BatteryOverlayViewDelegate(
         val closeSizePx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CLOSE_BUTTON_SIZE_DP, dm).toInt()
         val closeMarginPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CLOSE_BUTTON_MARGIN_DP, dm).toInt()
 
-        val container = LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
-            gravity = Gravity.CENTER_HORIZONTAL
-        }
+        val container =
+            LinearLayout(context).apply {
+                orientation = LinearLayout.VERTICAL
+                gravity = Gravity.CENTER_HORIZONTAL
+            }
         cardsContainer = container
 
-        val scrollView = ScrollView(context).apply {
-            addView(container, FrameLayout.LayoutParams(cardWidthPx, FrameLayout.LayoutParams.WRAP_CONTENT))
-            isVerticalScrollBarEnabled = false
-        }
+        val scrollView =
+            ScrollView(context).apply {
+                addView(container, FrameLayout.LayoutParams(cardWidthPx, FrameLayout.LayoutParams.WRAP_CONTENT))
+                isVerticalScrollBarEnabled = false
+            }
 
         val handleWidthPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, DRAG_HANDLE_WIDTH_DP, dm).toInt()
         val handleHeightPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, DRAG_HANDLE_HEIGHT_DP, dm).toInt()
-        val handleMarginTopPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, DRAG_HANDLE_MARGIN_TOP_DP, dm).toInt()
+        val handleMarginTopPx =
+            TypedValue
+                .applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP,
+                    DRAG_HANDLE_MARGIN_TOP_DP,
+                    dm,
+                ).toInt()
 
-        val dragHandle = View(context).apply {
-            setBackgroundResource(R.drawable.overlay_drag_handle)
-        }
+        val dragHandle =
+            View(context).apply {
+                setBackgroundResource(R.drawable.overlay_drag_handle)
+            }
 
-        val closeButton = ImageView(context).apply {
-            setImageResource(R.drawable.ic_close)
-            scaleType = ImageView.ScaleType.CENTER_INSIDE
-            setOnClickListener { hideWithAnimation() }
-        }
+        val closeButton =
+            ImageView(context).apply {
+                setImageResource(R.drawable.ic_close)
+                scaleType = ImageView.ScaleType.CENTER_INSIDE
+                setOnClickListener { hideWithAnimation() }
+            }
 
-        val root = DraggableFrameLayout(context, this).apply {
-            addView(scrollView, FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-            ))
-            addView(dragHandle, FrameLayout.LayoutParams(handleWidthPx, handleHeightPx, Gravity.TOP or Gravity.CENTER_HORIZONTAL).apply {
-                topMargin = handleMarginTopPx
-            })
-            addView(closeButton, FrameLayout.LayoutParams(closeSizePx, closeSizePx, Gravity.TOP or Gravity.END).apply {
-                topMargin = closeMarginPx
-                marginEnd = closeMarginPx
-            })
-        }
+        val root =
+            DraggableFrameLayout(context, this).apply {
+                addView(
+                    scrollView,
+                    FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.WRAP_CONTENT,
+                        FrameLayout.LayoutParams.WRAP_CONTENT,
+                    ),
+                )
+                addView(
+                    dragHandle,
+                    FrameLayout
+                        .LayoutParams(
+                            handleWidthPx,
+                            handleHeightPx,
+                            Gravity.TOP or Gravity.CENTER_HORIZONTAL,
+                        ).apply {
+                            topMargin = handleMarginTopPx
+                        },
+                )
+                addView(
+                    closeButton,
+                    FrameLayout.LayoutParams(closeSizePx, closeSizePx, Gravity.TOP or Gravity.END).apply {
+                        topMargin = closeMarginPx
+                        marginEnd = closeMarginPx
+                    },
+                )
+            }
 
-        val params = WindowManager.LayoutParams(
-            WindowManager.LayoutParams.WRAP_CONTENT,
-            WindowManager.LayoutParams.WRAP_CONTENT,
-            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
-            PixelFormat.TRANSLUCENT,
-        ).apply {
-            gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
-        }
+        val params =
+            WindowManager
+                .LayoutParams(
+                    WindowManager.LayoutParams.WRAP_CONTENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT,
+                    WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+                    PixelFormat.TRANSLUCENT,
+                ).apply {
+                    gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
+                }
 
         root.alpha = 0f
         root.scaleX = ANIM_SCALE_FROM
@@ -128,7 +154,6 @@ internal class BatteryOverlayViewDelegate(
         context: Context,
         private val delegate: BatteryOverlayViewDelegate,
     ) : FrameLayout(context) {
-
         private var initialX = 0
         private var initialY = 0
         private var initialTouchX = 0f
@@ -145,6 +170,7 @@ internal class BatteryOverlayViewDelegate(
                     initialTouchY = ev.rawY
                     isDragging = false
                 }
+
                 MotionEvent.ACTION_MOVE -> {
                     val dx = ev.rawX - initialTouchX
                     val dy = ev.rawY - initialTouchY
@@ -167,6 +193,7 @@ internal class BatteryOverlayViewDelegate(
                     delegate.windowOps.updateViewLayout(this, params)
                     return true
                 }
+
                 MotionEvent.ACTION_UP -> {
                     isDragging = false
                     return true
@@ -193,20 +220,23 @@ internal class BatteryOverlayViewDelegate(
         val scaleX = ObjectAnimator.ofFloat(view, View.SCALE_X, ANIM_SCALE_TO, ANIM_SCALE_FROM)
         val scaleY = ObjectAnimator.ofFloat(view, View.SCALE_Y, ANIM_SCALE_TO, ANIM_SCALE_FROM)
         val fadeOut = ObjectAnimator.ofFloat(view, View.ALPHA, 1f, 0f)
-        hideAnimator = AnimatorSet().apply {
-            playTogether(scaleX, scaleY, fadeOut)
-            duration = ANIM_DURATION_MS
-            interpolator = DecelerateInterpolator()
-            addListener(object : android.animation.AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: android.animation.Animator) {
-                    hideAnimator = null
-                    if (overlayView === view) {
-                        onComplete()
-                    }
-                }
-            })
-            start()
-        }
+        hideAnimator =
+            AnimatorSet().apply {
+                playTogether(scaleX, scaleY, fadeOut)
+                duration = ANIM_DURATION_MS
+                interpolator = DecelerateInterpolator()
+                addListener(
+                    object : android.animation.AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: android.animation.Animator) {
+                            hideAnimator = null
+                            if (overlayView === view) {
+                                onComplete()
+                            }
+                        }
+                    },
+                )
+                start()
+            }
     }
 
     override fun updateContent(devices: List<AppleDevice>) {
@@ -254,16 +284,18 @@ internal class BatteryOverlayViewDelegate(
             playTogether(scaleX, scaleY, fadeOut)
             duration = ANIM_DURATION_MS
             interpolator = DecelerateInterpolator()
-            addListener(object : android.animation.AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: android.animation.Animator) {
-                    if (overlayView === view) {
-                        windowOps.removeViewImmediate(view)
-                        overlayView = null
-                        cardsContainer = null
-                        layoutParams = null
+            addListener(
+                object : android.animation.AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: android.animation.Animator) {
+                        if (overlayView === view) {
+                            windowOps.removeViewImmediate(view)
+                            overlayView = null
+                            cardsContainer = null
+                            layoutParams = null
+                        }
                     }
-                }
-            })
+                },
+            )
             start()
         }
     }
@@ -272,8 +304,8 @@ internal class BatteryOverlayViewDelegate(
         inflater: LayoutInflater,
         parent: LinearLayout,
         device: AppleDevice,
-    ): View {
-        return when (val images = device.images) {
+    ): View =
+        when (val images = device.images) {
             is DeviceImages.Tws -> {
                 inflater.inflate(R.layout.overlay_device_tws, parent, false).apply {
                     findViewById<TextView>(R.id.device_model_name).text = device.modelName
@@ -294,6 +326,7 @@ internal class BatteryOverlayViewDelegate(
                         batteryText(device.caseBattery)
                 }
             }
+
             is DeviceImages.Single -> {
                 inflater.inflate(R.layout.overlay_device_single, parent, false).apply {
                     findViewById<TextView>(R.id.device_model_name).text = device.modelName
@@ -304,19 +337,20 @@ internal class BatteryOverlayViewDelegate(
                         batteryText(device.leftBattery)
                 }
             }
+
             null -> {
                 inflater.inflate(R.layout.overlay_device_text_only, parent, false).apply {
                     findViewById<TextView>(R.id.device_model_name).text = device.modelName
-                    val batteryStr = if (device.isSingle) {
-                        batteryText(device.leftBattery)
-                    } else {
-                        "L:${batteryText(device.leftBattery)} " +
-                            "R:${batteryText(device.rightBattery)} " +
-                            "Case:${batteryText(device.caseBattery)}"
-                    }
+                    val batteryStr =
+                        if (device.isSingle) {
+                            batteryText(device.leftBattery)
+                        } else {
+                            "L:${batteryText(device.leftBattery)} " +
+                                "R:${batteryText(device.rightBattery)} " +
+                                "Case:${batteryText(device.caseBattery)}"
+                        }
                     findViewById<TextView>(R.id.text_battery_summary).text = batteryStr
                 }
             }
         }
-    }
 }

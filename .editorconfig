@@ -1,0 +1,12 @@
+root = true
+
+[*.kt]
+indent_style = space
+indent_size = 4
+continuation_indent_size = 4
+max_line_length = 120
+
+# annotation ルールを無効化: "class Foo @Inject constructor" のような
+# コンストラクタアノテーション付きクラス宣言を複数行に展開させない
+ktlint_standard_annotation = disabled
+ktlint_standard_class-signature = disabled

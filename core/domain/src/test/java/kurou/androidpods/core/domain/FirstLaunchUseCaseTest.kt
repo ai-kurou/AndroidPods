@@ -15,7 +15,6 @@ import org.junit.Before
 import org.junit.Test
 
 class FirstLaunchUseCaseTest {
-
     private lateinit var useCase: FirstLaunchUseCase
     private val repository = mockk<FirstLaunchRepository>(relaxUnitFun = true)
 
@@ -30,22 +29,24 @@ class FirstLaunchUseCaseTest {
     }
 
     @Test
-    fun `observeがrepositoryのobserveIsFirstLaunchのFlowを返す`() = runTest {
-        val fakeFlow = MutableStateFlow(true)
-        every { repository.observeIsFirstLaunch() } returns fakeFlow
+    fun `observeがrepositoryのobserveIsFirstLaunchのFlowを返す`() =
+        runTest {
+            val fakeFlow = MutableStateFlow(true)
+            every { repository.observeIsFirstLaunch() } returns fakeFlow
 
-        val result = useCase.observe().first()
+            val result = useCase.observe().first()
 
-        assertEquals(true, result)
-        verify(exactly = 1) { repository.observeIsFirstLaunch() }
-        confirmVerified(repository)
-    }
+            assertEquals(true, result)
+            verify(exactly = 1) { repository.observeIsFirstLaunch() }
+            confirmVerified(repository)
+        }
 
     @Test
-    fun `markAsLaunchedでrepositoryのmarkAsLaunchedが呼ばれる`() = runTest {
-        useCase.markAsLaunched()
+    fun `markAsLaunchedでrepositoryのmarkAsLaunchedが呼ばれる`() =
+        runTest {
+            useCase.markAsLaunched()
 
-        coVerify(exactly = 1) { repository.markAsLaunched() }
-        confirmVerified(repository)
-    }
+            coVerify(exactly = 1) { repository.markAsLaunched() }
+            confirmVerified(repository)
+        }
 }

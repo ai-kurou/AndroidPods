@@ -20,16 +20,16 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [35])
 class DevicesScreenTest {
-
     @get:Rule
     val composeTestRule = createComposeRule()
 
     private val useCase = mockk<GetCompatibleDevicesUseCase>()
 
-    private val devices = listOf(
-        CompatibleDevice(name = "AirPods Pro (2nd Gen)", images = null),
-        CompatibleDevice(name = "AirPods Max", images = null),
-    )
+    private val devices =
+        listOf(
+            CompatibleDevice(name = "AirPods Pro (2nd Gen)", images = null),
+            CompatibleDevice(name = "AirPods Max", images = null),
+        )
     private val onBack = mockk<() -> Unit>(relaxed = true)
 
     @Test

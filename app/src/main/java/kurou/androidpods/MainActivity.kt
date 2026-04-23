@@ -4,9 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.core.view.WindowCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -27,11 +27,12 @@ class MainActivity : ComponentActivity() {
             val uiState = viewModel.uiState.collectAsStateWithLifecycle()
             val isFirstLaunch = uiState.value.isFirstLaunch ?: return@setContent
             val themeSettings = uiState.value.themeSettings
-            val darkTheme = when (themeSettings.themeMode) {
-                ThemeMode.LIGHT -> false
-                ThemeMode.DARK -> true
-                ThemeMode.SYSTEM -> isSystemInDarkTheme()
-            }
+            val darkTheme =
+                when (themeSettings.themeMode) {
+                    ThemeMode.LIGHT -> false
+                    ThemeMode.DARK -> true
+                    ThemeMode.SYSTEM -> isSystemInDarkTheme()
+                }
             AndroidPodsTheme(
                 darkTheme = darkTheme,
                 dynamicColor = themeSettings.useDynamicColor,

@@ -17,16 +17,20 @@ class CheckUpdateUseCase @Inject constructor(
         return isNewerVersion(latestVersion, currentVersion)
     }
 
-    private fun isNewerVersion(latest: String, current: String): Boolean = try {
-        val l = latest.split(".").map { it.toInt() }
-        val c = current.split(".").map { it.toInt() }
-        val size = maxOf(l.size, c.size)
-        for (i in 0 until size) {
-            val diff = l.getOrElse(i) { 0 } - c.getOrElse(i) { 0 }
-            if (diff != 0) return diff > 0
+    private fun isNewerVersion(
+        latest: String,
+        current: String,
+    ): Boolean =
+        try {
+            val l = latest.split(".").map { it.toInt() }
+            val c = current.split(".").map { it.toInt() }
+            val size = maxOf(l.size, c.size)
+            for (i in 0 until size) {
+                val diff = l.getOrElse(i) { 0 } - c.getOrElse(i) { 0 }
+                if (diff != 0) return diff > 0
+            }
+            false
+        } catch (e: NumberFormatException) {
+            false
         }
-        false
-    } catch (e: NumberFormatException) {
-        false
-    }
 }

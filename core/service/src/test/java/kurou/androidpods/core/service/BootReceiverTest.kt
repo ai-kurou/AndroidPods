@@ -14,7 +14,6 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [35])
 class BootReceiverTest {
-
     private val application: Application = ApplicationProvider.getApplicationContext()
     private val receiver = BootReceiver()
 

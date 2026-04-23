@@ -11,7 +11,6 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 class BluetoothPermissionsTest {
-
     @Config(sdk = [Build.VERSION_CODES.S])
     @Test
     fun `Android 12以上ではBLUETOOTH_CONNECTとBLUETOOTH_SCANを要求する`() {

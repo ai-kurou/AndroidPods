@@ -22,7 +22,6 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [35])
 class SettingsContentTest {
-
     @get:Rule
     val composeTestRule = createComposeRule()
 
@@ -30,10 +29,11 @@ class SettingsContentTest {
     fun `全て許可済みのとき権限警告が表示されない`() {
         composeTestRule.setContent {
             SettingsContent(
-                permissionStates = mapOf(
-                    Manifest.permission.BLUETOOTH_CONNECT to true,
-                    Manifest.permission.BLUETOOTH_SCAN to true,
-                ),
+                permissionStates =
+                    mapOf(
+                        Manifest.permission.BLUETOOTH_CONNECT to true,
+                        Manifest.permission.BLUETOOTH_SCAN to true,
+                    ),
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 overlayEnabled = false,
                 updateAvailable = false,
@@ -53,9 +53,10 @@ class SettingsContentTest {
             )
         }
 
-        composeTestRule.onNodeWithText(
-            "Some required permissions are not granted. Please grant all permissions."
-        ).assertDoesNotExist()
+        composeTestRule
+            .onNodeWithText(
+                "Some required permissions are not granted. Please grant all permissions.",
+            ).assertDoesNotExist()
     }
 
     @Test
@@ -63,10 +64,11 @@ class SettingsContentTest {
         var clicked = false
         composeTestRule.setContent {
             SettingsContent(
-                permissionStates = mapOf(
-                    Manifest.permission.BLUETOOTH_CONNECT to true,
-                    Manifest.permission.BLUETOOTH_SCAN to false,
-                ),
+                permissionStates =
+                    mapOf(
+                        Manifest.permission.BLUETOOTH_CONNECT to true,
+                        Manifest.permission.BLUETOOTH_SCAN to false,
+                    ),
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 overlayEnabled = false,
                 updateAvailable = false,
@@ -86,9 +88,10 @@ class SettingsContentTest {
             )
         }
 
-        composeTestRule.onNodeWithText(
-            "Some required permissions are not granted. Please grant all permissions."
-        ).performClick()
+        composeTestRule
+            .onNodeWithText(
+                "Some required permissions are not granted. Please grant all permissions.",
+            ).performClick()
 
         assertTrue(clicked)
     }
@@ -117,9 +120,10 @@ class SettingsContentTest {
             )
         }
 
-        composeTestRule.onNodeWithText(
-            "Bluetooth is off. Please enable Bluetooth."
-        ).assertDoesNotExist()
+        composeTestRule
+            .onNodeWithText(
+                "Bluetooth is off. Please enable Bluetooth.",
+            ).assertDoesNotExist()
     }
 
     @Test
@@ -147,9 +151,10 @@ class SettingsContentTest {
             )
         }
 
-        composeTestRule.onNodeWithText(
-            "Bluetooth is off. Please enable Bluetooth."
-        ).performClick()
+        composeTestRule
+            .onNodeWithText(
+                "Bluetooth is off. Please enable Bluetooth.",
+            ).performClick()
 
         assertTrue(clicked)
     }
@@ -179,9 +184,11 @@ class SettingsContentTest {
             )
         }
 
-        composeTestRule.onNodeWithText(
-            "This device does not support Bluetooth."
-        ).assertIsDisplayed().performClick()
+        composeTestRule
+            .onNodeWithText(
+                "This device does not support Bluetooth.",
+            ).assertIsDisplayed()
+            .performClick()
 
         assertTrue(!clicked)
     }
@@ -428,9 +435,10 @@ class SettingsContentTest {
             )
         }
 
-        composeTestRule.onNodeWithText(
-            "A new version is available. Tap to update."
-        ).performClick()
+        composeTestRule
+            .onNodeWithText(
+                "A new version is available. Tap to update.",
+            ).performClick()
 
         assertTrue(clicked)
     }

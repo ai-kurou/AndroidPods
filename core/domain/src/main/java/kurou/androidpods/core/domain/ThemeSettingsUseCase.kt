@@ -7,5 +7,6 @@ class ThemeSettingsUseCase @Inject constructor(
     private val repository: ThemeSettingsRepository,
 ) {
     fun observe(): Flow<ThemeSettings> = repository.observe()
+
     suspend fun update(settings: ThemeSettings) = repository.update(settings)
 }

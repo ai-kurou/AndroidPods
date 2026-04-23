@@ -9,44 +9,39 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+import kurou.androidpods.core.domain.AppleDeviceRepository
 import kurou.androidpods.core.domain.BluetoothAdapterRepository
 import kurou.androidpods.core.domain.CompatibleDeviceRepository
 import kurou.androidpods.core.domain.FirstLaunchRepository
-import kurou.androidpods.core.domain.AppleDeviceRepository
 import kurou.androidpods.core.domain.OverlaySettingsRepository
 import kurou.androidpods.core.domain.ThemeSettingsRepository
 import kurou.androidpods.core.domain.UpdateRepository
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class DataModule {
-
     companion object {
         @Provides
         @Singleton
-        fun provideThemeDataStore(@ApplicationContext context: Context): DataStore<Preferences> =
-            context.themeDataStore
+        fun provideThemeDataStore(
+            @ApplicationContext context: Context,
+        ): DataStore<Preferences> = context.themeDataStore
     }
+
     @Binds
     internal abstract fun bindBluetoothAdapterRepository(
         impl: BluetoothAdapterRepositoryImpl,
     ): BluetoothAdapterRepository
 
     @Binds
-    internal abstract fun bindFirstLaunchRepository(
-        impl: FirstLaunchRepositoryImpl,
-    ): FirstLaunchRepository
+    internal abstract fun bindFirstLaunchRepository(impl: FirstLaunchRepositoryImpl): FirstLaunchRepository
 
     @Binds
-    internal abstract fun bindAppleDeviceRepository(
-        impl: AppleDeviceRepositoryImpl,
-    ): AppleDeviceRepository
+    internal abstract fun bindAppleDeviceRepository(impl: AppleDeviceRepositoryImpl): AppleDeviceRepository
 
     @Binds
-    internal abstract fun bindOverlaySettingsRepository(
-        impl: OverlaySettingsRepositoryImpl,
-    ): OverlaySettingsRepository
+    internal abstract fun bindOverlaySettingsRepository(impl: OverlaySettingsRepositoryImpl): OverlaySettingsRepository
 
     @Binds
     internal abstract fun bindCompatibleDeviceRepository(
@@ -54,12 +49,8 @@ abstract class DataModule {
     ): CompatibleDeviceRepository
 
     @Binds
-    internal abstract fun bindUpdateRepository(
-        impl: UpdateRepositoryImpl,
-    ): UpdateRepository
+    internal abstract fun bindUpdateRepository(impl: UpdateRepositoryImpl): UpdateRepository
 
     @Binds
-    internal abstract fun bindThemeSettingsRepository(
-        impl: ThemeSettingsRepositoryImpl,
-    ): ThemeSettingsRepository
+    internal abstract fun bindThemeSettingsRepository(impl: ThemeSettingsRepositoryImpl): ThemeSettingsRepository
 }

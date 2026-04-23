@@ -8,19 +8,19 @@ import org.junit.Before
 import org.junit.Test
 
 class BatteryOverlayManagerTest {
-
     private lateinit var fakeDelegate: FakeOverlayViewDelegate
     private lateinit var manager: BatteryOverlayManager
 
-    private val baseDevice = AppleDevice(
-        address = "00:00:00:00:00:00",
-        modelName = "AirPods Pro",
-        modelCode = 0,
-        rssi = -50,
-        leftBattery = 5,
-        rightBattery = 5,
-        caseBattery = 5,
-    )
+    private val baseDevice =
+        AppleDevice(
+            address = "00:00:00:00:00:00",
+            modelName = "AirPods Pro",
+            modelCode = 0,
+            rssi = -50,
+            leftBattery = 5,
+            rightBattery = 5,
+            caseBattery = 5,
+        )
 
     @Before
     fun setUp() {
@@ -191,7 +191,6 @@ class BatteryOverlayManagerTest {
 }
 
 private class FakeOverlayViewDelegate : OverlayViewDelegate {
-
     var overlayPermission = true
     var addOverlayViewCount = 0
     var removeOverlayViewCount = 0

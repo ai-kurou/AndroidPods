@@ -27,7 +27,6 @@ import org.robolectric.shadows.ShadowSettings
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [35], qualifiers = "w360dp-h800dp-port-xxhdpi", application = HiltTestApplication::class)
 class AppScaffoldTest {
-
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
 
@@ -38,10 +37,12 @@ class AppScaffoldTest {
     fun setUp() {
         val app = ApplicationProvider.getApplicationContext<android.app.Application>()
         val shadowApp = Shadows.shadowOf(app)
-        val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-            listOf(Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN)
-        else
-            listOf(Manifest.permission.ACCESS_FINE_LOCATION)
+        val permissions =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                listOf(Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN)
+            } else {
+                listOf(Manifest.permission.ACCESS_FINE_LOCATION)
+            }
         permissions.forEach { shadowApp.grantPermissions(it) }
 
         Shadows.shadowOf(BluetoothAdapter.getDefaultAdapter()).setEnabled(true)
@@ -55,7 +56,7 @@ class AppScaffoldTest {
             AppScaffold(
                 isFirstLaunch = true,
                 windowWidthSizeClass = WindowWidthSizeClass.Compact,
-                onOnboardingComplete = { completeCalled = true},
+                onOnboardingComplete = { completeCalled = true },
                 onStartScanService = {},
                 onStopScanService = {},
             )
@@ -111,5 +112,4 @@ class AppScaffoldTest {
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("AndroidPods").assertIsDisplayed()
     }
-
 }

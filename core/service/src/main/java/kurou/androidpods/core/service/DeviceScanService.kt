@@ -3,32 +3,31 @@ package kurou.androidpods.core.service
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.Intent
-import android.app.PendingIntent
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
 import android.widget.RemoteViews
 import androidx.core.app.ServiceCompat
 import dagger.hilt.android.AndroidEntryPoint
-import kurou.androidpods.core.domain.AppleDevice
-import kurou.androidpods.core.domain.AppleDeviceRepository
-import kurou.androidpods.core.domain.BluetoothAdapterRepository
-import kurou.androidpods.core.domain.DeviceImages
-import kurou.androidpods.core.domain.OverlaySettingsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kurou.androidpods.core.domain.AppleDevice
+import kurou.androidpods.core.domain.AppleDeviceRepository
+import kurou.androidpods.core.domain.BluetoothAdapterRepository
+import kurou.androidpods.core.domain.DeviceImages
+import kurou.androidpods.core.domain.OverlaySettingsRepository
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class DeviceScanService : Service() {
-
     @Inject
     lateinit var appleDeviceRepository: AppleDeviceRepository
 
@@ -48,14 +47,20 @@ class DeviceScanService : Service() {
         overlayManager = BatteryOverlayManager(BatteryOverlayViewDelegate(this))
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int,
+    ): Int {
         if (!isForeground) {
             isForeground = true
             val notification = buildNotification(getString(R.string.notification_scanning), emptyList())
-            val foregroundServiceType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
-            else
-                0
+            val foregroundServiceType =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
+                } else {
+                    0
+                }
             ServiceCompat.startForeground(this, NOTIFICATION_ID, notification, foregroundServiceType)
             observeDevices()
             observeBluetoothState()
@@ -82,10 +87,11 @@ class DeviceScanService : Service() {
                 getSystemService(NotificationManager::class.java)
                     .notify(NOTIFICATION_ID, notification)
 
-                if (overlaySettingsRepository.isEnabled() && deviceList.isNotEmpty())
+                if (overlaySettingsRepository.isEnabled() && deviceList.isNotEmpty()) {
                     overlayManager.show(deviceList)
-                else
+                } else {
                     overlayManager.hide()
+                }
             }
         }
     }
@@ -101,19 +107,25 @@ class DeviceScanService : Service() {
     }
 
     private fun createNotificationChannel() {
-        val channel = NotificationChannel(
-            CHANNEL_ID,
-            getString(R.string.notification_channel_name),
-            NotificationManager.IMPORTANCE_LOW,
-        )
+        val channel =
+            NotificationChannel(
+                CHANNEL_ID,
+                getString(R.string.notification_channel_name),
+                NotificationManager.IMPORTANCE_LOW,
+            )
         getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
     }
 
-    private fun buildNotification(contentText: String, devices: List<AppleDevice>): Notification {
-        val builder = Notification.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_notification)
-            .setContentText(contentText)
-            .setOngoing(true)
+    private fun buildNotification(
+        contentText: String,
+        devices: List<AppleDevice>,
+    ): Notification {
+        val builder =
+            Notification
+                .Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_notification)
+                .setContentText(contentText)
+                .setOngoing(true)
 
         val contentIntent = createLaunchPendingIntent(this)
         if (contentIntent != null) {
@@ -134,6 +146,7 @@ class DeviceScanService : Service() {
     companion object {
         private const val CHANNEL_ID = "device_scan"
         private const val NOTIFICATION_ID = 1
+
         fun start(context: Context) {
             context.startForegroundService(Intent(context, DeviceScanService::class.java))
         }
@@ -145,8 +158,9 @@ class DeviceScanService : Service() {
 }
 
 internal fun createLaunchPendingIntent(context: Context): PendingIntent? {
-    val launchIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
-        ?: return null
+    val launchIntent =
+        context.packageManager.getLaunchIntentForPackage(context.packageName)
+            ?: return null
     return PendingIntent.getActivity(
         context,
         0,
@@ -180,8 +194,11 @@ internal fun buildExpandedRemoteViews(
     return expandedView
 }
 
-internal fun buildDeviceRemoteViews(packageName: String, device: AppleDevice): RemoteViews {
-    return when (val images = device.images) {
+internal fun buildDeviceRemoteViews(
+    packageName: String,
+    device: AppleDevice,
+): RemoteViews =
+    when (val images = device.images) {
         is DeviceImages.Tws -> {
             RemoteViews(packageName, R.layout.notification_device_tws).apply {
                 setTextViewText(R.id.device_model_name, device.modelName)
@@ -214,6 +231,7 @@ internal fun buildDeviceRemoteViews(packageName: String, device: AppleDevice): R
                 )
             }
         }
+
         is DeviceImages.Single -> {
             RemoteViews(packageName, R.layout.notification_device_single).apply {
                 setTextViewText(R.id.device_model_name, device.modelName)
@@ -228,21 +246,22 @@ internal fun buildDeviceRemoteViews(packageName: String, device: AppleDevice): R
                 )
             }
         }
+
         null -> {
             RemoteViews(packageName, R.layout.notification_device_text_only).apply {
                 setTextViewText(R.id.device_model_name, device.modelName)
-                val batteryStr = if (device.isSingle) {
-                    batteryText(device.leftBattery)
-                } else {
-                    "L:${batteryText(device.leftBattery)} " +
-                        "R:${batteryText(device.rightBattery)} " +
-                        "Case:${batteryText(device.caseBattery)}"
-                }
+                val batteryStr =
+                    if (device.isSingle) {
+                        batteryText(device.leftBattery)
+                    } else {
+                        "L:${batteryText(device.leftBattery)} " +
+                            "R:${batteryText(device.rightBattery)} " +
+                            "Case:${batteryText(device.caseBattery)}"
+                    }
                 setTextViewText(R.id.text_battery_summary, batteryStr)
             }
         }
     }
-}
 
 internal fun formatDevicesSummary(
     devices: List<AppleDevice>,
@@ -250,51 +269,56 @@ internal fun formatDevicesSummary(
 ): String {
     if (devices.isEmpty()) return "No Apple devices found"
     return devices.joinToString("\n") { device ->
-        val battery = if (device.isSingle) {
-            batteryText(device.leftBattery, showCharging && device.leftCharging)
-        } else {
-            "L:${batteryText(device.leftBattery, showCharging && device.leftCharging)} " +
-                "R:${batteryText(device.rightBattery, showCharging && device.rightCharging)} " +
-                "Case:${batteryText(device.caseBattery, showCharging && device.caseCharging)}"
-        }
+        val battery =
+            if (device.isSingle) {
+                batteryText(device.leftBattery, showCharging && device.leftCharging)
+            } else {
+                "L:${batteryText(device.leftBattery, showCharging && device.leftCharging)} " +
+                    "R:${batteryText(device.rightBattery, showCharging && device.rightCharging)} " +
+                    "Case:${batteryText(device.caseBattery, showCharging && device.caseCharging)}"
+            }
         "${device.modelName} — $battery"
     }
 }
 
-internal fun batteryIconRes(level: Int?, charging: Boolean): Int {
+internal fun batteryIconRes(
+    level: Int?,
+    charging: Boolean,
+): Int {
     if (level == null) return R.drawable.icon_battery_null
-    if (level >= 10) {
-        return if (charging) R.drawable.icon_battery_charging_100
-        else R.drawable.icon_battery_95_100
-    }
+    if (level >= 10) return if (charging) R.drawable.icon_battery_charging_100 else R.drawable.icon_battery_95_100
     val pct = level * 10 + 5
-    return if (charging) {
-        when {
-            pct < 20 -> R.drawable.icon_battery_charging_0_19
-            pct < 40 -> R.drawable.icon_battery_charging_20_39
-            pct < 60 -> R.drawable.icon_battery_charging_40_59
-            pct < 80 -> R.drawable.icon_battery_charging_60_79
-            pct < 95 -> R.drawable.icon_battery_charging_80_94
-            else -> R.drawable.icon_battery_charging_95_99
-        }
-    } else {
-        when {
-            pct < 5 -> R.drawable.icon_battery_0_4
-            pct < 20 -> R.drawable.icon_battery_5_19
-            pct < 40 -> R.drawable.icon_battery_20_39
-            pct < 60 -> R.drawable.icon_battery_40_59
-            pct < 80 -> R.drawable.icon_battery_60_79
-            pct < 95 -> R.drawable.icon_battery_80_94
-            else -> R.drawable.icon_battery_95_100
-        }
-    }
+    return if (charging) chargingBatteryIconRes(pct) else dischargingBatteryIconRes(pct)
 }
 
-internal fun batteryText(level: Int?, charging: Boolean = false): String {
-    val pct = when {
-        level == null -> "--"
-        level >= 10 -> "100%"
-        else -> "${level * 10 + 5}%"
-    }
+private fun chargingBatteryIconRes(pct: Int): Int = when {
+    pct < 20 -> R.drawable.icon_battery_charging_0_19
+    pct < 40 -> R.drawable.icon_battery_charging_20_39
+    pct < 60 -> R.drawable.icon_battery_charging_40_59
+    pct < 80 -> R.drawable.icon_battery_charging_60_79
+    pct < 95 -> R.drawable.icon_battery_charging_80_94
+    else -> R.drawable.icon_battery_charging_95_99
+}
+
+private fun dischargingBatteryIconRes(pct: Int): Int = when {
+    pct < 5 -> R.drawable.icon_battery_0_4
+    pct < 20 -> R.drawable.icon_battery_5_19
+    pct < 40 -> R.drawable.icon_battery_20_39
+    pct < 60 -> R.drawable.icon_battery_40_59
+    pct < 80 -> R.drawable.icon_battery_60_79
+    pct < 95 -> R.drawable.icon_battery_80_94
+    else -> R.drawable.icon_battery_95_100
+}
+
+internal fun batteryText(
+    level: Int?,
+    charging: Boolean = false,
+): String {
+    val pct =
+        when {
+            level == null -> "--"
+            level >= 10 -> "100%"
+            else -> "${level * 10 + 5}%"
+        }
     return if (charging) "$pct⚡" else pct
 }

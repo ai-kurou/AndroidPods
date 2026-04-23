@@ -17,7 +17,6 @@ import org.robolectric.shadows.ShadowWindowManagerImpl
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [35])
 class DefaultOverlayWindowOperationsTest {
-
     private lateinit var context: Context
     private lateinit var operations: DefaultOverlayWindowOperations
 
@@ -39,7 +38,10 @@ class DefaultOverlayWindowOperationsTest {
 
         operations.addView(view, params)
 
-        val shadow = shadowOf(context.getSystemService(Context.WINDOW_SERVICE) as WindowManager) as ShadowWindowManagerImpl
+        val shadow =
+            shadowOf(
+                context.getSystemService(Context.WINDOW_SERVICE) as WindowManager,
+            ) as ShadowWindowManagerImpl
         assertTrue(shadow.views.contains(view))
     }
 
@@ -51,7 +53,10 @@ class DefaultOverlayWindowOperationsTest {
 
         operations.removeViewImmediate(view)
 
-        val shadow = shadowOf(context.getSystemService(Context.WINDOW_SERVICE) as WindowManager) as ShadowWindowManagerImpl
+        val shadow =
+            shadowOf(
+                context.getSystemService(Context.WINDOW_SERVICE) as WindowManager,
+            ) as ShadowWindowManagerImpl
         assertFalse(shadow.views.contains(view))
     }
 

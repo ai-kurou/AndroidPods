@@ -8,9 +8,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
-internal fun BluetoothUnavailableDialog(
-    onDismiss: () -> Unit,
-) {
+internal fun BluetoothUnavailableDialog(onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.onboarding_bluetooth_unavailable_dialog_title)) },

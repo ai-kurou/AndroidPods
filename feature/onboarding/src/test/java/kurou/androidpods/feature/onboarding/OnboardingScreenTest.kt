@@ -30,18 +30,18 @@ import org.robolectric.shadows.ShadowSettings
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [30, 31])
 class OnboardingScreenTest {
-
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    private fun btAdapter(context: Context) =
-        context.getSystemService(BluetoothManager::class.java).adapter
+    private fun btAdapter(context: Context) = context.getSystemService(BluetoothManager::class.java).adapter
 
     private fun grantRequiredPermissions(context: Context) {
-        val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-            arrayOf(Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN)
-        else
-            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+        val permissions =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                arrayOf(Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN)
+            } else {
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+            }
         shadowOf(context as Application).grantPermissions(*permissions)
     }
 
@@ -81,33 +81,33 @@ class OnboardingScreenTest {
             OnboardingScreen(onComplete = {})
         }
 
-        composeTestRule.onNodeWithText("Next").performClick()           // page 0 → 1
+        composeTestRule.onNodeWithText("Next").performClick() // page 0 → 1
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("Grant Permission").performClick() // page 1 → 2
         composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithText("Allow Overlay").performClick()   // page 2 → 3
+        composeTestRule.onNodeWithText("Allow Overlay").performClick() // page 2 → 3
         composeTestRule.waitForIdle()
 
         composeTestRule.activityRule.scenario.onActivity {
-            it.onBackPressedDispatcher.onBackPressed()                   // page 3 → 2
+            it.onBackPressedDispatcher.onBackPressed() // page 3 → 2
         }
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("Allow Overlay").assertIsDisplayed()
 
         composeTestRule.activityRule.scenario.onActivity {
-            it.onBackPressedDispatcher.onBackPressed()                   // page 2 → 1
+            it.onBackPressedDispatcher.onBackPressed() // page 2 → 1
         }
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("Grant Permission").assertIsDisplayed()
 
         composeTestRule.activityRule.scenario.onActivity {
-            it.onBackPressedDispatcher.onBackPressed()                   // page 1 → 0
+            it.onBackPressedDispatcher.onBackPressed() // page 1 → 0
         }
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("Next").assertIsDisplayed()
 
         composeTestRule.activityRule.scenario.onActivity {
-            it.onBackPressedDispatcher.onBackPressed()                   // page 0 → 終了
+            it.onBackPressedDispatcher.onBackPressed() // page 0 → 終了
         }
         assertTrue(composeTestRule.activity.isFinishing)
     }
@@ -123,7 +123,7 @@ class OnboardingScreenTest {
             OnboardingScreen(onComplete = {})
         }
 
-        composeTestRule.onNodeWithText("Next").performClick()            // page 0 → 1
+        composeTestRule.onNodeWithText("Next").performClick() // page 0 → 1
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("Grant Permission").performClick() // page 1 → 2
         composeTestRule.waitForIdle()
@@ -147,11 +147,11 @@ class OnboardingScreenTest {
             OnboardingScreen(onComplete = {})
         }
 
-        composeTestRule.onNodeWithText("Next").performClick()            // page 0 → 1
+        composeTestRule.onNodeWithText("Next").performClick() // page 0 → 1
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("Grant Permission").performClick() // page 1 → 2
         composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithText("Allow Overlay").performClick()   // page 2 → 3
+        composeTestRule.onNodeWithText("Allow Overlay").performClick() // page 2 → 3
         composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithText("Enable Bluetooth").performClick()
@@ -175,7 +175,7 @@ class OnboardingScreenTest {
         composeTestRule.onNodeWithTag("lottie_animation").assertIsDisplayed()
         composeTestRule.onNodeWithText("Check the remaining battery level of your AirPods.").assertExists()
 
-        composeTestRule.onNodeWithText("Next").performClick()           // page 0 → 1
+        composeTestRule.onNodeWithText("Next").performClick() // page 0 → 1
         composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithTag("lottie_animation").assertIsDisplayed()
@@ -187,7 +187,7 @@ class OnboardingScreenTest {
         composeTestRule.onNodeWithTag("lottie_animation").assertIsDisplayed()
         composeTestRule.onNodeWithText("Allow overlay display to show battery info on screen.").assertExists()
 
-        composeTestRule.onNodeWithText("Allow Overlay").performClick()   // page 2 → 3
+        composeTestRule.onNodeWithText("Allow Overlay").performClick() // page 2 → 3
         composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithTag("lottie_animation").assertIsDisplayed()

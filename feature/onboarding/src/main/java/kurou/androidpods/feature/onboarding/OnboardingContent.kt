@@ -48,24 +48,25 @@ internal data class OnboardingPageData(
     @StringRes val textResId: Int,
 )
 
-internal val pages = listOf(
-    OnboardingPageData(
-        lottieResId = R.raw.charging,
-        textResId = R.string.onboarding_page1_text,
-    ),
-    OnboardingPageData(
-        lottieResId = R.raw.location,
-        textResId = R.string.onboarding_page2_text,
-    ),
-    OnboardingPageData(
-        lottieResId = R.raw.overlay,
-        textResId = R.string.onboarding_page3_text,
-    ),
-    OnboardingPageData(
-        lottieResId = R.raw.bluetooth,
-        textResId = R.string.onboarding_page4_text,
-    ),
-)
+internal val pages =
+    listOf(
+        OnboardingPageData(
+            lottieResId = R.raw.charging,
+            textResId = R.string.onboarding_page1_text,
+        ),
+        OnboardingPageData(
+            lottieResId = R.raw.location,
+            textResId = R.string.onboarding_page2_text,
+        ),
+        OnboardingPageData(
+            lottieResId = R.raw.overlay,
+            textResId = R.string.onboarding_page3_text,
+        ),
+        OnboardingPageData(
+            lottieResId = R.raw.bluetooth,
+            textResId = R.string.onboarding_page4_text,
+        ),
+    )
 
 @Composable
 internal fun OnboardingContent(
@@ -93,26 +94,31 @@ internal fun OnboardingContent(
 
         Button(
             onClick = onButtonClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
         ) {
             Text(
-                text = stringResource(
-                    when {
-                        pagerState.currentPage == PERMISSION_PAGE -> R.string.onboarding_button_grant_permission
-                        pagerState.currentPage == OVERLAY_PAGE -> R.string.onboarding_button_allow_overlay
-                        pagerState.currentPage == BLUETOOTH_PAGE -> R.string.onboarding_button_enable_bluetooth
-                        else -> R.string.onboarding_button_next
-                    },
-                ),
+                text =
+                    stringResource(
+                        when {
+                            pagerState.currentPage == PERMISSION_PAGE -> R.string.onboarding_button_grant_permission
+                            pagerState.currentPage == OVERLAY_PAGE -> R.string.onboarding_button_allow_overlay
+                            pagerState.currentPage == BLUETOOTH_PAGE -> R.string.onboarding_button_enable_bluetooth
+                            else -> R.string.onboarding_button_next
+                        },
+                    ),
             )
         }
     }
 }
 
 @Composable
-private fun OnboardingPage(pageData: OnboardingPageData, modifier: Modifier = Modifier) {
+private fun OnboardingPage(
+    pageData: OnboardingPageData,
+    modifier: Modifier = Modifier,
+) {
     val configuration = LocalConfiguration.current
     val isPortrait = configuration.screenHeightDp > configuration.screenWidthDp
 
@@ -130,7 +136,7 @@ private fun OnboardingPage(pageData: OnboardingPageData, modifier: Modifier = Mo
             Text(
                 text = stringResource(pageData.textResId),
                 style = MaterialTheme.typography.titleLarge,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
         }
     } else {
@@ -147,14 +153,17 @@ private fun OnboardingPage(pageData: OnboardingPageData, modifier: Modifier = Mo
             Text(
                 text = stringResource(pageData.textResId),
                 style = MaterialTheme.typography.titleLarge,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
         }
     }
 }
 
 @Composable
-private fun LottieContent(@RawRes lottieResId: Int, modifier: Modifier = Modifier) {
+private fun LottieContent(
+    @RawRes lottieResId: Int,
+    modifier: Modifier = Modifier,
+) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(lottieResId))
     LottieAnimation(
         composition = composition,
@@ -175,13 +184,17 @@ private fun PageIndicator(
     ) {
         repeat(pageCount) { index ->
             Box(
-                modifier = Modifier
-                    .size(8.dp)
-                    .clip(CircleShape)
-                    .background(
-                        if (index == currentPage) MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.outlineVariant,
-                    ),
+                modifier =
+                    Modifier
+                        .size(8.dp)
+                        .clip(CircleShape)
+                        .background(
+                            if (index == currentPage) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.outlineVariant
+                            },
+                        ),
             )
         }
     }
