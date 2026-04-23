@@ -10,6 +10,8 @@ plugins {
     alias(libs.plugins.roborazzi) apply false
     alias(libs.plugins.modules.graph.assert)
     alias(libs.plugins.detekt)
+    alias(libs.plugins.google.services) apply false
+    alias(libs.plugins.firebase.crashlytics.plugin) apply false
 }
 
 val isCI = System.getenv("CI") != null
