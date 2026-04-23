@@ -21,8 +21,8 @@ class MainViewModel @Inject constructor(
     val isFirstLaunch: StateFlow<Boolean?> = firstLaunchUseCase.observe()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
-    val themeSettings: StateFlow<ThemeSettings> = themeSettingsUseCase.observe()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ThemeSettings())
+    val themeSettings: StateFlow<ThemeSettings?> = themeSettingsUseCase.observe()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     fun markAsLaunched() {
         viewModelScope.launch {

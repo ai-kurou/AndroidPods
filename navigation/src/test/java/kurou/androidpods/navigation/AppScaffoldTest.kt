@@ -49,22 +49,6 @@ class AppScaffoldTest {
     }
 
     @Test
-    fun `isFirstLaunchがnullの場合は何も表示されない`() {
-        composeTestRule.setContent {
-            AppScaffold(
-                isFirstLaunch = null,
-                windowWidthSizeClass = WindowWidthSizeClass.Compact,
-                onOnboardingComplete = {},
-                onStartScanService = {},
-                onStopScanService = {},
-            )
-        }
-
-        composeTestRule.onNodeWithText("Next").assertDoesNotExist()
-        composeTestRule.onNodeWithText("AndroidPods").assertDoesNotExist()
-    }
-
-    @Test
     fun `初回起動時はオンボーディングが表示され、完了するとコールバックが呼ばれる`() {
         var completeCalled = false
         composeTestRule.setContent {

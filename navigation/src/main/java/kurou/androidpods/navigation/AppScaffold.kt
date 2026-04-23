@@ -27,15 +27,13 @@ private object Route {
 
 @Composable
 fun AppScaffold(
-    isFirstLaunch: Boolean?,
+    isFirstLaunch: Boolean,
     windowWidthSizeClass: WindowWidthSizeClass,
     onOnboardingComplete: () -> Unit,
     onStartScanService: () -> Unit,
     onStopScanService: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    if (isFirstLaunch == null) return
-
     val navController = rememberNavController()
     val startDestination = if (isFirstLaunch) Route.ONBOARDING else Route.SETTINGS
 
