@@ -7,6 +7,8 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.kover)
     alias(libs.plugins.roborazzi)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics.plugin)
 }
 
 val localProperties = Properties().apply {
@@ -70,6 +72,11 @@ android {
 }
 
 dependencies {
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.analytics)
+
     // プロジェクトモジュール
     implementation(project(":core:domain"))
     implementation(project(":core:data"))
