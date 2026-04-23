@@ -24,6 +24,9 @@ complexity:
     thresholdInInterfaces: 10
     thresholdInObjects: 20
     thresholdInEnums: 10
+    excludes:
+      - "**/test/**"
+      - "**/androidTest/**"
 
 coroutines:
   active: true
