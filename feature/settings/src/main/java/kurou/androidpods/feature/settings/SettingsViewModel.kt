@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class SettingsUiState(
@@ -54,12 +55,12 @@ class SettingsViewModel @Inject constructor(
 
     fun checkUpdate(currentVersion: String) {
         viewModelScope.launch {
-            _updateAvailable.value = checkUpdateUseCase(currentVersion)
+            _updateAvailable.update { checkUpdateUseCase(currentVersion) }
         }
     }
 
     fun refreshOverlayState() {
-        _overlayEnabled.value = getOverlaySettingsUseCase.isEnabled()
+        _overlayEnabled.update { getOverlaySettingsUseCase.isEnabled() }
     }
 
     fun updateThemeSettings(settings: ThemeSettings) {

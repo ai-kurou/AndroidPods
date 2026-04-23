@@ -24,10 +24,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val viewModel: MainViewModel = hiltViewModel()
-            val isFirstLaunch = viewModel.isFirstLaunch.collectAsStateWithLifecycle().value
-                ?: return@setContent
-            val themeSettings = viewModel.themeSettings.collectAsStateWithLifecycle().value
-                ?: return@setContent
+            val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+            val isFirstLaunch = uiState.value.isFirstLaunch ?: return@setContent
+            val themeSettings = uiState.value.themeSettings
             val darkTheme = when (themeSettings.themeMode) {
                 ThemeMode.LIGHT -> false
                 ThemeMode.DARK -> true
