@@ -57,13 +57,3 @@ dependencies {
     // Instrumented Test
     androidTestImplementation(libs.androidx.test.runner)
 }
-
-kover {
-    reports {
-        filters {
-            excludes {
-                annotatedBy("dagger.Module")
-            }
-        }
-    }
-}

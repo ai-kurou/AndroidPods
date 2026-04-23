@@ -168,3 +168,13 @@ dependencies {
     kover(project(":feature:licenses"))
     kover(project(":navigation"))
 }
+
+kover {
+    reports {
+        filters {
+            excludes {
+                annotatedBy("dagger.Module")
+            }
+        }
+    }
+}
