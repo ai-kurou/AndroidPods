@@ -48,19 +48,19 @@ class MainViewModelTest {
     }
 
     @Test
-    fun `初期状態はnullを返す`() {
-        assertNull(viewModel.isFirstLaunch.value)
+    fun `初期状態はisFirstLaunchがnullのUiStateを返す`() {
+        assertNull(viewModel.uiState.value.isFirstLaunch)
         verify(exactly = 1) { firstLaunchUseCase.observe() }
         verify(exactly = 1) { themeSettingsUseCase.observe() }
         confirmVerified(firstLaunchUseCase, themeSettingsUseCase)
     }
 
     @Test
-    fun `初回起動時はtrueが反映される`() = runTest {
+    fun `初回起動時はisFirstLaunchがtrueのUiStateが反映される`() = runTest {
         fakeFlow.value = true
 
-        val job = launch(testDispatcher) { viewModel.isFirstLaunch.collect {} }
-        assertEquals(true, viewModel.isFirstLaunch.value)
+        val job = launch(testDispatcher) { viewModel.uiState.collect {} }
+        assertEquals(true, viewModel.uiState.value.isFirstLaunch)
         job.cancel()
         verify(exactly = 1) { firstLaunchUseCase.observe() }
         verify(exactly = 1) { themeSettingsUseCase.observe() }
@@ -68,11 +68,11 @@ class MainViewModelTest {
     }
 
     @Test
-    fun `2回目以降はfalseが反映される`() = runTest {
+    fun `2回目以降はisFirstLaunchがfalseのUiStateが反映される`() = runTest {
         fakeFlow.value = false
 
-        val job = launch(testDispatcher) { viewModel.isFirstLaunch.collect {} }
-        assertEquals(false, viewModel.isFirstLaunch.value)
+        val job = launch(testDispatcher) { viewModel.uiState.collect {} }
+        assertEquals(false, viewModel.uiState.value.isFirstLaunch)
         job.cancel()
         verify(exactly = 1) { firstLaunchUseCase.observe() }
         verify(exactly = 1) { themeSettingsUseCase.observe() }
