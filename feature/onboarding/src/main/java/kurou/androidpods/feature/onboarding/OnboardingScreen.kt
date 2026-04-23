@@ -145,9 +145,11 @@ fun OnboardingScreen(
                 page = pagerState.currentPage,
                 context = context,
                 bluetoothAdapter = bluetoothAdapter,
-                permissionLauncher = permissionLauncher,
-                overlayPermissionLauncher = overlayPermissionLauncher,
-                bluetoothEnableLauncher = bluetoothEnableLauncher,
+                launchers = OnboardingLaunchers(
+                    permission = permissionLauncher,
+                    overlayPermission = overlayPermissionLauncher,
+                    bluetoothEnable = bluetoothEnableLauncher,
+                ),
                 onComplete = onComplete,
                 onBluetoothUnavailable = { showBluetoothUnavailableDialog = true },
                 onScrollToNextPage = {
@@ -189,21 +191,23 @@ private fun OnboardingDialogs(
     }
 }
 
+private data class OnboardingLaunchers(
+    val permission: ActivityResultLauncher<Array<String>>?,
+    val overlayPermission: ActivityResultLauncher<Intent>?,
+    val bluetoothEnable: ActivityResultLauncher<Intent>?,
+)
+
 private fun handleOnboardingButtonClick(
     page: Int,
     context: Context,
     bluetoothAdapter: BluetoothAdapter?,
-    permissionLauncher: ActivityResultLauncher<Array<String>>?,
-    overlayPermissionLauncher: ActivityResultLauncher<Intent>?,
-    bluetoothEnableLauncher: ActivityResultLauncher<Intent>?,
+    launchers: OnboardingLaunchers,
     onComplete: () -> Unit,
     onBluetoothUnavailable: () -> Unit,
     onScrollToNextPage: () -> Unit,
 ) {
     when (page) {
-        PERMISSION_PAGE -> {
-            permissionLauncher?.launch(requiredPermissions())
-        }
+        PERMISSION_PAGE -> launchers.permission?.launch(requiredPermissions())
 
         OVERLAY_PAGE -> {
             if (Settings.canDrawOverlays(context)) {
@@ -214,7 +218,7 @@ private fun handleOnboardingButtonClick(
                         Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                         "package:${context.packageName}".toUri(),
                     )
-                overlayPermissionLauncher?.launch(intent)
+                launchers.overlayPermission?.launch(intent)
             }
         }
 
@@ -222,12 +226,10 @@ private fun handleOnboardingButtonClick(
             when {
                 bluetoothAdapter == null -> onBluetoothUnavailable()
                 bluetoothAdapter.isEnabled -> onComplete()
-                else -> bluetoothEnableLauncher?.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
+                else -> launchers.bluetoothEnable?.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
             }
         }
 
-        else -> {
-            onScrollToNextPage()
-        }
+        else -> onScrollToNextPage()
     }
 }

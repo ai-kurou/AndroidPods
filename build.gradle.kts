@@ -25,7 +25,7 @@ subprojects {
         autoCorrect = true
     }
     tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
-        ignoreFailures = true
+        ignoreFailures = false
         autoCorrect = true
     }
     dependencies {
