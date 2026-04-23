@@ -114,6 +114,7 @@ Hiltを使用。新しいRepositoryを追加する場合:
 - **Service テスト**: Hilt + Robolectric。`@UninstallModules(DataModule::class)`でFakeモジュールに差し替え、`Robolectric.buildService()`でServiceControllerを取得。ロジックは`internal fun`として抽出しユニットテスト可能にする
 - **Compose UIテスト**: `createAndroidComposeRule<ComponentActivity>()` + Robolectricでユニットテストとして実行。Activityへのアクセス（`activityRule.scenario`、`onBackPressedDispatcher`など）が不要な場合は`createComposeRule()`でも可
 - **スクリーンショットテスト（Roborazzi）**: `@GraphicsMode(GraphicsMode.Mode.NATIVE)` を付けて `captureRoboImage()` でスクリーンショットを取得。クラスに `@Config(qualifiers = "w360dp-h640dp-port-xxhdpi")` でデバイスサイズを固定する。横向きは `@Config(qualifiers = "w640dp-h360dp-land-xxhdpi")` をメソッドに付与。アニメーション・`HorizontalPager`など描画が不安定なComposableは `RoborazziOptions(compareOptions = RoborazziOptions.CompareOptions(changeThreshold = 0.05f))` で差分しきい値を設定する
+- テストケース数は最小限に絞ること。カバレッジを確保しつつ、冗長なケースは省く
 - テスト名は日本語のバッククォート記法 (`` `初期状態はnullを返す`() ``)
 - 画面の向きは`@Config(qualifiers = "port")`または`@Config(qualifiers = "land")`で指定
 
