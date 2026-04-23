@@ -1,5 +1,6 @@
 package kurou.androidpods.core.data
 
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kurou.androidpods.core.domain.DeviceImages
 
 internal val APPLE_DEVICE_MODELS: Map<Int, String> =
@@ -45,9 +46,21 @@ internal val SINGLE_BATTERY_MODELS: Set<Int> =
         0x0C20, // Beats Solo Pro
     )
 
-internal fun appleModelName(modelCode: Int): String =
-    APPLE_DEVICE_MODELS[modelCode]
-        ?: "Unknown Apple Device (0x${modelCode.toString(16).padStart(4, '0')})"
+internal fun appleModelName(modelCode: Int): String {
+    val hexCode = "0x${modelCode.toString(16).padStart(4, '0')}"
+    return APPLE_DEVICE_MODELS[modelCode] ?: run {
+        try {
+            FirebaseCrashlytics.getInstance()
+                .recordException(UnknownAppleDeviceException(hexCode))
+        } catch (_: Exception) {
+            // Firebase未初期化環境（テスト等）では無視する
+        }
+        "Unknown Apple Device ($hexCode)"
+    }
+}
+
+internal class UnknownAppleDeviceException(modelCode: String) :
+    Exception("Unknown Apple device model code: $modelCode")
 
 private val APPLE_DEVICE_COLORS: Map<Int, String> =
     mapOf(
