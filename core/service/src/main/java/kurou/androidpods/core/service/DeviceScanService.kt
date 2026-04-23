@@ -286,34 +286,28 @@ internal fun batteryIconRes(
     charging: Boolean,
 ): Int {
     if (level == null) return R.drawable.icon_battery_null
-    if (level >= 10) {
-        return if (charging) {
-            R.drawable.icon_battery_charging_100
-        } else {
-            R.drawable.icon_battery_95_100
-        }
-    }
+    if (level >= 10) return if (charging) R.drawable.icon_battery_charging_100 else R.drawable.icon_battery_95_100
     val pct = level * 10 + 5
-    return if (charging) {
-        when {
-            pct < 20 -> R.drawable.icon_battery_charging_0_19
-            pct < 40 -> R.drawable.icon_battery_charging_20_39
-            pct < 60 -> R.drawable.icon_battery_charging_40_59
-            pct < 80 -> R.drawable.icon_battery_charging_60_79
-            pct < 95 -> R.drawable.icon_battery_charging_80_94
-            else -> R.drawable.icon_battery_charging_95_99
-        }
-    } else {
-        when {
-            pct < 5 -> R.drawable.icon_battery_0_4
-            pct < 20 -> R.drawable.icon_battery_5_19
-            pct < 40 -> R.drawable.icon_battery_20_39
-            pct < 60 -> R.drawable.icon_battery_40_59
-            pct < 80 -> R.drawable.icon_battery_60_79
-            pct < 95 -> R.drawable.icon_battery_80_94
-            else -> R.drawable.icon_battery_95_100
-        }
-    }
+    return if (charging) chargingBatteryIconRes(pct) else dischargingBatteryIconRes(pct)
+}
+
+private fun chargingBatteryIconRes(pct: Int): Int = when {
+    pct < 20 -> R.drawable.icon_battery_charging_0_19
+    pct < 40 -> R.drawable.icon_battery_charging_20_39
+    pct < 60 -> R.drawable.icon_battery_charging_40_59
+    pct < 80 -> R.drawable.icon_battery_charging_60_79
+    pct < 95 -> R.drawable.icon_battery_charging_80_94
+    else -> R.drawable.icon_battery_charging_95_99
+}
+
+private fun dischargingBatteryIconRes(pct: Int): Int = when {
+    pct < 5 -> R.drawable.icon_battery_0_4
+    pct < 20 -> R.drawable.icon_battery_5_19
+    pct < 40 -> R.drawable.icon_battery_20_39
+    pct < 60 -> R.drawable.icon_battery_40_59
+    pct < 80 -> R.drawable.icon_battery_60_79
+    pct < 95 -> R.drawable.icon_battery_80_94
+    else -> R.drawable.icon_battery_95_100
 }
 
 internal fun batteryText(
