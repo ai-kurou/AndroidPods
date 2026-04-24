@@ -111,21 +111,21 @@ class MainActivityTest {
                 .isNotEmpty()
         }
 
+        val openSourceLicenses = activity.getString(SettingsR.string.open_source_licenses)
         val compatibleDevices = activity.getString(SettingsR.string.compatible_devices)
         composeTestRule.onNodeWithText(compatibleDevices).performClick()
 
+        // SettingsScreen を離れた（openSourceLicenses が消えた）ことを確認してから戻る
         composeTestRule.waitUntil(timeoutMillis = 5_000) {
             composeTestRule
-                .onAllNodesWithText(compatibleDevices)
+                .onAllNodesWithText(openSourceLicenses)
                 .fetchSemanticsNodes()
-                .isNotEmpty()
+                .isEmpty()
         }
 
         composeTestRule.activityRule.scenario.onActivity {
             it.onBackPressedDispatcher.onBackPressed()
         }
-
-        val openSourceLicenses = activity.getString(SettingsR.string.open_source_licenses)
         composeTestRule.waitUntil(timeoutMillis = 5_000) {
             composeTestRule
                 .onAllNodesWithText(openSourceLicenses)
