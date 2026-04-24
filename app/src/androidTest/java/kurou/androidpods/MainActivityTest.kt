@@ -126,7 +126,7 @@ class MainActivityTest {
         }
 
         val openSourceLicenses = activity.getString(SettingsR.string.open_source_licenses)
-        composeTestRule.onNodeWithText(openSourceLicenses).performScrollTo().performClick()
+        composeTestRule.onNodeWithText(openSourceLicenses).performClick()
 
         composeTestRule.waitUntil(timeoutMillis = 5_000) {
             composeTestRule
