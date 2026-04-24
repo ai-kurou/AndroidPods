@@ -31,6 +31,8 @@ import kurou.androidpods.core.domain.CheckUpdateUseCase
 import kurou.androidpods.core.domain.GetAppleDevicesUseCase
 import kurou.androidpods.core.domain.GetBluetoothAdapterStateUseCase
 import kurou.androidpods.core.domain.GetOverlaySettingsUseCase
+import kurou.androidpods.core.domain.OverlayPosition
+import kurou.androidpods.core.domain.OverlayPositionUseCase
 import kurou.androidpods.core.domain.ThemeMode
 import kurou.androidpods.core.domain.ThemeSettings
 import kurou.androidpods.core.domain.ThemeSettingsUseCase
@@ -54,6 +56,7 @@ class SettingsScreenTest {
     private val overlayUseCase = mockk<GetOverlaySettingsUseCase>()
     private val checkUpdateUseCase = mockk<CheckUpdateUseCase>()
     private val themeSettingsUseCase = mockk<ThemeSettingsUseCase>()
+    private val overlayPositionUseCase = mockk<OverlayPositionUseCase>(relaxUnitFun = true)
 
     @After
     fun tearDown() {
@@ -72,6 +75,7 @@ class SettingsScreenTest {
         every { appleDevicesUseCase.observe() } returns MutableStateFlow(emptyMap())
         every { overlayUseCase.isEnabled() } returns false
         every { themeSettingsUseCase.observe() } returns MutableStateFlow(ThemeSettings())
+        every { overlayPositionUseCase.observe() } returns MutableStateFlow(OverlayPosition.BOTTOM)
         coEvery { themeSettingsUseCase.update(ThemeSettings(themeMode = ThemeMode.DARK)) } just Runs
         return SettingsViewModel(
             btUseCase,
@@ -79,6 +83,7 @@ class SettingsScreenTest {
             overlayUseCase,
             checkUpdateUseCase,
             themeSettingsUseCase,
+            overlayPositionUseCase,
         )
     }
 

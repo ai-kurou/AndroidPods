@@ -15,6 +15,8 @@ import kurou.androidpods.core.domain.CheckUpdateUseCase
 import kurou.androidpods.core.domain.GetAppleDevicesUseCase
 import kurou.androidpods.core.domain.GetBluetoothAdapterStateUseCase
 import kurou.androidpods.core.domain.GetOverlaySettingsUseCase
+import kurou.androidpods.core.domain.OverlayPosition
+import kurou.androidpods.core.domain.OverlayPositionUseCase
 import kurou.androidpods.core.domain.ThemeSettings
 import kurou.androidpods.core.domain.ThemeSettingsUseCase
 import javax.inject.Inject
@@ -25,6 +27,7 @@ data class SettingsUiState(
     val overlayEnabled: Boolean = false,
     val updateAvailable: Boolean = false,
     val themeSettings: ThemeSettings = ThemeSettings(),
+    val overlayPosition: OverlayPosition = OverlayPosition.BOTTOM,
 )
 
 @HiltViewModel
@@ -34,19 +37,32 @@ class SettingsViewModel @Inject constructor(
     private val getOverlaySettingsUseCase: GetOverlaySettingsUseCase,
     private val checkUpdateUseCase: CheckUpdateUseCase,
     private val themeSettingsUseCase: ThemeSettingsUseCase,
+    private val overlayPositionUseCase: OverlayPositionUseCase,
 ) : ViewModel() {
     private val _overlayEnabled = MutableStateFlow(getOverlaySettingsUseCase.isEnabled())
     private val _updateAvailable = MutableStateFlow(false)
 
     val uiState: StateFlow<SettingsUiState> =
         combine(
-            getBluetoothAdapterStateUseCase.observe(),
-            getAppleDevicesUseCase.observe(),
-            _overlayEnabled,
-            _updateAvailable,
-            themeSettingsUseCase.observe(),
-        ) { bluetoothAdapterState, appleDevices, overlayEnabled, updateAvailable, themeSettings ->
-            SettingsUiState(bluetoothAdapterState, appleDevices, overlayEnabled, updateAvailable, themeSettings)
+            combine(
+                getBluetoothAdapterStateUseCase.observe(),
+                getAppleDevicesUseCase.observe(),
+                _overlayEnabled,
+            ) { bluetoothAdapterState, appleDevices, overlayEnabled ->
+                Triple(bluetoothAdapterState, appleDevices, overlayEnabled)
+            },
+            combine(
+                _updateAvailable,
+                themeSettingsUseCase.observe(),
+                overlayPositionUseCase.observe(),
+            ) { updateAvailable, themeSettings, overlayPosition ->
+                Triple(updateAvailable, themeSettings, overlayPosition)
+            },
+        ) { (bluetoothAdapterState, appleDevices, overlayEnabled), (updateAvailable, themeSettings, overlayPosition) ->
+            SettingsUiState(
+                bluetoothAdapterState, appleDevices, overlayEnabled,
+                updateAvailable, themeSettings, overlayPosition,
+            )
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
@@ -66,6 +82,12 @@ class SettingsViewModel @Inject constructor(
     fun updateThemeSettings(settings: ThemeSettings) {
         viewModelScope.launch {
             themeSettingsUseCase.update(settings)
+        }
+    }
+
+    fun updateOverlayPosition(position: OverlayPosition) {
+        viewModelScope.launch {
+            overlayPositionUseCase.update(position)
         }
     }
 

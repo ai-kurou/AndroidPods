@@ -23,6 +23,8 @@ import kurou.androidpods.core.domain.CheckUpdateUseCase
 import kurou.androidpods.core.domain.GetAppleDevicesUseCase
 import kurou.androidpods.core.domain.GetBluetoothAdapterStateUseCase
 import kurou.androidpods.core.domain.GetOverlaySettingsUseCase
+import kurou.androidpods.core.domain.OverlayPosition
+import kurou.androidpods.core.domain.OverlayPositionUseCase
 import kurou.androidpods.core.domain.ThemeMode
 import kurou.androidpods.core.domain.ThemeSettings
 import kurou.androidpods.core.domain.ThemeSettingsUseCase
@@ -39,11 +41,13 @@ class SettingsViewModelTest {
     private val fakeBluetoothFlow = MutableSharedFlow<Int?>()
     private val fakeAppleDevicesFlow = MutableStateFlow<Map<String, AppleDevice>>(emptyMap())
     private val fakeThemeSettingsFlow = MutableStateFlow(ThemeSettings())
+    private val fakeOverlayPositionFlow = MutableStateFlow(OverlayPosition.BOTTOM)
     private val getBluetoothAdapterStateUseCase = mockk<GetBluetoothAdapterStateUseCase>()
     private val getAppleDevicesUseCase = mockk<GetAppleDevicesUseCase>(relaxUnitFun = true)
     private val getOverlaySettingsUseCase = mockk<GetOverlaySettingsUseCase>()
     private val checkUpdateUseCase = mockk<CheckUpdateUseCase>()
     private val themeSettingsUseCase = mockk<ThemeSettingsUseCase>()
+    private val overlayPositionUseCase = mockk<OverlayPositionUseCase>(relaxUnitFun = true)
 
     @Before
     fun setUp() {
@@ -52,6 +56,7 @@ class SettingsViewModelTest {
         every { getAppleDevicesUseCase.observe() } returns fakeAppleDevicesFlow
         every { getOverlaySettingsUseCase.isEnabled() } returns false
         every { themeSettingsUseCase.observe() } returns fakeThemeSettingsFlow
+        every { overlayPositionUseCase.observe() } returns fakeOverlayPositionFlow
         viewModel =
             SettingsViewModel(
                 getBluetoothAdapterStateUseCase,
@@ -59,6 +64,7 @@ class SettingsViewModelTest {
                 getOverlaySettingsUseCase,
                 checkUpdateUseCase,
                 themeSettingsUseCase,
+                overlayPositionUseCase,
             )
     }
 
@@ -85,12 +91,14 @@ class SettingsViewModelTest {
             // コンストラクタで1回 + refreshOverlayState()で1回 = 合計2回
             verify(exactly = 2) { getOverlaySettingsUseCase.isEnabled() }
             verify(exactly = 1) { themeSettingsUseCase.observe() }
+            verify(exactly = 1) { overlayPositionUseCase.observe() }
             confirmVerified(
                 getBluetoothAdapterStateUseCase,
                 getAppleDevicesUseCase,
                 getOverlaySettingsUseCase,
                 checkUpdateUseCase,
                 themeSettingsUseCase,
+                overlayPositionUseCase,
             )
         }
 
@@ -105,12 +113,14 @@ class SettingsViewModelTest {
         verify(exactly = 1) { getAppleDevicesUseCase.stopScan() }
         verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
         verify(exactly = 1) { themeSettingsUseCase.observe() }
+        verify(exactly = 1) { overlayPositionUseCase.observe() }
         confirmVerified(
             getBluetoothAdapterStateUseCase,
             getAppleDevicesUseCase,
             getOverlaySettingsUseCase,
             checkUpdateUseCase,
             themeSettingsUseCase,
+            overlayPositionUseCase,
         )
     }
 
@@ -128,6 +138,7 @@ class SettingsViewModelTest {
             verify(exactly = 1) { getAppleDevicesUseCase.observe() }
             verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
             verify(exactly = 1) { themeSettingsUseCase.observe() }
+            verify(exactly = 1) { overlayPositionUseCase.observe() }
             coVerify(exactly = 1) { checkUpdateUseCase(version) }
             confirmVerified(
                 getBluetoothAdapterStateUseCase,
@@ -135,6 +146,7 @@ class SettingsViewModelTest {
                 getOverlaySettingsUseCase,
                 checkUpdateUseCase,
                 themeSettingsUseCase,
+                overlayPositionUseCase,
             )
         }
 
@@ -152,6 +164,7 @@ class SettingsViewModelTest {
             verify(exactly = 1) { getAppleDevicesUseCase.observe() }
             verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
             verify(exactly = 1) { themeSettingsUseCase.observe() }
+            verify(exactly = 1) { overlayPositionUseCase.observe() }
             coVerify(exactly = 1) { checkUpdateUseCase(version) }
             confirmVerified(
                 getBluetoothAdapterStateUseCase,
@@ -159,6 +172,7 @@ class SettingsViewModelTest {
                 getOverlaySettingsUseCase,
                 checkUpdateUseCase,
                 themeSettingsUseCase,
+                overlayPositionUseCase,
             )
         }
 
@@ -174,6 +188,7 @@ class SettingsViewModelTest {
             verify(exactly = 1) { getAppleDevicesUseCase.observe() }
             verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
             verify(exactly = 1) { themeSettingsUseCase.observe() }
+            verify(exactly = 1) { overlayPositionUseCase.observe() }
             coVerify(exactly = 1) { themeSettingsUseCase.update(settings) }
             confirmVerified(
                 getBluetoothAdapterStateUseCase,
@@ -181,6 +196,28 @@ class SettingsViewModelTest {
                 getOverlaySettingsUseCase,
                 checkUpdateUseCase,
                 themeSettingsUseCase,
+                overlayPositionUseCase,
+            )
+        }
+
+    @Test
+    fun `updateOverlayPositionでUseCaseのupdateが呼ばれる`() =
+        runTest {
+            viewModel.updateOverlayPosition(OverlayPosition.TOP)
+
+            verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
+            verify(exactly = 1) { getAppleDevicesUseCase.observe() }
+            verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
+            verify(exactly = 1) { themeSettingsUseCase.observe() }
+            verify(exactly = 1) { overlayPositionUseCase.observe() }
+            coVerify(exactly = 1) { overlayPositionUseCase.update(OverlayPosition.TOP) }
+            confirmVerified(
+                getBluetoothAdapterStateUseCase,
+                getAppleDevicesUseCase,
+                getOverlaySettingsUseCase,
+                checkUpdateUseCase,
+                themeSettingsUseCase,
+                overlayPositionUseCase,
             )
         }
 }
