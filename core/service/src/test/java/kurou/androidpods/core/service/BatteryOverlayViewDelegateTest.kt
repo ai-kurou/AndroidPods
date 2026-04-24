@@ -1,5 +1,6 @@
 package kurou.androidpods.core.service
 
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
@@ -7,6 +8,7 @@ import android.widget.TextView
 import androidx.test.core.app.ApplicationProvider
 import kurou.androidpods.core.domain.AppleDevice
 import kurou.androidpods.core.domain.DeviceImages
+import kurou.androidpods.core.domain.OverlayPosition
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -237,6 +239,34 @@ class BatteryOverlayViewDelegateTest {
     }
 
     @Test
+    fun `addOverlayViewのデフォルトgravityがBOTTOM`() {
+        delegate.addOverlayView()
+
+        val params = fakeWindowOps.lastAddedParams!!
+        assertEquals(Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL, params.gravity)
+    }
+
+    @Test
+    fun `updatePositionでTOPに設定してaddOverlayViewするとgravityがTOP`() {
+        delegate.updatePosition(OverlayPosition.TOP)
+        delegate.addOverlayView()
+
+        val params = fakeWindowOps.lastAddedParams!!
+        assertEquals(Gravity.TOP or Gravity.CENTER_HORIZONTAL, params.gravity)
+    }
+
+    @Test
+    fun `表示中にupdatePositionを呼ぶとviewのgravityが更新される`() {
+        delegate.addOverlayView()
+
+        delegate.updatePosition(OverlayPosition.TOP)
+
+        val params = fakeWindowOps.lastUpdatedParams!!
+        assertEquals(Gravity.TOP or Gravity.CENTER_HORIZONTAL, params.gravity)
+        assertEquals(1, fakeWindowOps.updateLayoutCount)
+    }
+
+    @Test
     fun `addOverlayViewのLayoutParamsがWRAP_CONTENTでTYPE_APPLICATION_OVERLAY`() {
         delegate.addOverlayView()
 
@@ -390,10 +420,13 @@ private class FakeOverlayWindowOperations : OverlayWindowOperations {
         removeViewCount++
     }
 
+    var lastUpdatedParams: WindowManager.LayoutParams? = null
+
     override fun updateViewLayout(
         view: View,
         params: WindowManager.LayoutParams,
     ) {
         updateLayoutCount++
+        lastUpdatedParams = params
     }
 }

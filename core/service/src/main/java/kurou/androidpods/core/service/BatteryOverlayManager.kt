@@ -1,6 +1,7 @@
 package kurou.androidpods.core.service
 
 import kurou.androidpods.core.domain.AppleDevice
+import kurou.androidpods.core.domain.OverlayPosition
 
 internal class BatteryOverlayManager(private val delegate: OverlayViewDelegate) {
     /** dismiss時点の各デバイスの lidOpenCounter。同じカウンター値の間は再表示しない */
@@ -54,6 +55,10 @@ internal class BatteryOverlayManager(private val delegate: OverlayViewDelegate) 
             delegate.addOverlayView()
         }
         delegate.updateContent(visibleDevices)
+    }
+
+    fun updatePosition(position: OverlayPosition) {
+        delegate.updatePosition(position)
     }
 
     fun hide() {

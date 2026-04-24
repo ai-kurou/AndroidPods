@@ -20,6 +20,7 @@ import android.widget.ScrollView
 import android.widget.TextView
 import kurou.androidpods.core.domain.AppleDevice
 import kurou.androidpods.core.domain.DeviceImages
+import kurou.androidpods.core.domain.OverlayPosition
 
 internal class BatteryOverlayViewDelegate(
     private val context: Context,
@@ -39,6 +40,9 @@ internal class BatteryOverlayViewDelegate(
         private const val ANIM_SCALE_TO = 1.0f
         private const val DRAG_THRESHOLD = 10f
     }
+
+    private var overlayPosition: OverlayPosition = OverlayPosition.BOTTOM
+        private set
 
     private var overlayView: View? = null
     private var cardsContainer: LinearLayout? = null
@@ -129,7 +133,7 @@ internal class BatteryOverlayViewDelegate(
                     WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
                     PixelFormat.TRANSLUCENT,
                 ).apply {
-                    gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
+                    gravity = overlayPosition.toGravity()
                 }
 
         root.alpha = 0f
@@ -189,7 +193,12 @@ internal class BatteryOverlayViewDelegate(
             when (event.action) {
                 MotionEvent.ACTION_MOVE -> {
                     params.x = initialX + (event.rawX - initialTouchX).toInt()
-                    params.y = initialY - (event.rawY - initialTouchY).toInt()
+                    val yDelta = (event.rawY - initialTouchY).toInt()
+                    params.y = if (delegate.overlayPosition == OverlayPosition.TOP) {
+                        initialY + yDelta
+                    } else {
+                        initialY - yDelta
+                    }
                     delegate.windowOps.updateViewLayout(this, params)
                     return true
                 }
@@ -201,6 +210,14 @@ internal class BatteryOverlayViewDelegate(
             }
             return super.onTouchEvent(event)
         }
+    }
+
+    override fun updatePosition(position: OverlayPosition) {
+        overlayPosition = position
+        val params = layoutParams ?: return
+        params.gravity = position.toGravity()
+        val view = overlayView ?: return
+        windowOps.updateViewLayout(view, params)
     }
 
     override fun removeOverlayView() {
@@ -354,3 +371,10 @@ internal class BatteryOverlayViewDelegate(
             }
         }
 }
+
+private fun OverlayPosition.toGravity(): Int =
+    if (this == OverlayPosition.TOP) {
+        Gravity.TOP or Gravity.CENTER_HORIZONTAL
+    } else {
+        Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
+    }

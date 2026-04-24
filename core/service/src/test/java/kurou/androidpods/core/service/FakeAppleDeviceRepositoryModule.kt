@@ -11,6 +11,8 @@ import kurou.androidpods.core.domain.AppleDevice
 import kurou.androidpods.core.domain.AppleDeviceRepository
 import kurou.androidpods.core.domain.BluetoothAdapterRepository
 import kurou.androidpods.core.domain.FirstLaunchRepository
+import kurou.androidpods.core.domain.OverlayPosition
+import kurou.androidpods.core.domain.OverlayPositionRepository
 import kurou.androidpods.core.domain.OverlaySettingsRepository
 import javax.inject.Singleton
 
@@ -68,5 +70,15 @@ object FakeRepositoryModule {
     fun provideOverlaySettingsRepository(): OverlaySettingsRepository =
         object : OverlaySettingsRepository {
             override fun isEnabled(): Boolean = false
+        }
+
+    @Provides
+    @Singleton
+    fun provideOverlayPositionRepository(): OverlayPositionRepository =
+        object : OverlayPositionRepository {
+            override fun observe(): kotlinx.coroutines.flow.Flow<OverlayPosition> =
+                kotlinx.coroutines.flow.emptyFlow()
+
+            override suspend fun update(position: OverlayPosition) {}
         }
 }
