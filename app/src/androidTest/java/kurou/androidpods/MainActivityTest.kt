@@ -90,7 +90,7 @@ class MainActivityTest {
         composeTestRule.onNodeWithTag("SettingsGrid").performTouchInput { swipeUp() }
         waitForText("Open Source Licenses")
         composeTestRule.onNodeWithText("Open Source Licenses").performClick()
-        waitForText("Open Source Licenses")
+        waitForTag("LicensesScreen")
         navigateBack()
     }
 
