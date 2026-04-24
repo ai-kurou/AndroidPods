@@ -30,4 +30,7 @@
     <string name="theme_mode_light">ライト</string>
     <string name="theme_mode_dark">ダーク</string>
     <string name="dynamic_color_label">ダイナミックカラー</string>
+    <string name="overlay_position_label">オーバーレイ表示位置</string>
+    <string name="overlay_position_top">上部</string>
+    <string name="overlay_position_bottom">下部</string>
 </resources>

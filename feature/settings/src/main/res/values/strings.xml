@@ -30,4 +30,7 @@
     <string name="theme_mode_light">Light</string>
     <string name="theme_mode_dark">Dark</string>
     <string name="dynamic_color_label">Dynamic Color</string>
+    <string name="overlay_position_label">Overlay position</string>
+    <string name="overlay_position_top">Top</string>
+    <string name="overlay_position_bottom">Bottom</string>
 </resources>

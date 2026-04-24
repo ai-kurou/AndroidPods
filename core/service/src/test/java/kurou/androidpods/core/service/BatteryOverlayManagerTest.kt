@@ -1,6 +1,7 @@
 package kurou.androidpods.core.service
 
 import kurou.androidpods.core.domain.AppleDevice
+import kurou.androidpods.core.domain.OverlayPosition
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -173,6 +174,13 @@ class BatteryOverlayManagerTest {
     }
 
     @Test
+    fun `updatePositionでdelegateのupdatePositionが呼ばれる`() {
+        manager.updatePosition(OverlayPosition.TOP)
+
+        assertEquals(OverlayPosition.TOP, fakeDelegate.lastUpdatedPosition)
+    }
+
+    @Test
     fun `dismiss後に蓋を閉じて開き直すとlidOpenCounterが循環しても再表示される`() {
         fakeDelegate.overlayPermission = true
         // lidOpenCounter = 7（最大値）
@@ -197,6 +205,7 @@ private class FakeOverlayViewDelegate : OverlayViewDelegate {
     var animateHideCount = 0
     var updateContentCount = 0
     var lastUpdatedDevices: List<AppleDevice> = emptyList()
+    var lastUpdatedPosition: OverlayPosition? = null
 
     private var viewAdded = false
 
@@ -223,5 +232,9 @@ private class FakeOverlayViewDelegate : OverlayViewDelegate {
     override fun updateContent(devices: List<AppleDevice>) {
         updateContentCount++
         lastUpdatedDevices = devices
+    }
+
+    override fun updatePosition(position: OverlayPosition) {
+        lastUpdatedPosition = position
     }
 }

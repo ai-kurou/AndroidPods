@@ -65,6 +65,7 @@ fun SettingsScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showSettingsDialog by remember { mutableStateOf(false) }
     var showThemeModeDialog by remember { mutableStateOf(false) }
+    var showOverlayPositionDialog by remember { mutableStateOf(false) }
     var initialRequestDone by remember { mutableStateOf(false) }
     var isServiceRestarting by remember { mutableStateOf(false) }
 
@@ -129,6 +130,17 @@ fun SettingsScreen(
         )
     }
 
+    if (showOverlayPositionDialog) {
+        OverlayPositionDialog(
+            currentPosition = uiState.overlayPosition,
+            onDismiss = { showOverlayPositionDialog = false },
+            onPositionSelected = { position ->
+                viewModel.updateOverlayPosition(position)
+                showOverlayPositionDialog = false
+            },
+        )
+    }
+
     val columns =
         when (windowWidthSizeClass) {
             WindowWidthSizeClass.Compact -> 1
@@ -187,6 +199,7 @@ fun SettingsScreen(
         onDynamicColorToggle = { enabled ->
             viewModel.updateThemeSettings(uiState.themeSettings.copy(useDynamicColor = enabled))
         },
+        onOverlayPositionClick = { showOverlayPositionDialog = true },
     )
 }
 
@@ -253,6 +266,7 @@ private fun SettingsScaffold(
     onDevicesClick: () -> Unit,
     onGithubClick: () -> Unit,
     onOverlayToggle: (Boolean) -> Unit,
+    onOverlayPositionClick: () -> Unit,
     onRestartServiceClick: () -> Unit,
     onThemeModeClick: () -> Unit,
     onDynamicColorToggle: (Boolean) -> Unit,
@@ -272,6 +286,7 @@ private fun SettingsScaffold(
             permissionStates = permissionStates,
             bluetoothAdapterState = uiState.bluetoothAdapterState,
             overlayEnabled = uiState.overlayEnabled,
+            overlayPosition = uiState.overlayPosition,
             updateAvailable = uiState.updateAvailable,
             isServiceRestarting = isServiceRestarting,
             columns = columns,
@@ -283,6 +298,7 @@ private fun SettingsScaffold(
             onDevicesClick = onDevicesClick,
             onGithubClick = onGithubClick,
             onOverlayToggle = onOverlayToggle,
+            onOverlayPositionClick = onOverlayPositionClick,
             onRestartServiceClick = onRestartServiceClick,
             onThemeModeClick = onThemeModeClick,
             onDynamicColorToggle = onDynamicColorToggle,

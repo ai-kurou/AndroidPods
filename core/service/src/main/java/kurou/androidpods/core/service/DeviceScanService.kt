@@ -23,6 +23,7 @@ import kurou.androidpods.core.domain.AppleDevice
 import kurou.androidpods.core.domain.AppleDeviceRepository
 import kurou.androidpods.core.domain.BluetoothAdapterRepository
 import kurou.androidpods.core.domain.DeviceImages
+import kurou.androidpods.core.domain.OverlayPositionRepository
 import kurou.androidpods.core.domain.OverlaySettingsRepository
 import javax.inject.Inject
 
@@ -36,6 +37,9 @@ class DeviceScanService : Service() {
 
     @Inject
     lateinit var overlaySettingsRepository: OverlaySettingsRepository
+
+    @Inject
+    lateinit var overlayPositionRepository: OverlayPositionRepository
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private var isForeground = false
@@ -64,6 +68,7 @@ class DeviceScanService : Service() {
             ServiceCompat.startForeground(this, NOTIFICATION_ID, notification, foregroundServiceType)
             observeDevices()
             observeBluetoothState()
+            observeOverlayPosition()
         }
         appleDeviceRepository.startScan()
         return START_STICKY
@@ -92,6 +97,14 @@ class DeviceScanService : Service() {
                 } else {
                     overlayManager.hide()
                 }
+            }
+        }
+    }
+
+    private fun observeOverlayPosition() {
+        scope.launch {
+            overlayPositionRepository.observe().collect { position ->
+                overlayManager.updatePosition(position)
             }
         }
     }

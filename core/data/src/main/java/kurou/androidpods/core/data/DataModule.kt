@@ -13,9 +13,11 @@ import kurou.androidpods.core.domain.AppleDeviceRepository
 import kurou.androidpods.core.domain.BluetoothAdapterRepository
 import kurou.androidpods.core.domain.CompatibleDeviceRepository
 import kurou.androidpods.core.domain.FirstLaunchRepository
+import kurou.androidpods.core.domain.OverlayPositionRepository
 import kurou.androidpods.core.domain.OverlaySettingsRepository
 import kurou.androidpods.core.domain.ThemeSettingsRepository
 import kurou.androidpods.core.domain.UpdateRepository
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -27,6 +29,13 @@ abstract class DataModule {
         fun provideThemeDataStore(
             @ApplicationContext context: Context,
         ): DataStore<Preferences> = context.themeDataStore
+
+        @Provides
+        @Singleton
+        @Named("overlay_position")
+        fun provideOverlayPositionDataStore(
+            @ApplicationContext context: Context,
+        ): DataStore<Preferences> = context.overlayPositionDataStore
     }
 
     @Binds
@@ -39,6 +48,9 @@ abstract class DataModule {
 
     @Binds
     internal abstract fun bindAppleDeviceRepository(impl: AppleDeviceRepositoryImpl): AppleDeviceRepository
+
+    @Binds
+    internal abstract fun bindOverlayPositionRepository(impl: OverlayPositionRepositoryImpl): OverlayPositionRepository
 
     @Binds
     internal abstract fun bindOverlaySettingsRepository(impl: OverlaySettingsRepositoryImpl): OverlaySettingsRepository

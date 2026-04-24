@@ -10,6 +10,7 @@ import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
+import kurou.androidpods.core.domain.OverlayPosition
 import kurou.androidpods.core.domain.ThemeSettings
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -42,6 +43,8 @@ class SettingsContentTest {
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
+                overlayPosition = OverlayPosition.BOTTOM,
+                onOverlayPositionClick = {},
                 onRestartServiceClick = {},
                 themeSettings = ThemeSettings(),
                 onThemeModeClick = {},
@@ -77,6 +80,8 @@ class SettingsContentTest {
                 onPermissionWarningClick = { clicked = true },
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
+                overlayPosition = OverlayPosition.BOTTOM,
+                onOverlayPositionClick = {},
                 onRestartServiceClick = {},
                 themeSettings = ThemeSettings(),
                 onThemeModeClick = {},
@@ -109,6 +114,8 @@ class SettingsContentTest {
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
+                overlayPosition = OverlayPosition.BOTTOM,
+                onOverlayPositionClick = {},
                 onRestartServiceClick = {},
                 themeSettings = ThemeSettings(),
                 onThemeModeClick = {},
@@ -140,6 +147,8 @@ class SettingsContentTest {
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = { clicked = true },
                 onOverlayToggle = {},
+                overlayPosition = OverlayPosition.BOTTOM,
+                onOverlayPositionClick = {},
                 onRestartServiceClick = {},
                 themeSettings = ThemeSettings(),
                 onThemeModeClick = {},
@@ -173,6 +182,8 @@ class SettingsContentTest {
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = { clicked = true },
                 onOverlayToggle = {},
+                overlayPosition = OverlayPosition.BOTTOM,
+                onOverlayPositionClick = {},
                 onRestartServiceClick = {},
                 themeSettings = ThemeSettings(),
                 onThemeModeClick = {},
@@ -207,6 +218,8 @@ class SettingsContentTest {
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
+                overlayPosition = OverlayPosition.BOTTOM,
+                onOverlayPositionClick = {},
                 onRestartServiceClick = {},
                 themeSettings = ThemeSettings(),
                 onThemeModeClick = {},
@@ -238,6 +251,8 @@ class SettingsContentTest {
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
+                overlayPosition = OverlayPosition.BOTTOM,
+                onOverlayPositionClick = {},
                 onRestartServiceClick = {},
                 themeSettings = ThemeSettings(),
                 onThemeModeClick = {},
@@ -269,6 +284,8 @@ class SettingsContentTest {
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
+                overlayPosition = OverlayPosition.BOTTOM,
+                onOverlayPositionClick = {},
                 onRestartServiceClick = {},
                 themeSettings = ThemeSettings(),
                 onThemeModeClick = {},
@@ -300,6 +317,8 @@ class SettingsContentTest {
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
                 onOverlayToggle = { toggledValue = it },
+                overlayPosition = OverlayPosition.BOTTOM,
+                onOverlayPositionClick = {},
                 onRestartServiceClick = {},
                 themeSettings = ThemeSettings(),
                 onThemeModeClick = {},
@@ -331,6 +350,8 @@ class SettingsContentTest {
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
                 onOverlayToggle = { toggledValue = it },
+                overlayPosition = OverlayPosition.BOTTOM,
+                onOverlayPositionClick = {},
                 onRestartServiceClick = {},
                 themeSettings = ThemeSettings(),
                 onThemeModeClick = {},
@@ -362,6 +383,8 @@ class SettingsContentTest {
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
+                overlayPosition = OverlayPosition.BOTTOM,
+                onOverlayPositionClick = {},
                 onRestartServiceClick = { clicked = true },
                 themeSettings = ThemeSettings(),
                 onThemeModeClick = {},
@@ -393,6 +416,8 @@ class SettingsContentTest {
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
+                overlayPosition = OverlayPosition.BOTTOM,
+                onOverlayPositionClick = {},
                 onRestartServiceClick = { clicked = true },
                 themeSettings = ThemeSettings(),
                 onThemeModeClick = {},
@@ -424,6 +449,8 @@ class SettingsContentTest {
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
+                overlayPosition = OverlayPosition.BOTTOM,
+                onOverlayPositionClick = {},
                 onRestartServiceClick = {},
                 themeSettings = ThemeSettings(),
                 onThemeModeClick = {},
@@ -458,6 +485,8 @@ class SettingsContentTest {
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
+                overlayPosition = OverlayPosition.BOTTOM,
+                onOverlayPositionClick = {},
                 onRestartServiceClick = {},
                 onThemeModeClick = { clicked = true },
                 onDynamicColorToggle = {},
@@ -489,6 +518,8 @@ class SettingsContentTest {
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
+                overlayPosition = OverlayPosition.BOTTOM,
+                onOverlayPositionClick = {},
                 onRestartServiceClick = {},
                 onThemeModeClick = {},
                 onDynamicColorToggle = { toggledValue = it },
@@ -520,6 +551,8 @@ class SettingsContentTest {
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
+                overlayPosition = OverlayPosition.BOTTOM,
+                onOverlayPositionClick = {},
                 onRestartServiceClick = {},
                 onThemeModeClick = {},
                 onDynamicColorToggle = { toggledValue = it },
@@ -551,6 +584,8 @@ class SettingsContentTest {
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
                 onOverlayToggle = {},
+                overlayPosition = OverlayPosition.BOTTOM,
+                onOverlayPositionClick = {},
                 onRestartServiceClick = {},
                 onThemeModeClick = {},
                 onDynamicColorToggle = {},
@@ -562,5 +597,37 @@ class SettingsContentTest {
         }
 
         composeTestRule.onNodeWithText("Dynamic Color").assertDoesNotExist()
+    }
+
+    @Test
+    fun `オーバーレイ位置アイテムをタップするとonOverlayPositionClickが呼ばれる`() {
+        var clicked = false
+        composeTestRule.setContent {
+            SettingsContent(
+                permissionStates = emptyMap(),
+                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+                overlayEnabled = false,
+                overlayPosition = OverlayPosition.BOTTOM,
+                updateAvailable = false,
+                isServiceRestarting = false,
+                columns = 1,
+                themeSettings = ThemeSettings(),
+                onPermissionWarningClick = {},
+                onBluetoothWarningClick = {},
+                onOverlayToggle = {},
+                onOverlayPositionClick = { clicked = true },
+                onRestartServiceClick = {},
+                onThemeModeClick = {},
+                onDynamicColorToggle = {},
+                onUpdateClick = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                onGithubClick = {},
+            )
+        }
+
+        composeTestRule.onNodeWithText("Overlay position").performClick()
+
+        assertTrue(clicked)
     }
 }

@@ -31,10 +31,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kurou.androidpods.core.domain.OverlayPosition
 import kurou.androidpods.core.domain.ThemeMode
 import kurou.androidpods.core.domain.ThemeSettings
 
@@ -43,6 +45,7 @@ internal fun SettingsContent(
     permissionStates: Map<String, Boolean>,
     bluetoothAdapterState: Int?,
     overlayEnabled: Boolean,
+    overlayPosition: OverlayPosition,
     updateAvailable: Boolean,
     isServiceRestarting: Boolean,
     columns: Int,
@@ -50,6 +53,7 @@ internal fun SettingsContent(
     onPermissionWarningClick: () -> Unit,
     onBluetoothWarningClick: () -> Unit,
     onOverlayToggle: (Boolean) -> Unit,
+    onOverlayPositionClick: () -> Unit,
     onRestartServiceClick: () -> Unit,
     onThemeModeClick: () -> Unit,
     onDynamicColorToggle: (Boolean) -> Unit,
@@ -67,7 +71,7 @@ internal fun SettingsContent(
         columns = GridCells.Fixed(columns),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = modifier.fillMaxSize().padding(16.dp),
+        modifier = modifier.fillMaxSize().padding(16.dp).testTag("SettingsGrid"),
     ) {
         if (hasNotGranted) {
             item(span = { GridItemSpan(maxLineSpan) }) {
@@ -97,6 +101,19 @@ internal fun SettingsContent(
                 Switch(
                     checked = overlayEnabled,
                     onCheckedChange = onOverlayToggle,
+                )
+            }
+        }
+        item(span = { GridItemSpan(1) }) {
+            SettingsItem(
+                label = stringResource(R.string.overlay_position_label),
+                icon = painterResource(R.drawable.ic_overlay_position),
+                onClick = onOverlayPositionClick,
+            ) {
+                Text(
+                    text = stringResource(overlayPosition.toStringRes()),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
@@ -357,6 +374,12 @@ internal fun ThemeMode.toStringRes(): Int =
         ThemeMode.DARK -> R.string.theme_mode_dark
     }
 
+internal fun OverlayPosition.toStringRes(): Int =
+    when (this) {
+        OverlayPosition.TOP -> R.string.overlay_position_top
+        OverlayPosition.BOTTOM -> R.string.overlay_position_bottom
+    }
+
 @Preview(showBackground = true, widthDp = 400, heightDp = 700)
 @Composable
 private fun SettingsContentPreviewNoWarning() {
@@ -368,12 +391,14 @@ private fun SettingsContentPreviewNoWarning() {
             ),
         bluetoothAdapterState = BluetoothAdapter.STATE_ON,
         overlayEnabled = true,
+        overlayPosition = OverlayPosition.BOTTOM,
         updateAvailable = false,
         isServiceRestarting = false,
         columns = 1,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
+        onOverlayPositionClick = {},
         onRestartServiceClick = {},
         themeSettings = ThemeSettings(),
         onThemeModeClick = {},
@@ -392,12 +417,14 @@ private fun SettingsContentPreviewBluetoothUnavailable() {
         permissionStates = emptyMap(),
         bluetoothAdapterState = null,
         overlayEnabled = false,
+        overlayPosition = OverlayPosition.BOTTOM,
         updateAvailable = false,
         isServiceRestarting = false,
         columns = 1,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
+        onOverlayPositionClick = {},
         onRestartServiceClick = {},
         themeSettings = ThemeSettings(),
         onThemeModeClick = {},
@@ -420,12 +447,14 @@ private fun SettingsContentPreviewAllWarnings() {
             ),
         bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
         overlayEnabled = false,
+        overlayPosition = OverlayPosition.TOP,
         updateAvailable = true,
         isServiceRestarting = false,
         columns = 1,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
+        onOverlayPositionClick = {},
         onRestartServiceClick = {},
         themeSettings = ThemeSettings(),
         onThemeModeClick = {},
@@ -448,12 +477,14 @@ private fun SettingsContentPreviewServiceRestarting() {
             ),
         bluetoothAdapterState = BluetoothAdapter.STATE_ON,
         overlayEnabled = true,
+        overlayPosition = OverlayPosition.BOTTOM,
         updateAvailable = false,
         isServiceRestarting = true,
         columns = 1,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
+        onOverlayPositionClick = {},
         onRestartServiceClick = {},
         themeSettings = ThemeSettings(),
         onThemeModeClick = {},
@@ -476,12 +507,14 @@ private fun SettingsContentPreviewTwoColumns() {
             ),
         bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
         overlayEnabled = false,
+        overlayPosition = OverlayPosition.BOTTOM,
         updateAvailable = true,
         isServiceRestarting = false,
         columns = 2,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
+        onOverlayPositionClick = {},
         onRestartServiceClick = {},
         themeSettings = ThemeSettings(),
         onThemeModeClick = {},
@@ -504,12 +537,14 @@ private fun SettingsContentPreviewThreeColumns() {
             ),
         bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
         overlayEnabled = false,
+        overlayPosition = OverlayPosition.BOTTOM,
         updateAvailable = true,
         isServiceRestarting = false,
         columns = 3,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onOverlayToggle = {},
+        onOverlayPositionClick = {},
         onRestartServiceClick = {},
         themeSettings = ThemeSettings(),
         onThemeModeClick = {},

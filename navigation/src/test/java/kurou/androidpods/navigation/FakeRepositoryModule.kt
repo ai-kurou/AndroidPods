@@ -12,6 +12,8 @@ import kurou.androidpods.core.domain.AppleDeviceRepository
 import kurou.androidpods.core.domain.BluetoothAdapterRepository
 import kurou.androidpods.core.domain.CompatibleDevice
 import kurou.androidpods.core.domain.CompatibleDeviceRepository
+import kurou.androidpods.core.domain.OverlayPosition
+import kurou.androidpods.core.domain.OverlayPositionRepository
 import kurou.androidpods.core.domain.OverlaySettingsRepository
 import kurou.androidpods.core.domain.ThemeSettings
 import kurou.androidpods.core.domain.ThemeSettingsRepository
@@ -69,5 +71,14 @@ object FakeRepositoryModule {
             override fun observe(): Flow<ThemeSettings> = flowOf(ThemeSettings())
 
             override suspend fun update(settings: ThemeSettings) {}
+        }
+
+    @Provides
+    @Singleton
+    fun provideOverlayPositionRepository(): OverlayPositionRepository =
+        object : OverlayPositionRepository {
+            override fun observe(): Flow<OverlayPosition> = emptyFlow()
+
+            override suspend fun update(position: OverlayPosition) {}
         }
 }
