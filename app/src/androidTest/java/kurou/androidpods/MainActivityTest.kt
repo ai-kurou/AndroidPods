@@ -114,7 +114,7 @@ class MainActivityTest {
 
         val openSourceLicenses = activity.getString(SettingsR.string.open_source_licenses)
         val compatibleDevices = activity.getString(SettingsR.string.compatible_devices)
-        composeTestRule.onNodeWithText(compatibleDevices).performClick()
+        composeTestRule.onNodeWithText(compatibleDevices).performScrollTo().performClick()
 
         // DevicesScreen に遷移したことを testTag で確認
         composeTestRule.waitUntil(timeoutMillis = 5_000) {
@@ -127,13 +127,17 @@ class MainActivityTest {
         composeTestRule.activityRule.scenario.onActivity {
             it.onBackPressedDispatcher.onBackPressed()
         }
+
+        // SettingsScreen に戻ったことを画面上部の overlaySettingLabel で確認
         composeTestRule.waitUntil(timeoutMillis = 5_000) {
             composeTestRule
-                .onAllNodesWithText(openSourceLicenses)
+                .onAllNodesWithText(overlaySettingLabel)
                 .fetchSemanticsNodes()
                 .isNotEmpty()
         }
-        composeTestRule.onNodeWithText(openSourceLicenses).performClick()
+
+        // openSourceLicenses は LazyVerticalGrid の下方にあるためスクロールが必要
+        composeTestRule.onNodeWithText(openSourceLicenses).performScrollTo().performClick()
 
         composeTestRule.waitUntil(timeoutMillis = 5_000) {
             composeTestRule
