@@ -7,7 +7,10 @@ import android.provider.Settings
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -136,8 +139,12 @@ class MainActivityTest {
                 .isNotEmpty()
         }
 
-        // openSourceLicenses は LazyVerticalGrid の下方にあるためスクロールが必要
-        composeTestRule.onNodeWithText(openSourceLicenses).performScrollTo().performClick()
+        // LazyVerticalGrid をスワイプして openSourceLicenses を表示させてからクリック
+        composeTestRule.onNodeWithTag("SettingsGrid").performTouchInput { swipeUp() }
+        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+            composeTestRule.onAllNodesWithText(openSourceLicenses).fetchSemanticsNodes().isNotEmpty()
+        }
+        composeTestRule.onNodeWithText(openSourceLicenses).performClick()
 
         composeTestRule.waitUntil(timeoutMillis = 5_000) {
             composeTestRule
