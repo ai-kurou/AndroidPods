@@ -43,7 +43,6 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kurou.androidpods.core.domain.OverlayPosition
 import kurou.androidpods.core.domain.ThemeMode
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -306,44 +305,6 @@ private fun SettingsScaffold(
             modifier = Modifier.padding(innerPadding),
         )
     }
-}
-
-@Composable
-private fun OverlayPositionDialog(
-    currentPosition: OverlayPosition,
-    onDismiss: () -> Unit,
-    onPositionSelected: (OverlayPosition) -> Unit,
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.overlay_position_label)) },
-        text = {
-            Column {
-                OverlayPosition.entries.forEach { position ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .clickable { onPositionSelected(position) }
-                                .padding(vertical = 4.dp),
-                    ) {
-                        RadioButton(
-                            selected = position == currentPosition,
-                            onClick = { onPositionSelected(position) },
-                        )
-                        Text(stringResource(position.toStringRes()))
-                    }
-                }
-            }
-        },
-        confirmButton = {},
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(android.R.string.cancel))
-            }
-        },
-    )
 }
 
 @Composable
