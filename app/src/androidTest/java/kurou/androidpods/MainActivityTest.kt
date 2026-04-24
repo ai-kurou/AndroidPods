@@ -8,6 +8,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
@@ -111,7 +112,7 @@ class MainActivityTest {
         }
 
         val compatibleDevices = activity.getString(SettingsR.string.compatible_devices)
-        composeTestRule.onNodeWithText(compatibleDevices).performClick()
+        composeTestRule.onNodeWithText(compatibleDevices).performScrollTo().performClick()
 
         composeTestRule.waitUntil(timeoutMillis = 5_000) {
             composeTestRule
@@ -125,7 +126,7 @@ class MainActivityTest {
         }
 
         val openSourceLicenses = activity.getString(SettingsR.string.open_source_licenses)
-        composeTestRule.onNodeWithText(openSourceLicenses).performClick()
+        composeTestRule.onNodeWithText(openSourceLicenses).performScrollTo().performClick()
 
         composeTestRule.waitUntil(timeoutMillis = 5_000) {
             composeTestRule
