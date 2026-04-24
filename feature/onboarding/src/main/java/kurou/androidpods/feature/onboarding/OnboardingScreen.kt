@@ -9,7 +9,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import androidx.activity.compose.BackHandler
+import androidx.activity.compose.PredictiveBackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -108,9 +108,14 @@ fun OnboardingScreen(
         }
     }
 
-    BackHandler(enabled = pagerState.currentPage > 0) {
-        coroutineScope.launch {
-            pagerState.animateScrollToPage(pagerState.currentPage - 1)
+    PredictiveBackHandler(enabled = pagerState.currentPage > 0) { backEvent ->
+        try {
+            backEvent.collect {}
+            coroutineScope.launch {
+                pagerState.animateScrollToPage(pagerState.currentPage - 1)
+            }
+        } catch (_: kotlinx.coroutines.CancellationException) {
+            // ジェスチャーがキャンセルされた場合は何もしない
         }
     }
 
