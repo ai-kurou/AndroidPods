@@ -2,7 +2,7 @@
 
 [![Unit Test](https://github.com/ai-kurou/AndroidPods/actions/workflows/on-main-merge.yml/badge.svg)](https://github.com/ai-kurou/AndroidPods/actions/workflows/on-main-merge.yml)
 [![codecov](https://codecov.io/github/ai-kurou/AndroidPods/graph/badge.svg?token=0B62HU1W46)](https://codecov.io/github/ai-kurou/AndroidPods)
-[![CodeRabbit Pull Request Reviews](https://img.shields.io/endpoint?url=https://coderabbit.ai/integrations/shield/kurou/AndroidPods)](https://coderabbit.ai)
+[![Maintainability](https://qlty.sh/gh/ai-kurou/projects/AndroidPods/maintainability.svg)](https://qlty.sh/gh/ai-kurou/projects/AndroidPods)
 
 ## Contributing
 
