@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothManager
 import android.os.Build
 import android.provider.Settings
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -115,12 +116,12 @@ class MainActivityTest {
         val compatibleDevices = activity.getString(SettingsR.string.compatible_devices)
         composeTestRule.onNodeWithText(compatibleDevices).performClick()
 
-        // SettingsScreen を離れた（openSourceLicenses が消えた）ことを確認してから戻る
+        // DevicesScreen に遷移したことを testTag で確認
         composeTestRule.waitUntil(timeoutMillis = 5_000) {
             composeTestRule
-                .onAllNodesWithText(openSourceLicenses)
+                .onAllNodesWithTag("DevicesScreen")
                 .fetchSemanticsNodes()
-                .isEmpty()
+                .isNotEmpty()
         }
 
         composeTestRule.activityRule.scenario.onActivity {
