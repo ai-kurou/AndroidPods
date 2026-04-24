@@ -43,6 +43,7 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kurou.androidpods.core.domain.OverlayPosition
 import kurou.androidpods.core.domain.ThemeMode
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,6 +66,7 @@ fun SettingsScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showSettingsDialog by remember { mutableStateOf(false) }
     var showThemeModeDialog by remember { mutableStateOf(false) }
+    var showOverlayPositionDialog by remember { mutableStateOf(false) }
     var initialRequestDone by remember { mutableStateOf(false) }
     var isServiceRestarting by remember { mutableStateOf(false) }
 
@@ -129,6 +131,17 @@ fun SettingsScreen(
         )
     }
 
+    if (showOverlayPositionDialog) {
+        OverlayPositionDialog(
+            currentPosition = uiState.overlayPosition,
+            onDismiss = { showOverlayPositionDialog = false },
+            onPositionSelected = { position ->
+                viewModel.updateOverlayPosition(position)
+                showOverlayPositionDialog = false
+            },
+        )
+    }
+
     val columns =
         when (windowWidthSizeClass) {
             WindowWidthSizeClass.Compact -> 1
@@ -187,6 +200,7 @@ fun SettingsScreen(
         onDynamicColorToggle = { enabled ->
             viewModel.updateThemeSettings(uiState.themeSettings.copy(useDynamicColor = enabled))
         },
+        onOverlayPositionClick = { showOverlayPositionDialog = true },
     )
 }
 
@@ -253,6 +267,7 @@ private fun SettingsScaffold(
     onDevicesClick: () -> Unit,
     onGithubClick: () -> Unit,
     onOverlayToggle: (Boolean) -> Unit,
+    onOverlayPositionClick: () -> Unit,
     onRestartServiceClick: () -> Unit,
     onThemeModeClick: () -> Unit,
     onDynamicColorToggle: (Boolean) -> Unit,
@@ -272,6 +287,7 @@ private fun SettingsScaffold(
             permissionStates = permissionStates,
             bluetoothAdapterState = uiState.bluetoothAdapterState,
             overlayEnabled = uiState.overlayEnabled,
+            overlayPosition = uiState.overlayPosition,
             updateAvailable = uiState.updateAvailable,
             isServiceRestarting = isServiceRestarting,
             columns = columns,
@@ -283,12 +299,51 @@ private fun SettingsScaffold(
             onDevicesClick = onDevicesClick,
             onGithubClick = onGithubClick,
             onOverlayToggle = onOverlayToggle,
+            onOverlayPositionClick = onOverlayPositionClick,
             onRestartServiceClick = onRestartServiceClick,
             onThemeModeClick = onThemeModeClick,
             onDynamicColorToggle = onDynamicColorToggle,
             modifier = Modifier.padding(innerPadding),
         )
     }
+}
+
+@Composable
+private fun OverlayPositionDialog(
+    currentPosition: OverlayPosition,
+    onDismiss: () -> Unit,
+    onPositionSelected: (OverlayPosition) -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.overlay_position_label)) },
+        text = {
+            Column {
+                OverlayPosition.entries.forEach { position ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .clickable { onPositionSelected(position) }
+                                .padding(vertical = 4.dp),
+                    ) {
+                        RadioButton(
+                            selected = position == currentPosition,
+                            onClick = { onPositionSelected(position) },
+                        )
+                        Text(stringResource(position.toStringRes()))
+                    }
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(android.R.string.cancel))
+            }
+        },
+    )
 }
 
 @Composable
