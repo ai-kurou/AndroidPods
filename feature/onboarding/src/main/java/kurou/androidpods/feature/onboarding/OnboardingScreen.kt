@@ -9,7 +9,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import androidx.activity.compose.BackHandler
+import androidx.activity.compose.PredictiveBackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -27,6 +27,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.core.content.getSystemService
 import androidx.core.net.toUri
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
 private fun requiredPermissions(): Array<String> =
@@ -108,9 +109,12 @@ fun OnboardingScreen(
         }
     }
 
-    BackHandler(enabled = pagerState.currentPage > 0) {
-        coroutineScope.launch {
+    PredictiveBackHandler(enabled = pagerState.currentPage > 0) { backEvent ->
+        try {
+            backEvent.collect {}
             pagerState.animateScrollToPage(pagerState.currentPage - 1)
+        } catch (_: CancellationException) {
+            // ジェスチャーがキャンセルされた場合は何もしない
         }
     }
 
