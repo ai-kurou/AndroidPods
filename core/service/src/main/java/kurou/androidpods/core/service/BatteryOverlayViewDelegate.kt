@@ -42,7 +42,6 @@ internal class BatteryOverlayViewDelegate(
     }
 
     private var overlayPosition: OverlayPosition = OverlayPosition.BOTTOM
-        private set
 
     private var overlayView: View? = null
     private var cardsContainer: LinearLayout? = null

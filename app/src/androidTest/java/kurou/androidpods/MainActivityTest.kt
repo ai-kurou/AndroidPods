@@ -45,7 +45,7 @@ class MainActivityTest {
         }
 
     @Test
-    fun `MainActivityが起動してボタンを4回押してDevicesScreenが表示される`() {
+    fun `MainActivity起動後_オンボーディングを経てSettingsからDevicesとLicensesへ遷移できる`() {
         // オンボーディング: Page 0 「Next」
         composeTestRule.onNodeWithText("Next").performClick()
 
