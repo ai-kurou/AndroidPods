@@ -112,7 +112,7 @@ class MainActivityTest {
         }
 
         val compatibleDevices = activity.getString(SettingsR.string.compatible_devices)
-        composeTestRule.onNodeWithText(compatibleDevices).performScrollTo().performClick()
+        composeTestRule.onNodeWithText(compatibleDevices).performClick()
 
         composeTestRule.waitUntil(timeoutMillis = 5_000) {
             composeTestRule
@@ -126,6 +126,12 @@ class MainActivityTest {
         }
 
         val openSourceLicenses = activity.getString(SettingsR.string.open_source_licenses)
+        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+            composeTestRule
+                .onAllNodesWithText(openSourceLicenses)
+                .fetchSemanticsNodes()
+                .isNotEmpty()
+        }
         composeTestRule.onNodeWithText(openSourceLicenses).performClick()
 
         composeTestRule.waitUntil(timeoutMillis = 5_000) {
