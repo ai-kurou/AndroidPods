@@ -27,6 +27,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.core.content.getSystemService
 import androidx.core.net.toUri
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
 private fun requiredPermissions(): Array<String> =
@@ -111,10 +112,8 @@ fun OnboardingScreen(
     PredictiveBackHandler(enabled = pagerState.currentPage > 0) { backEvent ->
         try {
             backEvent.collect {}
-            coroutineScope.launch {
-                pagerState.animateScrollToPage(pagerState.currentPage - 1)
-            }
-        } catch (_: kotlinx.coroutines.CancellationException) {
+            pagerState.animateScrollToPage(pagerState.currentPage - 1)
+        } catch (_: CancellationException) {
             // ジェスチャーがキャンセルされた場合は何もしない
         }
     }
