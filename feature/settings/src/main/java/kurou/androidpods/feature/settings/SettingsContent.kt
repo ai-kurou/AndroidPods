@@ -136,6 +136,16 @@ internal fun SettingsContent(
                 )
             }
         }
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            Text(
+                text = stringResource(R.string.scan_service_section_label),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .animateItem()
+                    .padding(horizontal = 4.dp, vertical = 4.dp),
+            )
+        }
         item(span = { GridItemSpan(1) }) {
             SettingsItem(
                 label = stringResource(R.string.restart_service),

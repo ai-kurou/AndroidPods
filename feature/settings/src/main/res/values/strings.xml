@@ -24,6 +24,7 @@
     <string name="open_source_licenses">Open Source Licenses</string>
     <string name="github_repository">GitHub Repository</string>
     <string name="update_available">A new version is available. Tap to update.</string>
+    <string name="scan_service_section_label">Scan Service</string>
     <string name="restart_service">Restart scan service</string>
     <string name="restart_service_completed">Scan service restarted</string>
     <string name="theme_mode_label">Theme</string>

@@ -24,6 +24,7 @@
     <string name="open_source_licenses">オープンソースライセンス</string>
     <string name="github_repository">Githubレポジトリ</string>
     <string name="update_available">新しいバージョンが利用可能です。タップしてアップデートしてください。</string>
+    <string name="scan_service_section_label">スキャンサービス</string>
     <string name="restart_service">スキャンサービスを再起動</string>
     <string name="restart_service_completed">スキャンサービスを再起動しました</string>
     <string name="theme_mode_label">テーマ</string>
