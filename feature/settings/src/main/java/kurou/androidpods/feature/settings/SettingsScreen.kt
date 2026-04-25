@@ -169,18 +169,10 @@ fun SettingsScreen(
             context.startActivity(Intent(Settings.ACTION_BLUETOOTH_SETTINGS))
         },
         onNotificationWarningClick = {
-            val intent =
-                Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
-                    putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
-                }
-            context.startActivity(intent)
+            context.openAppNotificationSettings()
         },
         onDeviceScanChannelWarningClick = {
-            val intent =
-                Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
-                    putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
-                }
-            context.startActivity(intent)
+            context.openNotificationChannelSettings("device_scan")
         },
         onUpdateClick = {
             val intent = Intent(Intent.ACTION_VIEW, "https://github.com/ai-kurou/AndroidPods/releases/latest".toUri())
@@ -371,6 +363,23 @@ private fun ThemeModeDialog(
             TextButton(onClick = onDismiss) {
                 Text(stringResource(android.R.string.cancel))
             }
+        },
+    )
+}
+
+private fun android.content.Context.openAppNotificationSettings() {
+    startActivity(
+        Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+            putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+        },
+    )
+}
+
+private fun android.content.Context.openNotificationChannelSettings(channelId: String) {
+    startActivity(
+        Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS).apply {
+            putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+            putExtra(Settings.EXTRA_CHANNEL_ID, channelId)
         },
     )
 }
