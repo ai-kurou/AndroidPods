@@ -5,10 +5,13 @@ import android.bluetooth.BluetoothAdapter
 import android.os.Build
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.test.core.app.ApplicationProvider
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -93,6 +96,7 @@ class AppScaffoldTest {
         composeTestRule.onNodeWithText("AndroidPods").assertIsDisplayed()
 
         // SettingsScreen → DevicesScreen
+        composeTestRule.onNodeWithTag("SettingsGrid").performScrollToNode(hasText("Compatible devices"))
         composeTestRule.onNodeWithText("Compatible devices").performClick()
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("Compatible devices").assertIsDisplayed()
@@ -103,6 +107,7 @@ class AppScaffoldTest {
         composeTestRule.onNodeWithText("AndroidPods").assertIsDisplayed()
 
         // SettingsScreen → LicensesScreen
+        composeTestRule.onNodeWithTag("SettingsGrid").performScrollToNode(hasText("Open Source Licenses"))
         composeTestRule.onNodeWithText("Open Source Licenses").performClick()
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("Open Source Licenses").assertIsDisplayed()
