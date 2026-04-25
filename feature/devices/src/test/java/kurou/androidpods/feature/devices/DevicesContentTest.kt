@@ -1,6 +1,6 @@
 package kurou.androidpods.feature.devices
 
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import kurou.androidpods.core.domain.CompatibleDevice
 import kurou.androidpods.core.domain.DeviceImages
