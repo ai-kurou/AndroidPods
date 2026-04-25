@@ -1,3 +1,5 @@
+@file:Suppress("TooManyFunctions")
+
 package kurou.androidpods.feature.settings
 
 import android.bluetooth.BluetoothAdapter
@@ -49,11 +51,13 @@ internal fun SettingsContent(
     overlayEnabled: Boolean,
     overlayPosition: OverlayPosition,
     updateAvailable: Boolean,
+    isNotificationsDisabled: Boolean,
     isServiceRestarting: Boolean,
     columns: Int,
     themeSettings: ThemeSettings,
     onPermissionWarningClick: () -> Unit,
     onBluetoothWarningClick: () -> Unit,
+    onNotificationWarningClick: () -> Unit,
     onOverlayToggle: (Boolean) -> Unit,
     onOverlayPositionClick: () -> Unit,
     onRestartServiceClick: () -> Unit,
@@ -76,12 +80,16 @@ internal fun SettingsContent(
         modifier = modifier.fillMaxSize().padding(16.dp).testTag("SettingsGrid"),
     ) {
         bannerItems(
-            hasNotGranted = hasNotGranted,
-            isBluetoothUnavailable = isBluetoothUnavailable,
-            isBluetoothOff = isBluetoothOff,
-            updateAvailable = updateAvailable,
+            state = BannerState(
+                hasNotGranted = hasNotGranted,
+                isBluetoothUnavailable = isBluetoothUnavailable,
+                isBluetoothOff = isBluetoothOff,
+                updateAvailable = updateAvailable,
+                isNotificationsDisabled = isNotificationsDisabled,
+            ),
             onPermissionWarningClick = onPermissionWarningClick,
             onBluetoothWarningClick = onBluetoothWarningClick,
+            onNotificationWarningClick = onNotificationWarningClick,
             onUpdateClick = onUpdateClick,
         )
         overlaySectionItems(
@@ -107,16 +115,22 @@ internal fun SettingsContent(
     }
 }
 
+private data class BannerState(
+    val hasNotGranted: Boolean,
+    val isBluetoothUnavailable: Boolean,
+    val isBluetoothOff: Boolean,
+    val updateAvailable: Boolean,
+    val isNotificationsDisabled: Boolean,
+)
+
 private fun LazyGridScope.bannerItems(
-    hasNotGranted: Boolean,
-    isBluetoothUnavailable: Boolean,
-    isBluetoothOff: Boolean,
-    updateAvailable: Boolean,
+    state: BannerState,
     onPermissionWarningClick: () -> Unit,
     onBluetoothWarningClick: () -> Unit,
+    onNotificationWarningClick: () -> Unit,
     onUpdateClick: () -> Unit,
 ) {
-    if (hasNotGranted) {
+    if (state.hasNotGranted) {
         item(key = R.string.permission_warning, span = { GridItemSpan(maxLineSpan) }) {
             PermissionWarningBanner(
                 onClick = onPermissionWarningClick,
@@ -124,17 +138,25 @@ private fun LazyGridScope.bannerItems(
             )
         }
     }
-    if (isBluetoothUnavailable || isBluetoothOff) {
+    if (state.isNotificationsDisabled) {
+        item(key = R.string.notification_disabled_warning, span = { GridItemSpan(maxLineSpan) }) {
+            NotificationDisabledBanner(
+                onClick = onNotificationWarningClick,
+                modifier = Modifier.animateItem(),
+            )
+        }
+    }
+    if (state.isBluetoothUnavailable || state.isBluetoothOff) {
         item(key = R.string.bluetooth_warning, span = { GridItemSpan(maxLineSpan) }) {
             BluetoothWarningBanner(
-                isBluetoothUnavailable = isBluetoothUnavailable,
-                isBluetoothOff = isBluetoothOff,
+                isBluetoothUnavailable = state.isBluetoothUnavailable,
+                isBluetoothOff = state.isBluetoothOff,
                 onBluetoothWarningClick = onBluetoothWarningClick,
                 modifier = Modifier.animateItem(),
             )
         }
     }
-    if (updateAvailable) {
+    if (state.updateAvailable) {
         item(key = R.string.update_available, span = { GridItemSpan(maxLineSpan) }) {
             UpdateAvailableBanner(
                 onClick = onUpdateClick,
@@ -335,6 +357,38 @@ private fun PermissionWarningBanner(onClick: () -> Unit, modifier: Modifier = Mo
 }
 
 @Composable
+private fun NotificationDisabledBanner(onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+                .background(MaterialTheme.colorScheme.errorContainer)
+                .clickable(onClick = onClick)
+                .padding(12.dp),
+    ) {
+        Icon(
+            imageVector = Icons.Filled.Warning,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onErrorContainer,
+            modifier = Modifier.size(20.dp),
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = stringResource(R.string.notification_disabled_warning),
+            color = MaterialTheme.colorScheme.onErrorContainer,
+            modifier = Modifier.weight(1f),
+        )
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onErrorContainer,
+        )
+    }
+}
+
+@Composable
 private fun BluetoothWarningBanner(
     isBluetoothUnavailable: Boolean,
     isBluetoothOff: Boolean,
@@ -496,10 +550,12 @@ private fun SettingsContentPreviewNoWarning() {
         overlayEnabled = true,
         overlayPosition = OverlayPosition.BOTTOM,
         updateAvailable = false,
+        isNotificationsDisabled = false,
         isServiceRestarting = false,
         columns = 1,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
+        onNotificationWarningClick = {},
         onOverlayToggle = {},
         onOverlayPositionClick = {},
         onRestartServiceClick = {},
@@ -522,10 +578,12 @@ private fun SettingsContentPreviewBluetoothUnavailable() {
         overlayEnabled = false,
         overlayPosition = OverlayPosition.BOTTOM,
         updateAvailable = false,
+        isNotificationsDisabled = false,
         isServiceRestarting = false,
         columns = 1,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
+        onNotificationWarningClick = {},
         onOverlayToggle = {},
         onOverlayPositionClick = {},
         onRestartServiceClick = {},
@@ -552,10 +610,12 @@ private fun SettingsContentPreviewAllWarnings() {
         overlayEnabled = false,
         overlayPosition = OverlayPosition.TOP,
         updateAvailable = true,
+        isNotificationsDisabled = true,
         isServiceRestarting = false,
         columns = 1,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
+        onNotificationWarningClick = {},
         onOverlayToggle = {},
         onOverlayPositionClick = {},
         onRestartServiceClick = {},
@@ -582,10 +642,12 @@ private fun SettingsContentPreviewServiceRestarting() {
         overlayEnabled = true,
         overlayPosition = OverlayPosition.BOTTOM,
         updateAvailable = false,
+        isNotificationsDisabled = false,
         isServiceRestarting = true,
         columns = 1,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
+        onNotificationWarningClick = {},
         onOverlayToggle = {},
         onOverlayPositionClick = {},
         onRestartServiceClick = {},
@@ -612,10 +674,12 @@ private fun SettingsContentPreviewTwoColumns() {
         overlayEnabled = false,
         overlayPosition = OverlayPosition.BOTTOM,
         updateAvailable = true,
+        isNotificationsDisabled = true,
         isServiceRestarting = false,
         columns = 2,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
+        onNotificationWarningClick = {},
         onOverlayToggle = {},
         onOverlayPositionClick = {},
         onRestartServiceClick = {},
@@ -642,10 +706,12 @@ private fun SettingsContentPreviewThreeColumns() {
         overlayEnabled = false,
         overlayPosition = OverlayPosition.BOTTOM,
         updateAvailable = true,
+        isNotificationsDisabled = true,
         isServiceRestarting = false,
         columns = 3,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
+        onNotificationWarningClick = {},
         onOverlayToggle = {},
         onOverlayPositionClick = {},
         onRestartServiceClick = {},

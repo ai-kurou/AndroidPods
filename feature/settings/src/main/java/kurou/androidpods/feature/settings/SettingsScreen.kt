@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -167,6 +168,13 @@ fun SettingsScreen(
         onBluetoothWarningClick = {
             context.startActivity(Intent(Settings.ACTION_BLUETOOTH_SETTINGS))
         },
+        onNotificationWarningClick = {
+            val intent =
+                Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                    putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                }
+            context.startActivity(intent)
+        },
         onUpdateClick = {
             val intent = Intent(Intent.ACTION_VIEW, "https://github.com/ai-kurou/AndroidPods/releases/latest".toUri())
             context.startActivity(intent)
@@ -240,6 +248,9 @@ private fun SettingsEffects(
             )
         }
         viewModel.refreshOverlayState()
+        viewModel.refreshNotificationState(
+            isDisabled = !NotificationManagerCompat.from(context).areNotificationsEnabled(),
+        )
         onStartScanService()
         if (initialRequestDone) {
             val hasNotGranted =
@@ -261,6 +272,7 @@ private fun SettingsScaffold(
     columns: Int,
     onPermissionWarningClick: () -> Unit,
     onBluetoothWarningClick: () -> Unit,
+    onNotificationWarningClick: () -> Unit,
     onUpdateClick: () -> Unit,
     onLicensesClick: () -> Unit,
     onDevicesClick: () -> Unit,
@@ -288,11 +300,13 @@ private fun SettingsScaffold(
             overlayEnabled = uiState.overlayEnabled,
             overlayPosition = uiState.overlayPosition,
             updateAvailable = uiState.updateAvailable,
+            isNotificationsDisabled = uiState.isNotificationsDisabled,
             isServiceRestarting = isServiceRestarting,
             columns = columns,
             themeSettings = uiState.themeSettings,
             onPermissionWarningClick = onPermissionWarningClick,
             onBluetoothWarningClick = onBluetoothWarningClick,
+            onNotificationWarningClick = onNotificationWarningClick,
             onUpdateClick = onUpdateClick,
             onLicensesClick = onLicensesClick,
             onDevicesClick = onDevicesClick,

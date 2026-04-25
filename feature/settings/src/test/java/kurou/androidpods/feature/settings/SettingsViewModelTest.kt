@@ -201,6 +201,30 @@ class SettingsViewModelTest {
         }
 
     @Test
+    fun `refreshNotificationStateでisNotificationsDisabledが更新される`() =
+        runTest {
+            fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
+            assertEquals(false, viewModel.uiState.value.isNotificationsDisabled)
+
+            viewModel.refreshNotificationState(isDisabled = true)
+
+            assertEquals(true, viewModel.uiState.value.isNotificationsDisabled)
+            verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
+            verify(exactly = 1) { getAppleDevicesUseCase.observe() }
+            verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
+            verify(exactly = 1) { themeSettingsUseCase.observe() }
+            verify(exactly = 1) { overlayPositionUseCase.observe() }
+            confirmVerified(
+                getBluetoothAdapterStateUseCase,
+                getAppleDevicesUseCase,
+                getOverlaySettingsUseCase,
+                checkUpdateUseCase,
+                themeSettingsUseCase,
+                overlayPositionUseCase,
+            )
+        }
+
+    @Test
     fun `updateOverlayPositionでUseCaseのupdateが呼ばれる`() =
         runTest {
             viewModel.updateOverlayPosition(OverlayPosition.TOP)

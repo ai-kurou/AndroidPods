@@ -264,6 +264,37 @@ class SettingsScreenTest {
     }
 
     @Test
+    fun `通知無効警告をタップするとACTION_APP_NOTIFICATION_SETTINGSのインテントが発行される`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        grantRequiredPermissions(context)
+        val viewModel = createViewModel(BluetoothAdapter.STATE_ON)
+
+        composeTestRule.setContent {
+            SettingsScreen(
+                windowWidthSizeClass = WindowWidthSizeClass.Compact,
+                onStartScanService = {},
+                onStopScanService = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                viewModel = viewModel,
+            )
+        }
+        viewModel.refreshNotificationState(isDisabled = true)
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst()
+            .performScrollToNode(hasText("App notifications are disabled. Tap to open notification settings."))
+        composeTestRule
+            .onNodeWithText(
+                "App notifications are disabled. Tap to open notification settings.",
+            ).performClick()
+        composeTestRule.waitForIdle()
+
+        val started = shadowOf(composeTestRule.activity).nextStartedActivity
+        assertEquals(Settings.ACTION_APP_NOTIFICATION_SETTINGS, started?.action)
+    }
+
+    @Test
     fun `ダイアログでモードを選択するとダイアログが閉じる`() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         grantRequiredPermissions(context)
