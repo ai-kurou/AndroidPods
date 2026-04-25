@@ -296,6 +296,39 @@ class SettingsScreenTest {
     }
 
     @Test
+    fun `DeviceScanチャンネル無効警告をタップするとACTION_CHANNEL_NOTIFICATION_SETTINGSのインテントが発行される`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        grantRequiredPermissions(context)
+        val viewModel = createViewModel(BluetoothAdapter.STATE_ON)
+
+        composeTestRule.setContent {
+            SettingsScreen(
+                windowWidthSizeClass = WindowWidthSizeClass.Compact,
+                onStartScanService = {},
+                onStopScanService = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                viewModel = viewModel,
+            )
+        }
+        viewModel.refreshDeviceScanChannelState(isDisabled = true)
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst()
+            .performScrollToNode(hasText("Device Scan notifications are disabled. Tap to open notification settings."))
+        composeTestRule
+            .onNodeWithText(
+                "Device Scan notifications are disabled. Tap to open notification settings.",
+            ).performClick()
+        composeTestRule.waitForIdle()
+
+        val started = shadowOf(composeTestRule.activity).nextStartedActivity
+        assertEquals(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS, started?.action)
+        assertEquals(composeTestRule.activity.packageName, started?.getStringExtra(Settings.EXTRA_APP_PACKAGE))
+        assertEquals("device_scan", started?.getStringExtra(Settings.EXTRA_CHANNEL_ID))
+    }
+
+    @Test
     fun `ダイアログでモードを選択するとダイアログが閉じる`() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         grantRequiredPermissions(context)
