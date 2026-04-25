@@ -23,8 +23,8 @@ import kurou.androidpods.core.domain.AppleDevice
 import kurou.androidpods.core.domain.AppleDeviceRepository
 import kurou.androidpods.core.domain.BluetoothAdapterRepository
 import kurou.androidpods.core.domain.DeviceImages
-import kurou.androidpods.core.domain.OverlayPositionRepository
 import kurou.androidpods.core.domain.NotificationChannels
+import kurou.androidpods.core.domain.OverlayPositionRepository
 import kurou.androidpods.core.domain.OverlaySettingsRepository
 import javax.inject.Inject
 
