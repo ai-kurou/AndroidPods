@@ -83,7 +83,7 @@ class MainActivityTest {
         composeTestRule.onNodeWithText("Compatible devices").performClick()
         waitForTag("DevicesScreen")
         navigateBack()
-        waitForText("Show battery overlay")
+        waitForText("AndroidPods")
 
         // LicensesScreen に遷移して戻る
         composeTestRule.onNodeWithTag("SettingsGrid").performScrollToNode(hasText("Open Source Licenses"))
