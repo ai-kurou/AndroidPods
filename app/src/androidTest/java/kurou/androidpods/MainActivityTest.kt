@@ -5,14 +5,13 @@ import android.bluetooth.BluetoothManager
 import android.os.Build
 import android.provider.Settings
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollTo
-import androidx.compose.ui.test.performTouchInput
-import androidx.compose.ui.test.swipeUp
+import androidx.compose.ui.test.performScrollToNode
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
@@ -80,15 +79,14 @@ class MainActivityTest {
         waitForText("Show battery overlay")
 
         // DevicesScreen に遷移して戻る
-        composeTestRule.onNodeWithText("Compatible devices").performScrollTo().performClick()
+        composeTestRule.onNodeWithTag("SettingsGrid").performScrollToNode(hasText("Compatible devices"))
+        composeTestRule.onNodeWithText("Compatible devices").performClick()
         waitForTag("DevicesScreen")
         navigateBack()
-        waitForText("Show battery overlay")
+        waitForText("AndroidPods")
 
         // LicensesScreen に遷移して戻る
-        // "Open Source Licenses" は LazyVerticalGrid の下方にあるためスワイプで表示させる
-        composeTestRule.onNodeWithTag("SettingsGrid").performTouchInput { swipeUp() }
-        waitForText("Open Source Licenses")
+        composeTestRule.onNodeWithTag("SettingsGrid").performScrollToNode(hasText("Open Source Licenses"))
         composeTestRule.onNodeWithText("Open Source Licenses").performClick()
         waitForTag("LicensesScreen")
         navigateBack()

@@ -2,6 +2,7 @@ package kurou.androidpods.feature.settings
 
 import android.bluetooth.BluetoothAdapter
 import android.os.Build
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -73,124 +75,127 @@ internal fun SettingsContent(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier.fillMaxSize().padding(16.dp).testTag("SettingsGrid"),
     ) {
-        if (hasNotGranted) {
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                PermissionWarningBanner(onClick = onPermissionWarningClick)
-            }
+        bannerItems(
+            hasNotGranted = hasNotGranted,
+            isBluetoothUnavailable = isBluetoothUnavailable,
+            isBluetoothOff = isBluetoothOff,
+            updateAvailable = updateAvailable,
+            onPermissionWarningClick = onPermissionWarningClick,
+            onBluetoothWarningClick = onBluetoothWarningClick,
+            onUpdateClick = onUpdateClick,
+        )
+        overlaySectionItems(
+            overlayEnabled = overlayEnabled,
+            overlayPosition = overlayPosition,
+            onOverlayToggle = onOverlayToggle,
+            onOverlayPositionClick = onOverlayPositionClick,
+        )
+        scanServiceSectionItems(
+            isServiceRestarting = isServiceRestarting,
+            onRestartServiceClick = onRestartServiceClick,
+        )
+        appearanceSectionItems(
+            themeSettings = themeSettings,
+            onThemeModeClick = onThemeModeClick,
+            onDynamicColorToggle = onDynamicColorToggle,
+        )
+        infoSectionItems(
+            onDevicesClick = onDevicesClick,
+            onLicensesClick = onLicensesClick,
+            onGithubClick = onGithubClick,
+        )
+    }
+}
+
+private fun LazyGridScope.bannerItems(
+    hasNotGranted: Boolean,
+    isBluetoothUnavailable: Boolean,
+    isBluetoothOff: Boolean,
+    updateAvailable: Boolean,
+    onPermissionWarningClick: () -> Unit,
+    onBluetoothWarningClick: () -> Unit,
+    onUpdateClick: () -> Unit,
+) {
+    if (hasNotGranted) {
+        item(key = R.string.permission_warning, span = { GridItemSpan(maxLineSpan) }) {
+            PermissionWarningBanner(
+                onClick = onPermissionWarningClick,
+                modifier = Modifier.animateItem(),
+            )
         }
-        if (isBluetoothUnavailable || isBluetoothOff) {
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                BluetoothWarningBanner(
-                    isBluetoothUnavailable = isBluetoothUnavailable,
-                    isBluetoothOff = isBluetoothOff,
-                    onBluetoothWarningClick = onBluetoothWarningClick,
-                )
-            }
+    }
+    if (isBluetoothUnavailable || isBluetoothOff) {
+        item(key = R.string.bluetooth_warning, span = { GridItemSpan(maxLineSpan) }) {
+            BluetoothWarningBanner(
+                isBluetoothUnavailable = isBluetoothUnavailable,
+                isBluetoothOff = isBluetoothOff,
+                onBluetoothWarningClick = onBluetoothWarningClick,
+                modifier = Modifier.animateItem(),
+            )
         }
-        if (updateAvailable) {
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                UpdateAvailableBanner(onClick = onUpdateClick)
-            }
+    }
+    if (updateAvailable) {
+        item(key = R.string.update_available, span = { GridItemSpan(maxLineSpan) }) {
+            UpdateAvailableBanner(
+                onClick = onUpdateClick,
+                modifier = Modifier.animateItem(),
+            )
         }
-        item(span = { GridItemSpan(1) }) {
-            SettingsItem(
-                label = stringResource(R.string.overlay_setting_label),
-                icon = painterResource(R.drawable.ic_overlay_setting_label),
-                onClick = { onOverlayToggle(!overlayEnabled) },
-            ) {
-                Switch(
-                    checked = overlayEnabled,
-                    onCheckedChange = onOverlayToggle,
-                )
-            }
+    }
+}
+
+private fun LazyGridScope.overlaySectionItems(
+    overlayEnabled: Boolean,
+    overlayPosition: OverlayPosition,
+    onOverlayToggle: (Boolean) -> Unit,
+    onOverlayPositionClick: () -> Unit,
+) {
+    sectionLabel(R.string.overlay_section_label)
+    item(key = R.string.overlay_setting_label, span = { GridItemSpan(1) }) {
+        SettingsItem(
+            label = stringResource(R.string.overlay_setting_label),
+            icon = painterResource(R.drawable.ic_overlay_setting_label),
+            onClick = { onOverlayToggle(!overlayEnabled) },
+            modifier = Modifier.animateItem(),
+        ) {
+            Switch(
+                checked = overlayEnabled,
+                onCheckedChange = onOverlayToggle,
+            )
         }
-        item(span = { GridItemSpan(1) }) {
-            SettingsItem(
-                label = stringResource(R.string.overlay_position_label),
-                icon = painterResource(R.drawable.ic_overlay_position),
-                onClick = onOverlayPositionClick,
-            ) {
-                Text(
-                    text = stringResource(overlayPosition.toStringRes()),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
+    }
+    item(key = R.string.overlay_position_label, span = { GridItemSpan(1) }) {
+        SettingsItem(
+            label = stringResource(R.string.overlay_position_label),
+            icon = painterResource(R.drawable.ic_overlay_position),
+            onClick = onOverlayPositionClick,
+            modifier = Modifier.animateItem(),
+        ) {
+            Text(
+                text = stringResource(overlayPosition.toStringRes()),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
-        item(span = { GridItemSpan(1) }) {
-            SettingsItem(
-                label = stringResource(R.string.restart_service),
-                icon = painterResource(R.drawable.ic_restart_service),
-                onClick = onRestartServiceClick,
-                enabled = !isServiceRestarting,
-            ) {
-                if (isServiceRestarting) {
-                    CircularProgressIndicator(modifier = Modifier.size(20.dp))
-                } else {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                        contentDescription = null,
-                    )
-                }
-            }
-        }
-        item(span = { GridItemSpan(1) }) {
-            SettingsItem(
-                label = stringResource(R.string.theme_mode_label),
-                icon = painterResource(R.drawable.ic_theme),
-                onClick = onThemeModeClick,
-            ) {
-                Text(
-                    text = stringResource(themeSettings.themeMode.toStringRes()),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            item(span = { GridItemSpan(1) }) {
-                SettingsItem(
-                    label = stringResource(R.string.dynamic_color_label),
-                    icon = painterResource(R.drawable.ic_dynamic_color),
-                    onClick = { onDynamicColorToggle(!themeSettings.useDynamicColor) },
-                ) {
-                    Switch(
-                        checked = themeSettings.useDynamicColor,
-                        onCheckedChange = onDynamicColorToggle,
-                    )
-                }
-            }
-        }
-        item(span = { GridItemSpan(1) }) {
-            SettingsItem(
-                label = stringResource(R.string.compatible_devices),
-                icon = painterResource(R.drawable.ic_compatible_devices),
-                onClick = onDevicesClick,
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                    contentDescription = null,
-                )
-            }
-        }
-        item(span = { GridItemSpan(1) }) {
-            SettingsItem(
-                label = stringResource(R.string.open_source_licenses),
-                icon = painterResource(R.drawable.ic_open_source_licenses),
-                onClick = onLicensesClick,
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                    contentDescription = null,
-                )
-            }
-        }
-        item(span = { GridItemSpan(1) }) {
-            SettingsItem(
-                label = stringResource(R.string.github_repository),
-                icon = painterResource(R.drawable.ic_github_repository),
-                onClick = onGithubClick,
-            ) {
+    }
+}
+
+private fun LazyGridScope.scanServiceSectionItems(
+    isServiceRestarting: Boolean,
+    onRestartServiceClick: () -> Unit,
+) {
+    sectionLabel(R.string.scan_service_section_label)
+    item(key = R.string.restart_service, span = { GridItemSpan(1) }) {
+        SettingsItem(
+            label = stringResource(R.string.restart_service),
+            icon = painterResource(R.drawable.ic_restart_service),
+            onClick = onRestartServiceClick,
+            enabled = !isServiceRestarting,
+            modifier = Modifier.animateItem(),
+        ) {
+            if (isServiceRestarting) {
+                CircularProgressIndicator(modifier = Modifier.size(20.dp))
+            } else {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = null,
@@ -200,12 +205,109 @@ internal fun SettingsContent(
     }
 }
 
+private fun LazyGridScope.appearanceSectionItems(
+    themeSettings: ThemeSettings,
+    onThemeModeClick: () -> Unit,
+    onDynamicColorToggle: (Boolean) -> Unit,
+) {
+    sectionLabel(R.string.appearance_section_label)
+    item(key = R.string.theme_mode_label, span = { GridItemSpan(1) }) {
+        SettingsItem(
+            label = stringResource(R.string.theme_mode_label),
+            icon = painterResource(R.drawable.ic_theme),
+            onClick = onThemeModeClick,
+            modifier = Modifier.animateItem(),
+        ) {
+            Text(
+                text = stringResource(themeSettings.themeMode.toStringRes()),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        item(key = R.string.dynamic_color_label, span = { GridItemSpan(1) }) {
+            SettingsItem(
+                label = stringResource(R.string.dynamic_color_label),
+                icon = painterResource(R.drawable.ic_dynamic_color),
+                onClick = { onDynamicColorToggle(!themeSettings.useDynamicColor) },
+                modifier = Modifier.animateItem(),
+            ) {
+                Switch(
+                    checked = themeSettings.useDynamicColor,
+                    onCheckedChange = onDynamicColorToggle,
+                )
+            }
+        }
+    }
+}
+
+private fun LazyGridScope.infoSectionItems(
+    onDevicesClick: () -> Unit,
+    onLicensesClick: () -> Unit,
+    onGithubClick: () -> Unit,
+) {
+    sectionLabel(R.string.info_section_label)
+    item(key = R.string.compatible_devices, span = { GridItemSpan(1) }) {
+        SettingsItem(
+            label = stringResource(R.string.compatible_devices),
+            icon = painterResource(R.drawable.ic_compatible_devices),
+            onClick = onDevicesClick,
+            modifier = Modifier.animateItem(),
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = null,
+            )
+        }
+    }
+    item(key = R.string.open_source_licenses, span = { GridItemSpan(1) }) {
+        SettingsItem(
+            label = stringResource(R.string.open_source_licenses),
+            icon = painterResource(R.drawable.ic_open_source_licenses),
+            onClick = onLicensesClick,
+            modifier = Modifier.animateItem(),
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = null,
+            )
+        }
+    }
+    item(key = R.string.github_repository, span = { GridItemSpan(1) }) {
+        SettingsItem(
+            label = stringResource(R.string.github_repository),
+            icon = painterResource(R.drawable.ic_github_repository),
+            onClick = onGithubClick,
+            modifier = Modifier.animateItem(),
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = null,
+            )
+        }
+    }
+}
+
+private fun LazyGridScope.sectionLabel(@StringRes labelRes: Int) {
+    item(key = labelRes, span = { GridItemSpan(maxLineSpan) }) {
+        Text(
+            text = stringResource(labelRes),
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier
+                .animateItem()
+                .padding(horizontal = 4.dp, vertical = 4.dp),
+        )
+    }
+}
+
 @Composable
-private fun PermissionWarningBanner(onClick: () -> Unit) {
+private fun PermissionWarningBanner(onClick: () -> Unit, modifier: Modifier = Modifier) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier =
-            Modifier
+            modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(8.dp))
                 .background(MaterialTheme.colorScheme.errorContainer)
@@ -237,6 +339,7 @@ private fun BluetoothWarningBanner(
     isBluetoothUnavailable: Boolean,
     isBluetoothOff: Boolean,
     onBluetoothWarningClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val backgroundColor =
         if (isBluetoothUnavailable) {
@@ -253,7 +356,7 @@ private fun BluetoothWarningBanner(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier =
-            Modifier
+            modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(8.dp))
                 .background(backgroundColor)
@@ -295,11 +398,11 @@ private fun BluetoothWarningBanner(
 }
 
 @Composable
-private fun UpdateAvailableBanner(onClick: () -> Unit) {
+private fun UpdateAvailableBanner(onClick: () -> Unit, modifier: Modifier = Modifier) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier =
-            Modifier
+            modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(8.dp))
                 .background(MaterialTheme.colorScheme.primaryContainer)
