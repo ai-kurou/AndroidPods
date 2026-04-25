@@ -44,6 +44,7 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kurou.androidpods.core.domain.NotificationChannels
 import kurou.androidpods.core.domain.ThemeMode
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -172,7 +173,7 @@ fun SettingsScreen(
             context.openAppNotificationSettings()
         },
         onDeviceScanChannelWarningClick = {
-            context.openNotificationChannelSettings("device_scan")
+            context.openNotificationChannelSettings(NotificationChannels.DEVICE_SCAN)
         },
         onUpdateClick = {
             val intent = Intent(Intent.ACTION_VIEW, "https://github.com/ai-kurou/AndroidPods/releases/latest".toUri())
@@ -252,7 +253,7 @@ private fun SettingsEffects(
         viewModel.refreshNotificationState(isDisabled = !notificationsEnabled)
         viewModel.refreshDeviceScanChannelState(
             isDisabled = notificationsEnabled &&
-                notificationManager.getNotificationChannel("device_scan")
+                notificationManager.getNotificationChannel(NotificationChannels.DEVICE_SCAN)
                     ?.importance == android.app.NotificationManager.IMPORTANCE_NONE,
         )
         onStartScanService()

@@ -31,6 +31,7 @@ import kurou.androidpods.core.domain.CheckUpdateUseCase
 import kurou.androidpods.core.domain.GetAppleDevicesUseCase
 import kurou.androidpods.core.domain.GetBluetoothAdapterStateUseCase
 import kurou.androidpods.core.domain.GetOverlaySettingsUseCase
+import kurou.androidpods.core.domain.NotificationChannels
 import kurou.androidpods.core.domain.OverlayPosition
 import kurou.androidpods.core.domain.OverlayPositionUseCase
 import kurou.androidpods.core.domain.ThemeMode
@@ -325,7 +326,7 @@ class SettingsScreenTest {
         val started = shadowOf(composeTestRule.activity).nextStartedActivity
         assertEquals(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS, started?.action)
         assertEquals(composeTestRule.activity.packageName, started?.getStringExtra(Settings.EXTRA_APP_PACKAGE))
-        assertEquals("device_scan", started?.getStringExtra(Settings.EXTRA_CHANNEL_ID))
+        assertEquals(NotificationChannels.DEVICE_SCAN, started?.getStringExtra(Settings.EXTRA_CHANNEL_ID))
     }
 
     @Test
