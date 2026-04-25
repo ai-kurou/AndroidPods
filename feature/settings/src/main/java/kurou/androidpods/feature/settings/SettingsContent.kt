@@ -75,7 +75,10 @@ internal fun SettingsContent(
     ) {
         if (hasNotGranted) {
             item(span = { GridItemSpan(maxLineSpan) }) {
-                PermissionWarningBanner(onClick = onPermissionWarningClick)
+                PermissionWarningBanner(
+                    onClick = onPermissionWarningClick,
+                    modifier = Modifier.animateItem(),
+                )
             }
         }
         if (isBluetoothUnavailable || isBluetoothOff) {
@@ -84,12 +87,16 @@ internal fun SettingsContent(
                     isBluetoothUnavailable = isBluetoothUnavailable,
                     isBluetoothOff = isBluetoothOff,
                     onBluetoothWarningClick = onBluetoothWarningClick,
+                    modifier = Modifier.animateItem(),
                 )
             }
         }
         if (updateAvailable) {
             item(span = { GridItemSpan(maxLineSpan) }) {
-                UpdateAvailableBanner(onClick = onUpdateClick)
+                UpdateAvailableBanner(
+                    onClick = onUpdateClick,
+                    modifier = Modifier.animateItem(),
+                )
             }
         }
         item(span = { GridItemSpan(1) }) {
@@ -97,6 +104,7 @@ internal fun SettingsContent(
                 label = stringResource(R.string.overlay_setting_label),
                 icon = painterResource(R.drawable.ic_overlay_setting_label),
                 onClick = { onOverlayToggle(!overlayEnabled) },
+                modifier = Modifier.animateItem(),
             ) {
                 Switch(
                     checked = overlayEnabled,
@@ -109,6 +117,7 @@ internal fun SettingsContent(
                 label = stringResource(R.string.overlay_position_label),
                 icon = painterResource(R.drawable.ic_overlay_position),
                 onClick = onOverlayPositionClick,
+                modifier = Modifier.animateItem(),
             ) {
                 Text(
                     text = stringResource(overlayPosition.toStringRes()),
@@ -123,6 +132,7 @@ internal fun SettingsContent(
                 icon = painterResource(R.drawable.ic_restart_service),
                 onClick = onRestartServiceClick,
                 enabled = !isServiceRestarting,
+                modifier = Modifier.animateItem(),
             ) {
                 if (isServiceRestarting) {
                     CircularProgressIndicator(modifier = Modifier.size(20.dp))
@@ -139,6 +149,7 @@ internal fun SettingsContent(
                 label = stringResource(R.string.theme_mode_label),
                 icon = painterResource(R.drawable.ic_theme),
                 onClick = onThemeModeClick,
+                modifier = Modifier.animateItem(),
             ) {
                 Text(
                     text = stringResource(themeSettings.themeMode.toStringRes()),
@@ -153,6 +164,7 @@ internal fun SettingsContent(
                     label = stringResource(R.string.dynamic_color_label),
                     icon = painterResource(R.drawable.ic_dynamic_color),
                     onClick = { onDynamicColorToggle(!themeSettings.useDynamicColor) },
+                    modifier = Modifier.animateItem(),
                 ) {
                     Switch(
                         checked = themeSettings.useDynamicColor,
@@ -166,6 +178,7 @@ internal fun SettingsContent(
                 label = stringResource(R.string.compatible_devices),
                 icon = painterResource(R.drawable.ic_compatible_devices),
                 onClick = onDevicesClick,
+                modifier = Modifier.animateItem(),
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
@@ -178,6 +191,7 @@ internal fun SettingsContent(
                 label = stringResource(R.string.open_source_licenses),
                 icon = painterResource(R.drawable.ic_open_source_licenses),
                 onClick = onLicensesClick,
+                modifier = Modifier.animateItem(),
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
@@ -190,6 +204,7 @@ internal fun SettingsContent(
                 label = stringResource(R.string.github_repository),
                 icon = painterResource(R.drawable.ic_github_repository),
                 onClick = onGithubClick,
+                modifier = Modifier.animateItem(),
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
@@ -201,11 +216,11 @@ internal fun SettingsContent(
 }
 
 @Composable
-private fun PermissionWarningBanner(onClick: () -> Unit) {
+private fun PermissionWarningBanner(onClick: () -> Unit, modifier: Modifier = Modifier) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier =
-            Modifier
+            modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(8.dp))
                 .background(MaterialTheme.colorScheme.errorContainer)
@@ -237,6 +252,7 @@ private fun BluetoothWarningBanner(
     isBluetoothUnavailable: Boolean,
     isBluetoothOff: Boolean,
     onBluetoothWarningClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val backgroundColor =
         if (isBluetoothUnavailable) {
@@ -253,7 +269,7 @@ private fun BluetoothWarningBanner(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier =
-            Modifier
+            modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(8.dp))
                 .background(backgroundColor)
@@ -295,11 +311,11 @@ private fun BluetoothWarningBanner(
 }
 
 @Composable
-private fun UpdateAvailableBanner(onClick: () -> Unit) {
+private fun UpdateAvailableBanner(onClick: () -> Unit, modifier: Modifier = Modifier) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier =
-            Modifier
+            modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(8.dp))
                 .background(MaterialTheme.colorScheme.primaryContainer)
