@@ -175,6 +175,13 @@ fun SettingsScreen(
                 }
             context.startActivity(intent)
         },
+        onDeviceScanChannelWarningClick = {
+            val intent =
+                Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                    putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                }
+            context.startActivity(intent)
+        },
         onUpdateClick = {
             val intent = Intent(Intent.ACTION_VIEW, "https://github.com/ai-kurou/AndroidPods/releases/latest".toUri())
             context.startActivity(intent)
@@ -248,8 +255,14 @@ private fun SettingsEffects(
             )
         }
         viewModel.refreshOverlayState()
+        val notificationManager = NotificationManagerCompat.from(context)
         viewModel.refreshNotificationState(
-            isDisabled = !NotificationManagerCompat.from(context).areNotificationsEnabled(),
+            isDisabled = !notificationManager.areNotificationsEnabled(),
+        )
+        viewModel.refreshDeviceScanChannelState(
+            isDisabled = notificationManager.areNotificationsEnabled() &&
+                notificationManager.getNotificationChannel("device_scan")
+                    ?.importance == android.app.NotificationManager.IMPORTANCE_NONE,
         )
         onStartScanService()
         if (initialRequestDone) {
@@ -273,6 +286,7 @@ private fun SettingsScaffold(
     onPermissionWarningClick: () -> Unit,
     onBluetoothWarningClick: () -> Unit,
     onNotificationWarningClick: () -> Unit,
+    onDeviceScanChannelWarningClick: () -> Unit,
     onUpdateClick: () -> Unit,
     onLicensesClick: () -> Unit,
     onDevicesClick: () -> Unit,
@@ -301,12 +315,14 @@ private fun SettingsScaffold(
             overlayPosition = uiState.overlayPosition,
             updateAvailable = uiState.updateAvailable,
             isNotificationsDisabled = uiState.isNotificationsDisabled,
+            isDeviceScanChannelDisabled = uiState.isDeviceScanChannelDisabled,
             isServiceRestarting = isServiceRestarting,
             columns = columns,
             themeSettings = uiState.themeSettings,
             onPermissionWarningClick = onPermissionWarningClick,
             onBluetoothWarningClick = onBluetoothWarningClick,
             onNotificationWarningClick = onNotificationWarningClick,
+            onDeviceScanChannelWarningClick = onDeviceScanChannelWarningClick,
             onUpdateClick = onUpdateClick,
             onLicensesClick = onLicensesClick,
             onDevicesClick = onDevicesClick,

@@ -52,12 +52,14 @@ internal fun SettingsContent(
     overlayPosition: OverlayPosition,
     updateAvailable: Boolean,
     isNotificationsDisabled: Boolean,
+    isDeviceScanChannelDisabled: Boolean,
     isServiceRestarting: Boolean,
     columns: Int,
     themeSettings: ThemeSettings,
     onPermissionWarningClick: () -> Unit,
     onBluetoothWarningClick: () -> Unit,
     onNotificationWarningClick: () -> Unit,
+    onDeviceScanChannelWarningClick: () -> Unit,
     onOverlayToggle: (Boolean) -> Unit,
     onOverlayPositionClick: () -> Unit,
     onRestartServiceClick: () -> Unit,
@@ -86,10 +88,12 @@ internal fun SettingsContent(
                 isBluetoothOff = isBluetoothOff,
                 updateAvailable = updateAvailable,
                 isNotificationsDisabled = isNotificationsDisabled,
+                isDeviceScanChannelDisabled = isDeviceScanChannelDisabled,
             ),
             onPermissionWarningClick = onPermissionWarningClick,
             onBluetoothWarningClick = onBluetoothWarningClick,
             onNotificationWarningClick = onNotificationWarningClick,
+            onDeviceScanChannelWarningClick = onDeviceScanChannelWarningClick,
             onUpdateClick = onUpdateClick,
         )
         overlaySectionItems(
@@ -121,6 +125,7 @@ private data class BannerState(
     val isBluetoothOff: Boolean,
     val updateAvailable: Boolean,
     val isNotificationsDisabled: Boolean,
+    val isDeviceScanChannelDisabled: Boolean,
 )
 
 private fun LazyGridScope.bannerItems(
@@ -128,6 +133,7 @@ private fun LazyGridScope.bannerItems(
     onPermissionWarningClick: () -> Unit,
     onBluetoothWarningClick: () -> Unit,
     onNotificationWarningClick: () -> Unit,
+    onDeviceScanChannelWarningClick: () -> Unit,
     onUpdateClick: () -> Unit,
 ) {
     if (state.hasNotGranted) {
@@ -142,6 +148,14 @@ private fun LazyGridScope.bannerItems(
         item(key = R.string.notification_disabled_warning, span = { GridItemSpan(maxLineSpan) }) {
             NotificationDisabledBanner(
                 onClick = onNotificationWarningClick,
+                modifier = Modifier.animateItem(),
+            )
+        }
+    }
+    if (state.isDeviceScanChannelDisabled) {
+        item(key = R.string.device_scan_channel_disabled_warning, span = { GridItemSpan(maxLineSpan) }) {
+            DeviceScanChannelDisabledBanner(
+                onClick = onDeviceScanChannelWarningClick,
                 modifier = Modifier.animateItem(),
             )
         }
@@ -389,6 +403,38 @@ private fun NotificationDisabledBanner(onClick: () -> Unit, modifier: Modifier =
 }
 
 @Composable
+private fun DeviceScanChannelDisabledBanner(onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+                .background(MaterialTheme.colorScheme.errorContainer)
+                .clickable(onClick = onClick)
+                .padding(12.dp),
+    ) {
+        Icon(
+            imageVector = Icons.Filled.Warning,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onErrorContainer,
+            modifier = Modifier.size(20.dp),
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = stringResource(R.string.device_scan_channel_disabled_warning),
+            color = MaterialTheme.colorScheme.onErrorContainer,
+            modifier = Modifier.weight(1f),
+        )
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onErrorContainer,
+        )
+    }
+}
+
+@Composable
 private fun BluetoothWarningBanner(
     isBluetoothUnavailable: Boolean,
     isBluetoothOff: Boolean,
@@ -551,11 +597,13 @@ private fun SettingsContentPreviewNoWarning() {
         overlayPosition = OverlayPosition.BOTTOM,
         updateAvailable = false,
         isNotificationsDisabled = false,
+        isDeviceScanChannelDisabled = false,
         isServiceRestarting = false,
         columns = 1,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onNotificationWarningClick = {},
+        onDeviceScanChannelWarningClick = {},
         onOverlayToggle = {},
         onOverlayPositionClick = {},
         onRestartServiceClick = {},
@@ -579,11 +627,13 @@ private fun SettingsContentPreviewBluetoothUnavailable() {
         overlayPosition = OverlayPosition.BOTTOM,
         updateAvailable = false,
         isNotificationsDisabled = false,
+        isDeviceScanChannelDisabled = false,
         isServiceRestarting = false,
         columns = 1,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onNotificationWarningClick = {},
+        onDeviceScanChannelWarningClick = {},
         onOverlayToggle = {},
         onOverlayPositionClick = {},
         onRestartServiceClick = {},
@@ -611,11 +661,13 @@ private fun SettingsContentPreviewAllWarnings() {
         overlayPosition = OverlayPosition.TOP,
         updateAvailable = true,
         isNotificationsDisabled = true,
+        isDeviceScanChannelDisabled = true,
         isServiceRestarting = false,
         columns = 1,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onNotificationWarningClick = {},
+        onDeviceScanChannelWarningClick = {},
         onOverlayToggle = {},
         onOverlayPositionClick = {},
         onRestartServiceClick = {},
@@ -643,11 +695,13 @@ private fun SettingsContentPreviewServiceRestarting() {
         overlayPosition = OverlayPosition.BOTTOM,
         updateAvailable = false,
         isNotificationsDisabled = false,
+        isDeviceScanChannelDisabled = false,
         isServiceRestarting = true,
         columns = 1,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onNotificationWarningClick = {},
+        onDeviceScanChannelWarningClick = {},
         onOverlayToggle = {},
         onOverlayPositionClick = {},
         onRestartServiceClick = {},
@@ -675,11 +729,13 @@ private fun SettingsContentPreviewTwoColumns() {
         overlayPosition = OverlayPosition.BOTTOM,
         updateAvailable = true,
         isNotificationsDisabled = true,
+        isDeviceScanChannelDisabled = false,
         isServiceRestarting = false,
         columns = 2,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onNotificationWarningClick = {},
+        onDeviceScanChannelWarningClick = {},
         onOverlayToggle = {},
         onOverlayPositionClick = {},
         onRestartServiceClick = {},
@@ -707,11 +763,13 @@ private fun SettingsContentPreviewThreeColumns() {
         overlayPosition = OverlayPosition.BOTTOM,
         updateAvailable = true,
         isNotificationsDisabled = true,
+        isDeviceScanChannelDisabled = false,
         isServiceRestarting = false,
         columns = 3,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
         onNotificationWarningClick = {},
+        onDeviceScanChannelWarningClick = {},
         onOverlayToggle = {},
         onOverlayPositionClick = {},
         onRestartServiceClick = {},

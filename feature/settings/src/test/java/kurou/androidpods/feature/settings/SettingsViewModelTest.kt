@@ -225,6 +225,30 @@ class SettingsViewModelTest {
         }
 
     @Test
+    fun `refreshDeviceScanChannelStateでisDeviceScanChannelDisabledが更新される`() =
+        runTest {
+            fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
+            assertEquals(false, viewModel.uiState.value.isDeviceScanChannelDisabled)
+
+            viewModel.refreshDeviceScanChannelState(isDisabled = true)
+
+            assertEquals(true, viewModel.uiState.value.isDeviceScanChannelDisabled)
+            verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
+            verify(exactly = 1) { getAppleDevicesUseCase.observe() }
+            verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
+            verify(exactly = 1) { themeSettingsUseCase.observe() }
+            verify(exactly = 1) { overlayPositionUseCase.observe() }
+            confirmVerified(
+                getBluetoothAdapterStateUseCase,
+                getAppleDevicesUseCase,
+                getOverlaySettingsUseCase,
+                checkUpdateUseCase,
+                themeSettingsUseCase,
+                overlayPositionUseCase,
+            )
+        }
+
+    @Test
     fun `updateOverlayPositionでUseCaseのupdateが呼ばれる`() =
         runTest {
             viewModel.updateOverlayPosition(OverlayPosition.TOP)

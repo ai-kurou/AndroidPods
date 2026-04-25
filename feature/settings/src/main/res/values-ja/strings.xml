@@ -8,6 +8,7 @@
     <string name="permission_not_granted">未許可</string>
     <string name="permission_warning">必要な権限が許可されていません。すべての権限を許可してください。</string>
     <string name="notification_disabled_warning">アプリの通知がオフになっています。タップして通知設定を開いてください。</string>
+    <string name="device_scan_channel_disabled_warning">Device Scanの通知がオフになっています。タップして通知設定を開いてください。</string>
     <string name="bluetooth_warning">Bluetoothがオフです。Bluetoothを有効にしてください。</string>
     <string name="bluetooth_not_supported">Bluetoothが利用できない端末です。</string>
     <string name="bluetooth_adapter_state">Bluetoothアダプタ</string>
