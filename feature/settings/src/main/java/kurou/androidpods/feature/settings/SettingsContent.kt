@@ -164,6 +164,16 @@ internal fun SettingsContent(
                 }
             }
         }
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            Text(
+                text = stringResource(R.string.appearance_section_label),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .animateItem()
+                    .padding(horizontal = 4.dp, vertical = 4.dp),
+            )
+        }
         item(span = { GridItemSpan(1) }) {
             SettingsItem(
                 label = stringResource(R.string.theme_mode_label),
@@ -192,6 +202,16 @@ internal fun SettingsContent(
                     )
                 }
             }
+        }
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            Text(
+                text = stringResource(R.string.info_section_label),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .animateItem()
+                    .padding(horizontal = 4.dp, vertical = 4.dp),
+            )
         }
         item(span = { GridItemSpan(1) }) {
             SettingsItem(
