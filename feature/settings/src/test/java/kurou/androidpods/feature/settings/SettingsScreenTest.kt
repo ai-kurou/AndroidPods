@@ -292,6 +292,7 @@ class SettingsScreenTest {
 
         val started = shadowOf(composeTestRule.activity).nextStartedActivity
         assertEquals(Settings.ACTION_APP_NOTIFICATION_SETTINGS, started?.action)
+        assertEquals(composeTestRule.activity.packageName, started?.getStringExtra(Settings.EXTRA_APP_PACKAGE))
     }
 
     @Test
