@@ -117,7 +117,7 @@ private fun LazyGridScope.bannerItems(
     onUpdateClick: () -> Unit,
 ) {
     if (hasNotGranted) {
-        item(span = { GridItemSpan(maxLineSpan) }) {
+        item(key = R.string.permission_warning, span = { GridItemSpan(maxLineSpan) }) {
             PermissionWarningBanner(
                 onClick = onPermissionWarningClick,
                 modifier = Modifier.animateItem(),
@@ -125,7 +125,7 @@ private fun LazyGridScope.bannerItems(
         }
     }
     if (isBluetoothUnavailable || isBluetoothOff) {
-        item(span = { GridItemSpan(maxLineSpan) }) {
+        item(key = R.string.bluetooth_warning, span = { GridItemSpan(maxLineSpan) }) {
             BluetoothWarningBanner(
                 isBluetoothUnavailable = isBluetoothUnavailable,
                 isBluetoothOff = isBluetoothOff,
@@ -135,7 +135,7 @@ private fun LazyGridScope.bannerItems(
         }
     }
     if (updateAvailable) {
-        item(span = { GridItemSpan(maxLineSpan) }) {
+        item(key = R.string.update_available, span = { GridItemSpan(maxLineSpan) }) {
             UpdateAvailableBanner(
                 onClick = onUpdateClick,
                 modifier = Modifier.animateItem(),
@@ -151,7 +151,7 @@ private fun LazyGridScope.overlaySectionItems(
     onOverlayPositionClick: () -> Unit,
 ) {
     sectionLabel(R.string.overlay_section_label)
-    item(span = { GridItemSpan(1) }) {
+    item(key = R.string.overlay_setting_label, span = { GridItemSpan(1) }) {
         SettingsItem(
             label = stringResource(R.string.overlay_setting_label),
             icon = painterResource(R.drawable.ic_overlay_setting_label),
@@ -164,7 +164,7 @@ private fun LazyGridScope.overlaySectionItems(
             )
         }
     }
-    item(span = { GridItemSpan(1) }) {
+    item(key = R.string.overlay_position_label, span = { GridItemSpan(1) }) {
         SettingsItem(
             label = stringResource(R.string.overlay_position_label),
             icon = painterResource(R.drawable.ic_overlay_position),
@@ -185,7 +185,7 @@ private fun LazyGridScope.scanServiceSectionItems(
     onRestartServiceClick: () -> Unit,
 ) {
     sectionLabel(R.string.scan_service_section_label)
-    item(span = { GridItemSpan(1) }) {
+    item(key = R.string.restart_service, span = { GridItemSpan(1) }) {
         SettingsItem(
             label = stringResource(R.string.restart_service),
             icon = painterResource(R.drawable.ic_restart_service),
@@ -211,7 +211,7 @@ private fun LazyGridScope.appearanceSectionItems(
     onDynamicColorToggle: (Boolean) -> Unit,
 ) {
     sectionLabel(R.string.appearance_section_label)
-    item(span = { GridItemSpan(1) }) {
+    item(key = R.string.theme_mode_label, span = { GridItemSpan(1) }) {
         SettingsItem(
             label = stringResource(R.string.theme_mode_label),
             icon = painterResource(R.drawable.ic_theme),
@@ -226,7 +226,7 @@ private fun LazyGridScope.appearanceSectionItems(
         }
     }
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        item(span = { GridItemSpan(1) }) {
+        item(key = R.string.dynamic_color_label, span = { GridItemSpan(1) }) {
             SettingsItem(
                 label = stringResource(R.string.dynamic_color_label),
                 icon = painterResource(R.drawable.ic_dynamic_color),
@@ -248,7 +248,7 @@ private fun LazyGridScope.infoSectionItems(
     onGithubClick: () -> Unit,
 ) {
     sectionLabel(R.string.info_section_label)
-    item(span = { GridItemSpan(1) }) {
+    item(key = R.string.compatible_devices, span = { GridItemSpan(1) }) {
         SettingsItem(
             label = stringResource(R.string.compatible_devices),
             icon = painterResource(R.drawable.ic_compatible_devices),
@@ -261,7 +261,7 @@ private fun LazyGridScope.infoSectionItems(
             )
         }
     }
-    item(span = { GridItemSpan(1) }) {
+    item(key = R.string.open_source_licenses, span = { GridItemSpan(1) }) {
         SettingsItem(
             label = stringResource(R.string.open_source_licenses),
             icon = painterResource(R.drawable.ic_open_source_licenses),
@@ -274,7 +274,7 @@ private fun LazyGridScope.infoSectionItems(
             )
         }
     }
-    item(span = { GridItemSpan(1) }) {
+    item(key = R.string.github_repository, span = { GridItemSpan(1) }) {
         SettingsItem(
             label = stringResource(R.string.github_repository),
             icon = painterResource(R.drawable.ic_github_repository),
@@ -290,7 +290,7 @@ private fun LazyGridScope.infoSectionItems(
 }
 
 private fun LazyGridScope.sectionLabel(@StringRes labelRes: Int) {
-    item(span = { GridItemSpan(maxLineSpan) }) {
+    item(key = labelRes, span = { GridItemSpan(maxLineSpan) }) {
         Text(
             text = stringResource(labelRes),
             style = MaterialTheme.typography.titleSmall,
