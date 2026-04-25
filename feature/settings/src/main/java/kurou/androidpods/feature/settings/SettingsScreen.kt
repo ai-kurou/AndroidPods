@@ -248,11 +248,10 @@ private fun SettingsEffects(
         }
         viewModel.refreshOverlayState()
         val notificationManager = NotificationManagerCompat.from(context)
-        viewModel.refreshNotificationState(
-            isDisabled = !notificationManager.areNotificationsEnabled(),
-        )
+        val notificationsEnabled = notificationManager.areNotificationsEnabled()
+        viewModel.refreshNotificationState(isDisabled = !notificationsEnabled)
         viewModel.refreshDeviceScanChannelState(
-            isDisabled = notificationManager.areNotificationsEnabled() &&
+            isDisabled = notificationsEnabled &&
                 notificationManager.getNotificationChannel("device_scan")
                     ?.importance == android.app.NotificationManager.IMPORTANCE_NONE,
         )
