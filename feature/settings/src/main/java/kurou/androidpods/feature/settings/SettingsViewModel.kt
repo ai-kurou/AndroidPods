@@ -28,6 +28,8 @@ data class SettingsUiState(
     val updateAvailable: Boolean = false,
     val themeSettings: ThemeSettings = ThemeSettings(),
     val overlayPosition: OverlayPosition = OverlayPosition.BOTTOM,
+    val isNotificationsDisabled: Boolean = false,
+    val isDeviceScanChannelDisabled: Boolean = false,
 )
 
 @HiltViewModel
@@ -41,6 +43,8 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
     private val _overlayEnabled = MutableStateFlow(getOverlaySettingsUseCase.isEnabled())
     private val _updateAvailable = MutableStateFlow(false)
+    private val _isNotificationsDisabled = MutableStateFlow(false)
+    private val _isDeviceScanChannelDisabled = MutableStateFlow(false)
 
     val uiState: StateFlow<SettingsUiState> =
         combine(
@@ -58,10 +62,25 @@ class SettingsViewModel @Inject constructor(
             ) { updateAvailable, themeSettings, overlayPosition ->
                 Triple(updateAvailable, themeSettings, overlayPosition)
             },
-        ) { (bluetoothAdapterState, appleDevices, overlayEnabled), (updateAvailable, themeSettings, overlayPosition) ->
+            combine(
+                _isNotificationsDisabled,
+                _isDeviceScanChannelDisabled,
+            ) { isNotificationsDisabled, isDeviceScanChannelDisabled ->
+                Pair(isNotificationsDisabled, isDeviceScanChannelDisabled)
+            },
+        ) { (bluetoothAdapterState, appleDevices, overlayEnabled),
+            (updateAvailable, themeSettings, overlayPosition),
+            (isNotificationsDisabled, isDeviceScanChannelDisabled),
+            ->
             SettingsUiState(
-                bluetoothAdapterState, appleDevices, overlayEnabled,
-                updateAvailable, themeSettings, overlayPosition,
+                bluetoothAdapterState = bluetoothAdapterState,
+                appleDevices = appleDevices,
+                overlayEnabled = overlayEnabled,
+                updateAvailable = updateAvailable,
+                themeSettings = themeSettings,
+                overlayPosition = overlayPosition,
+                isNotificationsDisabled = isNotificationsDisabled,
+                isDeviceScanChannelDisabled = isDeviceScanChannelDisabled,
             )
         }.stateIn(
             scope = viewModelScope,
@@ -77,6 +96,14 @@ class SettingsViewModel @Inject constructor(
 
     fun refreshOverlayState() {
         _overlayEnabled.update { getOverlaySettingsUseCase.isEnabled() }
+    }
+
+    fun refreshNotificationState(isDisabled: Boolean) {
+        _isNotificationsDisabled.update { isDisabled }
+    }
+
+    fun refreshDeviceScanChannelState(isDisabled: Boolean) {
+        _isDeviceScanChannelDisabled.update { isDisabled }
     }
 
     fun updateThemeSettings(settings: ThemeSettings) {

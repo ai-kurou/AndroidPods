@@ -7,6 +7,8 @@
     <string name="permission_granted">Granted</string>
     <string name="permission_not_granted">Not Granted</string>
     <string name="permission_warning">Some required permissions are not granted. Please grant all permissions.</string>
+    <string name="notification_disabled_warning">App notifications are disabled. Tap to open notification settings.</string>
+    <string name="device_scan_channel_disabled_warning">Device Scan notifications are disabled. Tap to open notification settings.</string>
     <string name="bluetooth_warning">Bluetooth is off. Please enable Bluetooth.</string>
     <string name="bluetooth_not_supported">This device does not support Bluetooth.</string>
     <string name="bluetooth_adapter_state">Bluetooth Adapter</string>

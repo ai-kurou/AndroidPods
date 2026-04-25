@@ -2,7 +2,6 @@ package kurou.androidpods.feature.settings
 
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
-import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.v2.createComposeRule
@@ -38,10 +37,14 @@ class SettingsContentTest {
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 overlayEnabled = false,
                 updateAvailable = false,
+                isNotificationsDisabled = false,
+                isDeviceScanChannelDisabled = false,
                 isServiceRestarting = false,
                 columns = 1,
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
+                onNotificationWarningClick = {},
+                onDeviceScanChannelWarningClick = {},
                 onOverlayToggle = {},
                 overlayPosition = OverlayPosition.BOTTOM,
                 onOverlayPositionClick = {},
@@ -75,10 +78,14 @@ class SettingsContentTest {
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 overlayEnabled = false,
                 updateAvailable = false,
+                isNotificationsDisabled = false,
+                isDeviceScanChannelDisabled = false,
                 isServiceRestarting = false,
                 columns = 1,
                 onPermissionWarningClick = { clicked = true },
                 onBluetoothWarningClick = {},
+                onNotificationWarningClick = {},
+                onDeviceScanChannelWarningClick = {},
                 onOverlayToggle = {},
                 overlayPosition = OverlayPosition.BOTTOM,
                 onOverlayPositionClick = {},
@@ -102,17 +109,22 @@ class SettingsContentTest {
     }
 
     @Test
-    fun `BluetoothがONのときBluetooth警告が表示されない`() {
+    fun `通知が無効のとき通知無効警告が表示され、タップするとコールバックが呼ばれる`() {
+        var clicked = false
         composeTestRule.setContent {
             SettingsContent(
                 permissionStates = emptyMap(),
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 overlayEnabled = false,
                 updateAvailable = false,
+                isNotificationsDisabled = true,
+                isDeviceScanChannelDisabled = false,
                 isServiceRestarting = false,
                 columns = 1,
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
+                onNotificationWarningClick = { clicked = true },
+                onDeviceScanChannelWarningClick = {},
                 onOverlayToggle = {},
                 overlayPosition = OverlayPosition.BOTTOM,
                 onOverlayPositionClick = {},
@@ -128,9 +140,10 @@ class SettingsContentTest {
         }
 
         composeTestRule
-            .onNodeWithText(
-                "Bluetooth is off. Please enable Bluetooth.",
-            ).assertDoesNotExist()
+            .onNodeWithText("App notifications are disabled. Tap to open notification settings.")
+            .performClick()
+
+        assertTrue(clicked)
     }
 
     @Test
@@ -142,10 +155,14 @@ class SettingsContentTest {
                 bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
                 overlayEnabled = false,
                 updateAvailable = false,
+                isNotificationsDisabled = false,
+                isDeviceScanChannelDisabled = false,
                 isServiceRestarting = false,
                 columns = 1,
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = { clicked = true },
+                onNotificationWarningClick = {},
+                onDeviceScanChannelWarningClick = {},
                 onOverlayToggle = {},
                 overlayPosition = OverlayPosition.BOTTOM,
                 onOverlayPositionClick = {},
@@ -169,42 +186,6 @@ class SettingsContentTest {
     }
 
     @Test
-    fun `Bluetoothがnullのときbluetooth警告が表示されタップしてもコールバックが呼ばれない`() {
-        var clicked = false
-        composeTestRule.setContent {
-            SettingsContent(
-                permissionStates = emptyMap(),
-                bluetoothAdapterState = null,
-                overlayEnabled = false,
-                updateAvailable = false,
-                isServiceRestarting = false,
-                columns = 1,
-                onPermissionWarningClick = {},
-                onBluetoothWarningClick = { clicked = true },
-                onOverlayToggle = {},
-                overlayPosition = OverlayPosition.BOTTOM,
-                onOverlayPositionClick = {},
-                onRestartServiceClick = {},
-                themeSettings = ThemeSettings(),
-                onThemeModeClick = {},
-                onDynamicColorToggle = {},
-                onUpdateClick = {},
-                onLicensesClick = {},
-                onDevicesClick = {},
-                onGithubClick = {},
-            )
-        }
-
-        composeTestRule
-            .onNodeWithText(
-                "This device does not support Bluetooth.",
-            ).assertIsDisplayed()
-            .performClick()
-
-        assertTrue(!clicked)
-    }
-
-    @Test
     fun `対応デバイスアイテムをタップするとonDevicesClickが呼ばれる`() {
         var clicked = false
         composeTestRule.setContent {
@@ -213,10 +194,14 @@ class SettingsContentTest {
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 overlayEnabled = false,
                 updateAvailable = false,
+                isNotificationsDisabled = false,
+                isDeviceScanChannelDisabled = false,
                 isServiceRestarting = false,
                 columns = 1,
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
+                onNotificationWarningClick = {},
+                onDeviceScanChannelWarningClick = {},
                 onOverlayToggle = {},
                 overlayPosition = OverlayPosition.BOTTOM,
                 onOverlayPositionClick = {},
@@ -246,10 +231,14 @@ class SettingsContentTest {
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 overlayEnabled = false,
                 updateAvailable = false,
+                isNotificationsDisabled = false,
+                isDeviceScanChannelDisabled = false,
                 isServiceRestarting = false,
                 columns = 1,
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
+                onNotificationWarningClick = {},
+                onDeviceScanChannelWarningClick = {},
                 onOverlayToggle = {},
                 overlayPosition = OverlayPosition.BOTTOM,
                 onOverlayPositionClick = {},
@@ -279,10 +268,14 @@ class SettingsContentTest {
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 overlayEnabled = false,
                 updateAvailable = false,
+                isNotificationsDisabled = false,
+                isDeviceScanChannelDisabled = false,
                 isServiceRestarting = false,
                 columns = 1,
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
+                onNotificationWarningClick = {},
+                onDeviceScanChannelWarningClick = {},
                 onOverlayToggle = {},
                 overlayPosition = OverlayPosition.BOTTOM,
                 onOverlayPositionClick = {},
@@ -312,10 +305,14 @@ class SettingsContentTest {
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 overlayEnabled = false,
                 updateAvailable = false,
+                isNotificationsDisabled = false,
+                isDeviceScanChannelDisabled = false,
                 isServiceRestarting = false,
                 columns = 1,
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
+                onNotificationWarningClick = {},
+                onDeviceScanChannelWarningClick = {},
                 onOverlayToggle = { toggledValue = it },
                 overlayPosition = OverlayPosition.BOTTOM,
                 onOverlayPositionClick = {},
@@ -345,10 +342,14 @@ class SettingsContentTest {
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 overlayEnabled = true,
                 updateAvailable = false,
+                isNotificationsDisabled = false,
+                isDeviceScanChannelDisabled = false,
                 isServiceRestarting = false,
                 columns = 1,
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
+                onNotificationWarningClick = {},
+                onDeviceScanChannelWarningClick = {},
                 onOverlayToggle = { toggledValue = it },
                 overlayPosition = OverlayPosition.BOTTOM,
                 onOverlayPositionClick = {},
@@ -378,10 +379,14 @@ class SettingsContentTest {
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 overlayEnabled = false,
                 updateAvailable = false,
+                isNotificationsDisabled = false,
+                isDeviceScanChannelDisabled = false,
                 isServiceRestarting = false,
                 columns = 1,
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
+                onNotificationWarningClick = {},
+                onDeviceScanChannelWarningClick = {},
                 onOverlayToggle = {},
                 overlayPosition = OverlayPosition.BOTTOM,
                 onOverlayPositionClick = {},
@@ -411,10 +416,14 @@ class SettingsContentTest {
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 overlayEnabled = false,
                 updateAvailable = false,
+                isNotificationsDisabled = false,
+                isDeviceScanChannelDisabled = false,
                 isServiceRestarting = true,
                 columns = 1,
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
+                onNotificationWarningClick = {},
+                onDeviceScanChannelWarningClick = {},
                 onOverlayToggle = {},
                 overlayPosition = OverlayPosition.BOTTOM,
                 onOverlayPositionClick = {},
@@ -444,10 +453,14 @@ class SettingsContentTest {
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 overlayEnabled = false,
                 updateAvailable = true,
+                isNotificationsDisabled = false,
+                isDeviceScanChannelDisabled = false,
                 isServiceRestarting = false,
                 columns = 1,
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
+                onNotificationWarningClick = {},
+                onDeviceScanChannelWarningClick = {},
                 onOverlayToggle = {},
                 overlayPosition = OverlayPosition.BOTTOM,
                 onOverlayPositionClick = {},
@@ -479,11 +492,15 @@ class SettingsContentTest {
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 overlayEnabled = false,
                 updateAvailable = false,
+                isNotificationsDisabled = false,
+                isDeviceScanChannelDisabled = false,
                 isServiceRestarting = false,
                 columns = 1,
                 themeSettings = ThemeSettings(),
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
+                onNotificationWarningClick = {},
+                onDeviceScanChannelWarningClick = {},
                 onOverlayToggle = {},
                 overlayPosition = OverlayPosition.BOTTOM,
                 onOverlayPositionClick = {},
@@ -512,11 +529,15 @@ class SettingsContentTest {
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 overlayEnabled = false,
                 updateAvailable = false,
+                isNotificationsDisabled = false,
+                isDeviceScanChannelDisabled = false,
                 isServiceRestarting = false,
                 columns = 1,
                 themeSettings = ThemeSettings(useDynamicColor = false),
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
+                onNotificationWarningClick = {},
+                onDeviceScanChannelWarningClick = {},
                 onOverlayToggle = {},
                 overlayPosition = OverlayPosition.BOTTOM,
                 onOverlayPositionClick = {},
@@ -545,11 +566,15 @@ class SettingsContentTest {
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 overlayEnabled = false,
                 updateAvailable = false,
+                isNotificationsDisabled = false,
+                isDeviceScanChannelDisabled = false,
                 isServiceRestarting = false,
                 columns = 1,
                 themeSettings = ThemeSettings(useDynamicColor = true),
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
+                onNotificationWarningClick = {},
+                onDeviceScanChannelWarningClick = {},
                 onOverlayToggle = {},
                 overlayPosition = OverlayPosition.BOTTOM,
                 onOverlayPositionClick = {},
@@ -578,11 +603,15 @@ class SettingsContentTest {
                 bluetoothAdapterState = BluetoothAdapter.STATE_ON,
                 overlayEnabled = false,
                 updateAvailable = false,
+                isNotificationsDisabled = false,
+                isDeviceScanChannelDisabled = false,
                 isServiceRestarting = false,
                 columns = 1,
                 themeSettings = ThemeSettings(),
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
+                onNotificationWarningClick = {},
+                onDeviceScanChannelWarningClick = {},
                 onOverlayToggle = {},
                 overlayPosition = OverlayPosition.BOTTOM,
                 onOverlayPositionClick = {},
@@ -609,11 +638,15 @@ class SettingsContentTest {
                 overlayEnabled = false,
                 overlayPosition = OverlayPosition.BOTTOM,
                 updateAvailable = false,
+                isNotificationsDisabled = false,
+                isDeviceScanChannelDisabled = false,
                 isServiceRestarting = false,
                 columns = 1,
                 themeSettings = ThemeSettings(),
                 onPermissionWarningClick = {},
                 onBluetoothWarningClick = {},
+                onNotificationWarningClick = {},
+                onDeviceScanChannelWarningClick = {},
                 onOverlayToggle = {},
                 onOverlayPositionClick = { clicked = true },
                 onRestartServiceClick = {},

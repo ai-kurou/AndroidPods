@@ -31,6 +31,7 @@ import kurou.androidpods.core.domain.CheckUpdateUseCase
 import kurou.androidpods.core.domain.GetAppleDevicesUseCase
 import kurou.androidpods.core.domain.GetBluetoothAdapterStateUseCase
 import kurou.androidpods.core.domain.GetOverlaySettingsUseCase
+import kurou.androidpods.core.domain.NotificationChannels
 import kurou.androidpods.core.domain.OverlayPosition
 import kurou.androidpods.core.domain.OverlayPositionUseCase
 import kurou.androidpods.core.domain.ThemeMode
@@ -261,6 +262,71 @@ class SettingsScreenTest {
 
         composeTestRule.onNodeWithText("Light").assertIsDisplayed()
         composeTestRule.onNodeWithText("Dark").assertIsDisplayed()
+    }
+
+    @Test
+    fun `通知無効警告をタップするとACTION_APP_NOTIFICATION_SETTINGSのインテントが発行される`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        grantRequiredPermissions(context)
+        val viewModel = createViewModel(BluetoothAdapter.STATE_ON)
+
+        composeTestRule.setContent {
+            SettingsScreen(
+                windowWidthSizeClass = WindowWidthSizeClass.Compact,
+                onStartScanService = {},
+                onStopScanService = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                viewModel = viewModel,
+            )
+        }
+        viewModel.refreshNotificationState(isDisabled = true)
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst()
+            .performScrollToNode(hasText("App notifications are disabled. Tap to open notification settings."))
+        composeTestRule
+            .onNodeWithText(
+                "App notifications are disabled. Tap to open notification settings.",
+            ).performClick()
+        composeTestRule.waitForIdle()
+
+        val started = shadowOf(composeTestRule.activity).nextStartedActivity
+        assertEquals(Settings.ACTION_APP_NOTIFICATION_SETTINGS, started?.action)
+        assertEquals(composeTestRule.activity.packageName, started?.getStringExtra(Settings.EXTRA_APP_PACKAGE))
+    }
+
+    @Test
+    fun `DeviceScanチャンネル無効警告をタップするとACTION_CHANNEL_NOTIFICATION_SETTINGSのインテントが発行される`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        grantRequiredPermissions(context)
+        val viewModel = createViewModel(BluetoothAdapter.STATE_ON)
+
+        composeTestRule.setContent {
+            SettingsScreen(
+                windowWidthSizeClass = WindowWidthSizeClass.Compact,
+                onStartScanService = {},
+                onStopScanService = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                viewModel = viewModel,
+            )
+        }
+        viewModel.refreshDeviceScanChannelState(isDisabled = true)
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst()
+            .performScrollToNode(hasText("Device Scan notifications are disabled. Tap to open notification settings."))
+        composeTestRule
+            .onNodeWithText(
+                "Device Scan notifications are disabled. Tap to open notification settings.",
+            ).performClick()
+        composeTestRule.waitForIdle()
+
+        val started = shadowOf(composeTestRule.activity).nextStartedActivity
+        assertEquals(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS, started?.action)
+        assertEquals(composeTestRule.activity.packageName, started?.getStringExtra(Settings.EXTRA_APP_PACKAGE))
+        assertEquals(NotificationChannels.DEVICE_SCAN, started?.getStringExtra(Settings.EXTRA_CHANNEL_ID))
     }
 
     @Test

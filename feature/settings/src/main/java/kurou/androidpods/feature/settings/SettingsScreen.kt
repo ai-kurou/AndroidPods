@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -43,6 +44,7 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kurou.androidpods.core.domain.NotificationChannels
 import kurou.androidpods.core.domain.ThemeMode
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -167,6 +169,12 @@ fun SettingsScreen(
         onBluetoothWarningClick = {
             context.startActivity(Intent(Settings.ACTION_BLUETOOTH_SETTINGS))
         },
+        onNotificationWarningClick = {
+            context.openAppNotificationSettings()
+        },
+        onDeviceScanChannelWarningClick = {
+            context.openNotificationChannelSettings(NotificationChannels.DEVICE_SCAN)
+        },
         onUpdateClick = {
             val intent = Intent(Intent.ACTION_VIEW, "https://github.com/ai-kurou/AndroidPods/releases/latest".toUri())
             context.startActivity(intent)
@@ -240,6 +248,14 @@ private fun SettingsEffects(
             )
         }
         viewModel.refreshOverlayState()
+        val notificationManager = NotificationManagerCompat.from(context)
+        val notificationsEnabled = notificationManager.areNotificationsEnabled()
+        viewModel.refreshNotificationState(isDisabled = !notificationsEnabled)
+        viewModel.refreshDeviceScanChannelState(
+            isDisabled = notificationsEnabled &&
+                notificationManager.getNotificationChannel(NotificationChannels.DEVICE_SCAN)
+                    ?.importance == android.app.NotificationManager.IMPORTANCE_NONE,
+        )
         onStartScanService()
         if (initialRequestDone) {
             val hasNotGranted =
@@ -261,6 +277,8 @@ private fun SettingsScaffold(
     columns: Int,
     onPermissionWarningClick: () -> Unit,
     onBluetoothWarningClick: () -> Unit,
+    onNotificationWarningClick: () -> Unit,
+    onDeviceScanChannelWarningClick: () -> Unit,
     onUpdateClick: () -> Unit,
     onLicensesClick: () -> Unit,
     onDevicesClick: () -> Unit,
@@ -288,11 +306,15 @@ private fun SettingsScaffold(
             overlayEnabled = uiState.overlayEnabled,
             overlayPosition = uiState.overlayPosition,
             updateAvailable = uiState.updateAvailable,
+            isNotificationsDisabled = uiState.isNotificationsDisabled,
+            isDeviceScanChannelDisabled = uiState.isDeviceScanChannelDisabled,
             isServiceRestarting = isServiceRestarting,
             columns = columns,
             themeSettings = uiState.themeSettings,
             onPermissionWarningClick = onPermissionWarningClick,
             onBluetoothWarningClick = onBluetoothWarningClick,
+            onNotificationWarningClick = onNotificationWarningClick,
+            onDeviceScanChannelWarningClick = onDeviceScanChannelWarningClick,
             onUpdateClick = onUpdateClick,
             onLicensesClick = onLicensesClick,
             onDevicesClick = onDevicesClick,
@@ -341,6 +363,23 @@ private fun ThemeModeDialog(
             TextButton(onClick = onDismiss) {
                 Text(stringResource(android.R.string.cancel))
             }
+        },
+    )
+}
+
+private fun android.content.Context.openAppNotificationSettings() {
+    startActivity(
+        Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+            putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+        },
+    )
+}
+
+private fun android.content.Context.openNotificationChannelSettings(channelId: String) {
+    startActivity(
+        Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS).apply {
+            putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+            putExtra(Settings.EXTRA_CHANNEL_ID, channelId)
         },
     )
 }
