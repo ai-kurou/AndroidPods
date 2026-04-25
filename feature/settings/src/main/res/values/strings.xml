@@ -18,6 +18,7 @@
     <string name="apple_devices_title">Apple Devices</string>
     <string name="no_apple_devices">No Apple devices found</string>
     <string name="app_name">AndroidPods</string>
+    <string name="overlay_section_label">Overlay</string>
     <string name="overlay_setting_label">Show battery overlay</string>
     <string name="compatible_devices">Compatible devices</string>
     <string name="open_source_licenses">Open Source Licenses</string>

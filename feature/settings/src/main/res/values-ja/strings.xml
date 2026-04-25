@@ -18,6 +18,7 @@
     <string name="apple_devices_title">Appleデバイス</string>
     <string name="no_apple_devices">Appleデバイスが見つかりません</string>
     <string name="app_name">AndroidPods</string>
+    <string name="overlay_section_label">オーバーレイ</string>
     <string name="overlay_setting_label">バッテリーオーバーレイを表示</string>
     <string name="compatible_devices">対応デバイス</string>
     <string name="open_source_licenses">オープンソースライセンス</string>
