@@ -42,7 +42,7 @@ internal fun DevicesContent(
         modifier = modifier.fillMaxSize().padding(16.dp),
     ) {
         items(devices) { device ->
-            DeviceItem(device = device, modifier = Modifier.fillMaxWidth().aspectRatio(1f))
+            DeviceItem(device = device, modifier = Modifier.animateItem().fillMaxWidth().aspectRatio(1f))
         }
     }
 }
