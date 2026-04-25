@@ -138,7 +138,8 @@ private fun LazyGridScope.bannerItems(
 ) {
     if (state.hasNotGranted) {
         item(key = R.string.permission_warning, span = { GridItemSpan(maxLineSpan) }) {
-            PermissionWarningBanner(
+            WarningBanner(
+                text = stringResource(R.string.permission_warning),
                 onClick = onPermissionWarningClick,
                 modifier = Modifier.animateItem(),
             )
@@ -146,7 +147,8 @@ private fun LazyGridScope.bannerItems(
     }
     if (state.isNotificationsDisabled) {
         item(key = R.string.notification_disabled_warning, span = { GridItemSpan(maxLineSpan) }) {
-            NotificationDisabledBanner(
+            WarningBanner(
+                text = stringResource(R.string.notification_disabled_warning),
                 onClick = onNotificationWarningClick,
                 modifier = Modifier.animateItem(),
             )
@@ -154,7 +156,8 @@ private fun LazyGridScope.bannerItems(
     }
     if (state.isDeviceScanChannelDisabled) {
         item(key = R.string.device_scan_channel_disabled_warning, span = { GridItemSpan(maxLineSpan) }) {
-            DeviceScanChannelDisabledBanner(
+            WarningBanner(
+                text = stringResource(R.string.device_scan_channel_disabled_warning),
                 onClick = onDeviceScanChannelWarningClick,
                 modifier = Modifier.animateItem(),
             )
@@ -339,7 +342,7 @@ private fun LazyGridScope.sectionLabel(@StringRes labelRes: Int) {
 }
 
 @Composable
-private fun PermissionWarningBanner(onClick: () -> Unit, modifier: Modifier = Modifier) {
+internal fun WarningBanner(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier =
@@ -358,71 +361,7 @@ private fun PermissionWarningBanner(onClick: () -> Unit, modifier: Modifier = Mo
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = stringResource(R.string.permission_warning),
-            color = MaterialTheme.colorScheme.onErrorContainer,
-            modifier = Modifier.weight(1f),
-        )
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onErrorContainer,
-        )
-    }
-}
-
-@Composable
-private fun NotificationDisabledBanner(onClick: () -> Unit, modifier: Modifier = Modifier) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.errorContainer)
-                .clickable(onClick = onClick)
-                .padding(12.dp),
-    ) {
-        Icon(
-            imageVector = Icons.Filled.Warning,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onErrorContainer,
-            modifier = Modifier.size(20.dp),
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = stringResource(R.string.notification_disabled_warning),
-            color = MaterialTheme.colorScheme.onErrorContainer,
-            modifier = Modifier.weight(1f),
-        )
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onErrorContainer,
-        )
-    }
-}
-
-@Composable
-private fun DeviceScanChannelDisabledBanner(onClick: () -> Unit, modifier: Modifier = Modifier) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.errorContainer)
-                .clickable(onClick = onClick)
-                .padding(12.dp),
-    ) {
-        Icon(
-            imageVector = Icons.Filled.Warning,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onErrorContainer,
-            modifier = Modifier.size(20.dp),
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = stringResource(R.string.device_scan_channel_disabled_warning),
+            text = text,
             color = MaterialTheme.colorScheme.onErrorContainer,
             modifier = Modifier.weight(1f),
         )
