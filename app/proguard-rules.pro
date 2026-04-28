@@ -23,6 +23,9 @@
 -keep class okhttp3.** { *; }
 -dontwarn okhttp3.**
 -dontwarn okio.**
+# Ktor の JVM デバッグ検出クラスは Android に存在しないため警告を抑制
+-dontwarn java.lang.management.ManagementFactory
+-dontwarn java.lang.management.RuntimeMXBean
 
 # Hilt / Dagger — コード生成クラスを保持
 -keep class dagger.hilt.** { *; }
