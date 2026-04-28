@@ -24,14 +24,12 @@ internal class UpdateRepositoryImpl @Inject constructor(
             "https://api.github.com/repos/ai-kurou/AndroidPods/releases/latest"
     }
 
-    override suspend fun fetchLatestTagName(): String? =
-        try {
+    override suspend fun fetchLatestTagName(): Result<String> =
+        runCatching {
             httpClient
                 .get(API_URL) {
                     header("Accept", "application/vnd.github+json")
                 }.body<GitHubRelease>()
                 .tagName
-        } catch (e: Exception) {
-            null
         }
 }

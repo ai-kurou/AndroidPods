@@ -61,7 +61,7 @@ object FakeRepositoryModule {
     @Singleton
     fun provideUpdateRepository(): UpdateRepository =
         object : UpdateRepository {
-            override suspend fun fetchLatestTagName(): String? = null
+            override suspend fun fetchLatestTagName(): Result<String> = Result.success("v0.0.0")
         }
 
     @Provides

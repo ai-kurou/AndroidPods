@@ -125,15 +125,16 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun `checkUpdateがtrueを返すとupdateAvailableがtrueになる`() =
+    fun `checkUpdateがResult_success_trueを返すとupdateAvailableがtrueになる`() =
         runTest {
             fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
             val version = "0.1.0"
-            coEvery { checkUpdateUseCase(version) } returns true
+            coEvery { checkUpdateUseCase(version) } returns Result.success(true)
 
             viewModel.checkUpdate(version)
 
             assertEquals(true, viewModel.uiState.value.updateAvailable)
+            assertEquals(false, viewModel.uiState.value.updateCheckFailed)
             verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
             verify(exactly = 1) { getAppleDevicesUseCase.observe() }
             verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
@@ -151,15 +152,43 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun `checkUpdateがfalseを返すとupdateAvailableがfalseのまま`() =
+    fun `checkUpdateがResult_success_falseを返すとupdateAvailableがfalseのまま`() =
         runTest {
             fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
             val version = "0.1.0"
-            coEvery { checkUpdateUseCase(version) } returns false
+            coEvery { checkUpdateUseCase(version) } returns Result.success(false)
 
             viewModel.checkUpdate(version)
 
             assertEquals(false, viewModel.uiState.value.updateAvailable)
+            assertEquals(false, viewModel.uiState.value.updateCheckFailed)
+            verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
+            verify(exactly = 1) { getAppleDevicesUseCase.observe() }
+            verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
+            verify(exactly = 1) { themeSettingsUseCase.observe() }
+            verify(exactly = 1) { overlayPositionUseCase.observe() }
+            coVerify(exactly = 1) { checkUpdateUseCase(version) }
+            confirmVerified(
+                getBluetoothAdapterStateUseCase,
+                getAppleDevicesUseCase,
+                getOverlaySettingsUseCase,
+                checkUpdateUseCase,
+                themeSettingsUseCase,
+                overlayPositionUseCase,
+            )
+        }
+
+    @Test
+    fun `checkUpdateがResult_failureを返すとupdateCheckFailedがtrueになる`() =
+        runTest {
+            fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
+            val version = "0.1.0"
+            coEvery { checkUpdateUseCase(version) } returns Result.failure(Exception("network error"))
+
+            viewModel.checkUpdate(version)
+
+            assertEquals(false, viewModel.uiState.value.updateAvailable)
+            assertEquals(true, viewModel.uiState.value.updateCheckFailed)
             verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
             verify(exactly = 1) { getAppleDevicesUseCase.observe() }
             verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
