@@ -117,6 +117,26 @@ Hiltを使用。新しいRepositoryを追加する場合:
 3. `core:data/DataModule.kt` に `@Binds` メソッドを追加
 4. `navigation/src/test/.../FakeRepositoryModule.kt` にダミー実装を追加（`AppScaffold`のナビゲーションテストで使用）
 
+### Coroutines のエラーハンドリング
+
+`runCatching` および `mapCatching` は `CancellationException` を捕捉するため、structured concurrency を破壊する恐れがある。**使用禁止**。
+
+代わりに `try-catch` で `CancellationException` を明示的に再スローすること:
+
+```kotlin
+// NG
+runCatching { suspendFun() }
+
+// OK
+try {
+    Result.success(suspendFun())
+} catch (e: CancellationException) {
+    throw e
+} catch (e: Exception) {
+    Result.failure(e)
+}
+```
+
 ### テストパターン
 
 - **ViewModel テスト**: MockKでUseCaseをモック、`UnconfinedTestDispatcher`で`Dispatchers.Main`を差し替え

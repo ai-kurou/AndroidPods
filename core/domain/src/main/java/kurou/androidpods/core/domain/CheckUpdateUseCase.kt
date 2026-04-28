@@ -1,5 +1,6 @@
 package kurou.androidpods.core.domain
 
+import kotlinx.coroutines.CancellationException
 import javax.inject.Inject
 
 class CheckUpdateUseCase @Inject constructor(
@@ -12,8 +13,14 @@ class CheckUpdateUseCase @Inject constructor(
      * @param currentVersion "0.1.0" 形式の文字列
      */
     suspend operator fun invoke(currentVersion: String): Result<Boolean> =
-        repository.fetchLatestTagName().mapCatching { tagName ->
-            isNewerVersion(latest = tagName.trimStart('v'), current = currentVersion)
+        repository.fetchLatestTagName().map { tagName ->
+            try {
+                isNewerVersion(latest = tagName.trimStart('v'), current = currentVersion)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                return Result.failure(e)
+            }
         }
 
     private fun isNewerVersion(
