@@ -67,7 +67,7 @@ moduleGraphAssert {
         ":core:designsystem -X> :core:data",
         ":core:designsystem -X> :core:service",
         ":core:designsystem -X> :feature:.*",
-        ":core:service -X> :core:app",
+        ":core:service -X> :app",
         ":core:service -X> :core:designsystem",
         ":core:service -X> :navigation",
         ":core:service -X> :feature:.*",
