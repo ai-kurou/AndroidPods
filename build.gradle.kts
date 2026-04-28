@@ -41,9 +41,11 @@ moduleGraphAssert {
     allowed = arrayOf(
         ":app -> :core:domain",
         ":app -> :core:data",
+        ":app -> :core:designsystem",
         ":app -> :core:service",
         ":app -> :navigation",
         ":navigation -> :feature:.*",
+        ":feature:.* -> :core:designsystem",
         ":core:service -> :core:domain",
         ":core:data -> :core:domain",
         ":feature:.* -> :core:domain",
@@ -55,11 +57,18 @@ moduleGraphAssert {
         ":navigation -X> :app",
         ":feature:.* -X> :navigation",
         ":core:domain -X> :core:data",
+        ":core:domain -X> :core:designsystem",
         ":core:domain -X> :core:service",
         ":core:domain -X> :feature:.*",
+        ":core:data -X> :core:designsystem",
         ":core:data -X> :core:service",
         ":core:data -X> :feature:.*",
+        ":core:designsystem -X> :core:domain",
+        ":core:designsystem -X> :core:data",
+        ":core:designsystem -X> :core:service",
+        ":core:designsystem -X> :feature:.*",
         ":core:service -X> :core:app",
+        ":core:service -X> :core:designsystem",
         ":core:service -X> :navigation",
         ":core:service -X> :feature:.*",
     )
@@ -180,6 +189,7 @@ dependencies {
     kover(project(":app"))
     kover(project(":core:domain"))
     kover(project(":core:data"))
+    kover(project(":core:designsystem"))
     kover(project(":core:service"))
     kover(project(":feature:settings"))
     kover(project(":feature:onboarding"))

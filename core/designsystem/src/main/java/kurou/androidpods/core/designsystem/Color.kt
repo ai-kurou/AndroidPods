@@ -1,4 +1,4 @@
-package kurou.androidpods.ui.theme
+package kurou.androidpods.core.designsystem
 
 import androidx.compose.ui.graphics.Color
 

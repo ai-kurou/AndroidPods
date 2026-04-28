@@ -1,4 +1,4 @@
-package kurou.androidpods.ui.theme
+package kurou.androidpods.core.designsystem
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.graphics.Color
@@ -90,19 +90,6 @@ class ThemeTest {
     }
 
     @Test
-    @Config(sdk = [31])
-    fun `Android12以上でdynamicColorオンのライトテーマはcolorSchemeが設定される`() {
-        var primary = Color.Unspecified
-        composeTestRule.setContent {
-            AndroidPodsTheme(darkTheme = false, dynamicColor = true) {
-                primary = MaterialTheme.colorScheme.primary
-            }
-        }
-        assertNotEquals(Color.Unspecified, primary)
-        assertNotEquals(Purple40, primary)
-    }
-
-    @Test
     @Config(sdk = [30])
     fun `Android12未満でdynamicColorオンのライトテーマは静的LightColorSchemeが使われる`() {
         composeTestRule.setContent {
@@ -122,6 +109,19 @@ class ThemeTest {
                 assertEquals(Purple80, primary)
             }
         }
+    }
+
+    @Test
+    @Config(sdk = [31])
+    fun `Android12以上でdynamicColorオンのライトテーマはcolorSchemeが設定される`() {
+        var primary = Color.Unspecified
+        composeTestRule.setContent {
+            AndroidPodsTheme(darkTheme = false, dynamicColor = true) {
+                primary = MaterialTheme.colorScheme.primary
+            }
+        }
+        assertNotEquals(Color.Unspecified, primary)
+        assertNotEquals(Purple40, primary)
     }
 
     @Test

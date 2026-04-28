@@ -11,10 +11,10 @@ import androidx.core.view.WindowCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import kurou.androidpods.core.designsystem.AndroidPodsTheme
 import kurou.androidpods.core.domain.ThemeMode
 import kurou.androidpods.core.service.DeviceScanService
 import kurou.androidpods.navigation.AppScaffold
-import kurou.androidpods.ui.theme.AndroidPodsTheme
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
