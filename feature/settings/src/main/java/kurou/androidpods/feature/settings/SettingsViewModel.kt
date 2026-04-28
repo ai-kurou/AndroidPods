@@ -97,7 +97,7 @@ class SettingsViewModel @Inject constructor(
 
     fun checkUpdate(currentVersion: String) {
         viewModelScope.launch {
-            _updateAvailable.update { checkUpdateUseCase(currentVersion) }
+            _updateAvailable.update { checkUpdateUseCase(currentVersion).getOrDefault(false) }
         }
     }
 

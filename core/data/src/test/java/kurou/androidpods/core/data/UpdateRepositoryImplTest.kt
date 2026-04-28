@@ -11,7 +11,7 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class UpdateRepositoryImplTest {
@@ -37,11 +37,11 @@ class UpdateRepositoryImplTest {
 
             val result = repository.fetchLatestTagName()
 
-            assertEquals("v1.2.3", result)
+            assertEquals("v1.2.3", result.getOrNull())
         }
 
     @Test
-    fun `HTTPエラー時はnullを返す`() =
+    fun `HTTPエラー時はResult_failureを返す`() =
         runTest {
             val engine =
                 MockEngine { _ ->
@@ -54,11 +54,11 @@ class UpdateRepositoryImplTest {
 
             val result = repository.fetchLatestTagName()
 
-            assertNull(result)
+            assertTrue(result.isFailure)
         }
 
     @Test
-    fun `ネットワークエラー時はnullを返す`() =
+    fun `ネットワークエラー時はResult_failureを返す`() =
         runTest {
             val engine =
                 MockEngine { _ ->
@@ -68,6 +68,6 @@ class UpdateRepositoryImplTest {
 
             val result = repository.fetchLatestTagName()
 
-            assertNull(result)
+            assertTrue(result.isFailure)
         }
 }
