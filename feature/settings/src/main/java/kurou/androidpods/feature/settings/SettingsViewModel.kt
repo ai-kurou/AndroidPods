@@ -28,7 +28,7 @@ private data class UseCaseState(
     val overlayPosition: OverlayPosition,
 )
 
-private data class MutableState(
+private data class InternalState(
     val overlayEnabled: Boolean,
     val updateAvailable: Boolean,
     val isNotificationsDisabled: Boolean,
@@ -76,18 +76,18 @@ class SettingsViewModel @Inject constructor(
                 _isNotificationsDisabled,
                 _isDeviceScanChannelDisabled,
             ) { overlayEnabled, updateAvailable, isNotificationsDisabled, isDeviceScanChannelDisabled ->
-                MutableState(overlayEnabled, updateAvailable, isNotificationsDisabled, isDeviceScanChannelDisabled)
+                InternalState(overlayEnabled, updateAvailable, isNotificationsDisabled, isDeviceScanChannelDisabled)
             },
-        ) { useCaseState, mutableState ->
+        ) { useCaseState, internalState ->
             SettingsUiState(
                 bluetoothAdapterState = useCaseState.bluetoothAdapterState,
                 appleDevices = useCaseState.appleDevices,
                 themeSettings = useCaseState.themeSettings,
                 overlayPosition = useCaseState.overlayPosition,
-                overlayEnabled = mutableState.overlayEnabled,
-                updateAvailable = mutableState.updateAvailable,
-                isNotificationsDisabled = mutableState.isNotificationsDisabled,
-                isDeviceScanChannelDisabled = mutableState.isDeviceScanChannelDisabled,
+                overlayEnabled = internalState.overlayEnabled,
+                updateAvailable = internalState.updateAvailable,
+                isNotificationsDisabled = internalState.isNotificationsDisabled,
+                isDeviceScanChannelDisabled = internalState.isDeviceScanChannelDisabled,
             )
         }.stateIn(
             scope = viewModelScope,
