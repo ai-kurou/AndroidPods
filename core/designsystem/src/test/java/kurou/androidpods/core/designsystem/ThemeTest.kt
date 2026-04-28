@@ -1,4 +1,4 @@
-package kurou.androidpods.ui.theme
+package kurou.androidpods.core.designsystem
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.graphics.Color
@@ -85,6 +85,28 @@ class ThemeTest {
                 assertEquals(Typography.bodyLarge.fontSize, bodyLarge.fontSize)
                 assertEquals(Typography.bodyLarge.lineHeight, bodyLarge.lineHeight)
                 assertEquals(Typography.bodyLarge.letterSpacing, bodyLarge.letterSpacing)
+            }
+        }
+    }
+
+    @Test
+    @Config(sdk = [30])
+    fun `Android12未満でdynamicColorオンのライトテーマは静的LightColorSchemeが使われる`() {
+        composeTestRule.setContent {
+            AndroidPodsTheme(darkTheme = false, dynamicColor = true) {
+                val primary = MaterialTheme.colorScheme.primary
+                assertEquals(Purple40, primary)
+            }
+        }
+    }
+
+    @Test
+    @Config(sdk = [30])
+    fun `Android12未満でdynamicColorオンのダークテーマは静的DarkColorSchemeが使われる`() {
+        composeTestRule.setContent {
+            AndroidPodsTheme(darkTheme = true, dynamicColor = true) {
+                val primary = MaterialTheme.colorScheme.primary
+                assertEquals(Purple80, primary)
             }
         }
     }
