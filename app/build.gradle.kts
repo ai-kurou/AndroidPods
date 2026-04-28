@@ -80,6 +80,7 @@ dependencies {
     // プロジェクトモジュール
     implementation(project(":core:domain"))
     implementation(project(":core:data"))
+    implementation(project(":core:designsystem"))
     implementation(project(":core:service"))
     implementation(project(":navigation"))
 
