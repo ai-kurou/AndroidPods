@@ -24,8 +24,8 @@
 <!-- :app&#45;&gt;:navigation -->
 <g id="edge1" class="edge">
 <title>:app&#45;&gt;:navigation</title>
-<path fill="none" stroke="black" d="M399.74,-143.7C399.74,-135.98 399.74,-126.71 399.74,-118.11"/>
-<polygon fill="black" stroke="black" points="403.24,-118.1 399.74,-108.1 396.24,-118.1 403.24,-118.1"/>
+<path fill="none" stroke="red" stroke-width="2" d="M399.74,-143.7C399.74,-135.98 399.74,-126.71 399.74,-118.11"/>
+<polygon fill="red" stroke="red" stroke-width="2" points="403.24,-118.1 399.74,-108.1 396.24,-118.1 403.24,-118.1"/>
 </g>
 <!-- :feature:settings -->
 <g id="node3" class="node">
@@ -36,8 +36,8 @@
 <!-- :navigation&#45;&gt;:feature:settings -->
 <g id="edge2" class="edge">
 <title>:navigation&#45;&gt;:feature:settings</title>
-<path fill="none" stroke="black" d="M352.02,-78.29C299.33,-66.47 214.13,-47.36 154.76,-34.04"/>
-<polygon fill="black" stroke="black" points="155.25,-30.56 144.73,-31.79 153.72,-37.39 155.25,-30.56"/>
+<path fill="none" stroke="red" stroke-width="2" d="M352.02,-78.29C299.33,-66.47 214.13,-47.36 154.76,-34.04"/>
+<polygon fill="red" stroke="red" stroke-width="2" points="155.25,-30.56 144.73,-31.79 153.72,-37.39 155.25,-30.56"/>
 </g>
 <!-- :feature:onboarding -->
 <g id="node4" class="node">

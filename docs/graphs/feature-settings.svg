@@ -24,8 +24,8 @@
 <!-- :navigation&#45;&gt;:feature:settings -->
 <g id="edge1" class="edge">
 <title>:navigation&#45;&gt;:feature:settings</title>
-<path fill="none" stroke="black" d="M87.74,-143.7C87.74,-135.98 87.74,-126.71 87.74,-118.11"/>
-<polygon fill="black" stroke="black" points="91.24,-118.1 87.74,-108.1 84.24,-118.1 91.24,-118.1"/>
+<path fill="none" stroke="red" stroke-width="2" d="M87.74,-143.7C87.74,-135.98 87.74,-126.71 87.74,-118.11"/>
+<polygon fill="red" stroke="red" stroke-width="2" points="91.24,-118.1 87.74,-108.1 84.24,-118.1 91.24,-118.1"/>
 </g>
 <!-- :core:domain -->
 <g id="node3" class="node">
@@ -36,8 +36,8 @@
 <!-- :feature:settings&#45;&gt;:core:domain -->
 <g id="edge2" class="edge">
 <title>:feature:settings&#45;&gt;:core:domain</title>
-<path fill="none" stroke="black" d="M87.74,-71.7C87.74,-63.98 87.74,-54.71 87.74,-46.11"/>
-<polygon fill="black" stroke="black" points="91.24,-46.1 87.74,-36.1 84.24,-46.1 91.24,-46.1"/>
+<path fill="none" stroke="red" stroke-width="2" d="M87.74,-71.7C87.74,-63.98 87.74,-54.71 87.74,-46.11"/>
+<polygon fill="red" stroke="red" stroke-width="2" points="91.24,-46.1 87.74,-36.1 84.24,-46.1 91.24,-46.1"/>
 </g>
 </g>
 </svg>
