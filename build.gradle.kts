@@ -45,7 +45,6 @@ moduleGraphAssert {
         ":app -> :navigation",
         ":navigation -> :feature:.*",
         ":core:service -> :core:domain",
-        ":core:service -> :core:data",
         ":core:data -> :core:domain",
         ":feature:.* -> :core:domain",
     )

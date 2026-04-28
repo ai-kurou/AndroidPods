@@ -28,7 +28,6 @@ android {
 dependencies {
     // プロジェクトモジュール
     implementation(project(":core:domain"))
-    implementation(project(":core:data"))
 
     // Hilt (DI)
     implementation(libs.hilt.android)
@@ -41,6 +40,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
 
     // Unit Test
+    testImplementation(project(":core:data"))
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     testImplementation(libs.mockk)
