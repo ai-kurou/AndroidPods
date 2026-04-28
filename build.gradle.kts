@@ -39,7 +39,9 @@ subprojects {
 moduleGraphAssert {
     maxHeight = 4
     allowed = arrayOf(
-        ":app -> :core:.*",
+        ":app -> :core:domain",
+        ":app -> :core:data",
+        ":app -> :core:service",
         ":app -> :navigation",
         ":navigation -> :feature:.*",
         ":core:service -> :core:domain",
@@ -51,6 +53,16 @@ moduleGraphAssert {
         ":app -X> :feature:.*",
         ":feature:.* -X> :core:data",
         ":navigation -X> :core:.*",
+        ":navigation -X> :app",
+        ":feature:.* -X> :navigation",
+        ":core:domain -X> :core:data",
+        ":core:domain -X> :core:service",
+        ":core:domain -X> :feature:.*",
+        ":core:data -X> :core:service",
+        ":core:data -X> :feature:.*",
+        ":core:service -X> :core:app",
+        ":core:service -X> :navigation",
+        ":core:service -X> :feature:.*",
     )
 }
 
