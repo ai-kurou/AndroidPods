@@ -1,5 +1,6 @@
 package kurou.androidpods.core.data
 
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -31,5 +32,11 @@ internal class UpdateRepositoryImpl @Inject constructor(
                     header("Accept", "application/vnd.github+json")
                 }.body<GitHubRelease>()
                 .tagName
+        }.onFailure { e ->
+            try {
+                FirebaseCrashlytics.getInstance().recordException(e)
+            } catch (_: Exception) {
+                // Firebase未初期化環境（テスト等）では無視する
+            }
         }
 }

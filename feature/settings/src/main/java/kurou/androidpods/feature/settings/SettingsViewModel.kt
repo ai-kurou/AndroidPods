@@ -31,7 +31,6 @@ private data class UseCaseState(
 private data class InternalState(
     val overlayEnabled: Boolean,
     val updateAvailable: Boolean,
-    val updateCheckFailed: Boolean,
     val isNotificationsDisabled: Boolean,
     val isDeviceScanChannelDisabled: Boolean,
 )
@@ -41,7 +40,6 @@ data class SettingsUiState(
     val appleDevices: Map<String, AppleDevice> = emptyMap(),
     val overlayEnabled: Boolean = false,
     val updateAvailable: Boolean = false,
-    val updateCheckFailed: Boolean = false,
     val themeSettings: ThemeSettings = ThemeSettings(),
     val overlayPosition: OverlayPosition = OverlayPosition.BOTTOM,
     val isNotificationsDisabled: Boolean = false,
@@ -59,7 +57,6 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
     private val _overlayEnabled = MutableStateFlow(getOverlaySettingsUseCase.isEnabled())
     private val _updateAvailable = MutableStateFlow(false)
-    private val _updateCheckFailed = MutableStateFlow(false)
     private val _isNotificationsDisabled = MutableStateFlow(false)
     private val _isDeviceScanChannelDisabled = MutableStateFlow(false)
 
@@ -76,19 +73,10 @@ class SettingsViewModel @Inject constructor(
             combine(
                 _overlayEnabled,
                 _updateAvailable,
-                _updateCheckFailed,
                 _isNotificationsDisabled,
                 _isDeviceScanChannelDisabled,
-            ) { overlayEnabled, updateAvailable, updateCheckFailed,
-                isNotificationsDisabled, isDeviceScanChannelDisabled,
-            ->
-                InternalState(
-                    overlayEnabled,
-                    updateAvailable,
-                    updateCheckFailed,
-                    isNotificationsDisabled,
-                    isDeviceScanChannelDisabled,
-                )
+            ) { overlayEnabled, updateAvailable, isNotificationsDisabled, isDeviceScanChannelDisabled ->
+                InternalState(overlayEnabled, updateAvailable, isNotificationsDisabled, isDeviceScanChannelDisabled)
             },
         ) { useCaseState, internalState ->
             SettingsUiState(
@@ -98,7 +86,6 @@ class SettingsViewModel @Inject constructor(
                 overlayPosition = useCaseState.overlayPosition,
                 overlayEnabled = internalState.overlayEnabled,
                 updateAvailable = internalState.updateAvailable,
-                updateCheckFailed = internalState.updateCheckFailed,
                 isNotificationsDisabled = internalState.isNotificationsDisabled,
                 isDeviceScanChannelDisabled = internalState.isDeviceScanChannelDisabled,
             )
@@ -110,14 +97,7 @@ class SettingsViewModel @Inject constructor(
 
     fun checkUpdate(currentVersion: String) {
         viewModelScope.launch {
-            checkUpdateUseCase(currentVersion)
-                .onSuccess { available ->
-                    _updateAvailable.update { available }
-                    _updateCheckFailed.update { false }
-                }
-                .onFailure {
-                    _updateCheckFailed.update { true }
-                }
+            _updateAvailable.update { checkUpdateUseCase(currentVersion).getOrDefault(false) }
         }
     }
 
