@@ -103,6 +103,28 @@ class ThemeTest {
     }
 
     @Test
+    @Config(sdk = [30])
+    fun `Android12未満でdynamicColorオンのライトテーマは静的LightColorSchemeが使われる`() {
+        composeTestRule.setContent {
+            AndroidPodsTheme(darkTheme = false, dynamicColor = true) {
+                val primary = MaterialTheme.colorScheme.primary
+                assertEquals(Purple40, primary)
+            }
+        }
+    }
+
+    @Test
+    @Config(sdk = [30])
+    fun `Android12未満でdynamicColorオンのダークテーマは静的DarkColorSchemeが使われる`() {
+        composeTestRule.setContent {
+            AndroidPodsTheme(darkTheme = true, dynamicColor = true) {
+                val primary = MaterialTheme.colorScheme.primary
+                assertEquals(Purple80, primary)
+            }
+        }
+    }
+
+    @Test
     @Config(sdk = [31])
     fun `Android12以上でdynamicColorオンのダークテーマはcolorSchemeが設定される`() {
         var primary = Color.Unspecified
