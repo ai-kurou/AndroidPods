@@ -21,6 +21,20 @@ import kurou.androidpods.core.domain.ThemeSettings
 import kurou.androidpods.core.domain.ThemeSettingsUseCase
 import javax.inject.Inject
 
+private data class UseCaseState(
+    val bluetoothAdapterState: Int?,
+    val appleDevices: Map<String, AppleDevice>,
+    val themeSettings: ThemeSettings,
+    val overlayPosition: OverlayPosition,
+)
+
+private data class InternalState(
+    val overlayEnabled: Boolean,
+    val updateAvailable: Boolean,
+    val isNotificationsDisabled: Boolean,
+    val isDeviceScanChannelDisabled: Boolean,
+)
+
 data class SettingsUiState(
     val bluetoothAdapterState: Int? = null,
     val appleDevices: Map<String, AppleDevice> = emptyMap(),
@@ -51,36 +65,29 @@ class SettingsViewModel @Inject constructor(
             combine(
                 getBluetoothAdapterStateUseCase.observe(),
                 getAppleDevicesUseCase.observe(),
-                _overlayEnabled,
-            ) { bluetoothAdapterState, appleDevices, overlayEnabled ->
-                Triple(bluetoothAdapterState, appleDevices, overlayEnabled)
-            },
-            combine(
-                _updateAvailable,
                 themeSettingsUseCase.observe(),
                 overlayPositionUseCase.observe(),
-            ) { updateAvailable, themeSettings, overlayPosition ->
-                Triple(updateAvailable, themeSettings, overlayPosition)
+            ) { bluetoothAdapterState, appleDevices, themeSettings, overlayPosition ->
+                UseCaseState(bluetoothAdapterState, appleDevices, themeSettings, overlayPosition)
             },
             combine(
+                _overlayEnabled,
+                _updateAvailable,
                 _isNotificationsDisabled,
                 _isDeviceScanChannelDisabled,
-            ) { isNotificationsDisabled, isDeviceScanChannelDisabled ->
-                Pair(isNotificationsDisabled, isDeviceScanChannelDisabled)
+            ) { overlayEnabled, updateAvailable, isNotificationsDisabled, isDeviceScanChannelDisabled ->
+                InternalState(overlayEnabled, updateAvailable, isNotificationsDisabled, isDeviceScanChannelDisabled)
             },
-        ) { (bluetoothAdapterState, appleDevices, overlayEnabled),
-            (updateAvailable, themeSettings, overlayPosition),
-            (isNotificationsDisabled, isDeviceScanChannelDisabled),
-            ->
+        ) { useCaseState, internalState ->
             SettingsUiState(
-                bluetoothAdapterState = bluetoothAdapterState,
-                appleDevices = appleDevices,
-                overlayEnabled = overlayEnabled,
-                updateAvailable = updateAvailable,
-                themeSettings = themeSettings,
-                overlayPosition = overlayPosition,
-                isNotificationsDisabled = isNotificationsDisabled,
-                isDeviceScanChannelDisabled = isDeviceScanChannelDisabled,
+                bluetoothAdapterState = useCaseState.bluetoothAdapterState,
+                appleDevices = useCaseState.appleDevices,
+                themeSettings = useCaseState.themeSettings,
+                overlayPosition = useCaseState.overlayPosition,
+                overlayEnabled = internalState.overlayEnabled,
+                updateAvailable = internalState.updateAvailable,
+                isNotificationsDisabled = internalState.isNotificationsDisabled,
+                isDeviceScanChannelDisabled = internalState.isDeviceScanChannelDisabled,
             )
         }.stateIn(
             scope = viewModelScope,

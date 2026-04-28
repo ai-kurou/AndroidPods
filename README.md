@@ -36,11 +36,12 @@ Kotlin + Jetpack Composeによるマルチモジュール構成のClean Architec
 
 | モジュール | 役割 |
 |---|---|
-| `:app` | エントリーポイント・テーマ管理 |
+| `:app` | エントリーポイント |
 | `:navigation` | 全ナビゲーションルートの一元管理 |
 | `:core:domain` | リポジトリインターフェース・UseCase |
 | `:core:data` | リポジトリ実装・Hilt DIモジュール |
 | `:core:service` | BLEスキャンとオーバーレイ通知（Foreground Service） |
+| `:core:designsystem` | テーマ・カラー・タイポグラフィ |
 | `:feature:devices` | デバイス一覧画面 |
 | `:feature:settings` | 設定画面 |
 | `:feature:onboarding` | 初回セットアップウィザード |
