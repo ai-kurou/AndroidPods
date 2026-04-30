@@ -29,7 +29,7 @@ internal class BatteryOverlayViewDelegate(
     companion object {
         private const val CARD_WIDTH_DP = 280f
         private const val CARD_SPACING_DP = 12f
-        private const val CONTAINER_MARGIN_BOTTOM_DP = 32f
+        private const val CONTAINER_EDGE_MARGIN_DP = 32f
         private const val CLOSE_BUTTON_SIZE_DP = 36f
         private const val CLOSE_BUTTON_MARGIN_DP = 8f
         private const val DRAG_HANDLE_WIDTH_DP = 36f
@@ -123,6 +123,7 @@ internal class BatteryOverlayViewDelegate(
                 )
             }
 
+        val edgeMarginPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CONTAINER_EDGE_MARGIN_DP, dm).toInt()
         val params =
             WindowManager
                 .LayoutParams(
@@ -133,6 +134,7 @@ internal class BatteryOverlayViewDelegate(
                     PixelFormat.TRANSLUCENT,
                 ).apply {
                     gravity = overlayPosition.toGravity()
+                    y = edgeMarginPx
                 }
 
         root.alpha = 0f
@@ -215,6 +217,11 @@ internal class BatteryOverlayViewDelegate(
         overlayPosition = position
         val params = layoutParams ?: return
         params.gravity = position.toGravity()
+        params.y = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            CONTAINER_EDGE_MARGIN_DP,
+            context.resources.displayMetrics,
+        ).toInt()
         val view = overlayView ?: return
         windowOps.updateViewLayout(view, params)
     }
