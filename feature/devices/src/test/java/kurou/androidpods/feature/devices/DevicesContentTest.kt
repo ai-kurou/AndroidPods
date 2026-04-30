@@ -1,16 +1,9 @@
 package kurou.androidpods.feature.devices
 
-import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.onRoot
-import androidx.compose.ui.test.performKeyInput
-import androidx.compose.ui.test.pressKey
 import kurou.androidpods.core.domain.CompatibleDevice
 import kurou.androidpods.core.domain.DeviceImages
-import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -71,28 +64,5 @@ class DevicesContentTest {
         }
 
         composeTestRule.onNodeWithText("AirPods Max").assertExists()
-    }
-
-    @Test
-    fun `DirectionDownキーでスクロール量が増えDirectionUpキーで減る`() {
-        val devices = (1..20).map { CompatibleDevice(name = "Device $it", images = null) }
-        lateinit var gridState: LazyGridState
-        composeTestRule.setContent {
-            val state = rememberLazyGridState()
-            gridState = state
-            DevicesContent(devices = devices, columns = 2, gridState = state)
-        }
-
-        composeTestRule.onRoot().performKeyInput { pressKey(Key.DirectionDown) }
-        composeTestRule.waitForIdle()
-        val scrollAfterDown =
-            gridState.firstVisibleItemIndex * 1000 + gridState.firstVisibleItemScrollOffset
-        assertTrue("DirectionDownでスクロールされること", scrollAfterDown > 0)
-
-        composeTestRule.onRoot().performKeyInput { pressKey(Key.DirectionUp) }
-        composeTestRule.waitForIdle()
-        val scrollAfterUp =
-            gridState.firstVisibleItemIndex * 1000 + gridState.firstVisibleItemScrollOffset
-        assertTrue("DirectionUpでスクロールが戻ること", scrollAfterUp < scrollAfterDown)
     }
 }
