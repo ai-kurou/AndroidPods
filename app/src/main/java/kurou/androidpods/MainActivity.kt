@@ -5,8 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.core.view.WindowCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -18,7 +16,6 @@ import kurou.androidpods.navigation.AppScaffold
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -45,11 +42,8 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                val windowSizeClass = calculateWindowSizeClass(this@MainActivity)
-
                 AppScaffold(
                     isFirstLaunch = isFirstLaunch,
-                    windowWidthSizeClass = windowSizeClass.widthSizeClass,
                     onOnboardingComplete = { viewModel.markAsLaunched() },
                     onStartScanService = { DeviceScanService.start(this@MainActivity) },
                     onStopScanService = { DeviceScanService.stop(this@MainActivity) },

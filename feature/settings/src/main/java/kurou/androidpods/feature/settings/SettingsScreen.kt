@@ -21,7 +21,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -42,6 +41,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.window.core.layout.WindowSizeClass
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kurou.androidpods.core.domain.NotificationChannels
@@ -50,7 +50,7 @@ import kurou.androidpods.core.domain.ThemeMode
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    windowWidthSizeClass: WindowWidthSizeClass,
+    windowSizeClass: WindowSizeClass,
     onStartScanService: () -> Unit,
     onStopScanService: () -> Unit,
     onLicensesClick: () -> Unit,
@@ -144,10 +144,10 @@ fun SettingsScreen(
     }
 
     val columns =
-        when (windowWidthSizeClass) {
-            WindowWidthSizeClass.Compact -> 1
-            WindowWidthSizeClass.Medium -> 2
-            else -> 3
+        when {
+            windowSizeClass.isWidthAtLeastBreakpoint(840) -> 3
+            windowSizeClass.isWidthAtLeastBreakpoint(600) -> 2
+            else -> 1
         }
 
     val restartServiceMessage = stringResource(R.string.restart_service_completed)
