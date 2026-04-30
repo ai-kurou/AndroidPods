@@ -123,8 +123,12 @@ internal fun OnboardingContent(
                                     true
                                 }
                                 Key.DirectionLeft, Key.Backspace, Key.Escape -> {
-                                    onBackClick()
-                                    true
+                                    if (pagerState.currentPage == 0) {
+                                        false
+                                    } else {
+                                        onBackClick()
+                                        true
+                                    }
                                 }
                                 else -> false
                             }
