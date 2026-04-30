@@ -113,8 +113,9 @@ class DeviceScanService : Service() {
     private fun observeBluetoothState() {
         scope.launch {
             bluetoothAdapterRepository.observeAdapterState().collect { state ->
-                if (state == BluetoothAdapter.STATE_ON) {
-                    appleDeviceRepository.startScan()
+                when (state) {
+                    BluetoothAdapter.STATE_OFF -> appleDeviceRepository.stopScan()
+                    BluetoothAdapter.STATE_ON -> appleDeviceRepository.startScan()
                 }
             }
         }

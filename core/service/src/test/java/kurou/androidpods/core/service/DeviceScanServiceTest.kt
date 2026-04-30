@@ -99,6 +99,16 @@ class DeviceScanServiceTest {
     }
 
     @Test
+    fun `BluetoothがSTATE_OFFになるとstopScanが呼ばれる`() {
+        controller.create().startCommand(0, 0)
+        stopScanCalled = false
+
+        fakeBluetoothStateFlow.tryEmit(BluetoothAdapter.STATE_OFF)
+
+        assertTrue(stopScanCalled)
+    }
+
+    @Test
     fun `onDestroyでstopScanが呼ばれる`() {
         controller.create().startCommand(0, 0)
         controller.destroy()
