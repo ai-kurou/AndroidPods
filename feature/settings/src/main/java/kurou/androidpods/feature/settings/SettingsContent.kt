@@ -9,6 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -79,7 +80,8 @@ internal fun SettingsContent(
         columns = GridCells.Fixed(columns),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = modifier.fillMaxSize().padding(16.dp).testTag("SettingsGrid"),
+        contentPadding = PaddingValues(16.dp),
+        modifier = modifier.fillMaxSize().testTag("SettingsGrid"),
     ) {
         bannerItems(
             state = BannerState(
