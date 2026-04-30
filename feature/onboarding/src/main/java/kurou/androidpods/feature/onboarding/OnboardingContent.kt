@@ -122,15 +122,7 @@ internal fun OnboardingContent(
                                     onButtonClick()
                                     true
                                 }
-                                Key.DirectionLeft -> {
-                                    onBackClick()
-                                    true
-                                }
-                                Key.Backspace -> {
-                                    onBackClick()
-                                    true
-                                }
-                                Key.Escape -> {
+                                Key.DirectionLeft, Key.Backspace, Key.Escape -> {
                                     onBackClick()
                                     true
                                 }
