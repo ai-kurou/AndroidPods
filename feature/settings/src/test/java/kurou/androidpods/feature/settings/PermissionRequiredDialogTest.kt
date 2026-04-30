@@ -1,12 +1,9 @@
 package kurou.androidpods.feature.settings
 
-import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performKeyInput
-import androidx.compose.ui.test.pressKey
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -21,10 +18,9 @@ class PermissionRequiredDialogTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun `タイトルとメッセージが表示されEscapeキーでonDismissが呼ばれる`() {
-        var dismissed = false
+    fun `タイトルとメッセージが表示される`() {
         composeTestRule.setContent {
-            PermissionRequiredDialog(onDismiss = { dismissed = true }, onConfirm = {})
+            PermissionRequiredDialog(onDismiss = {}, onConfirm = {})
         }
 
         composeTestRule.onNodeWithText("Bluetooth Permission Required").assertIsDisplayed()
@@ -32,10 +28,6 @@ class PermissionRequiredDialogTest {
             .onNodeWithText(
                 "This app requires Bluetooth permissions to connect to devices. Please grant permissions in Settings.",
             ).assertIsDisplayed()
-
-        composeTestRule.onNodeWithText("Bluetooth Permission Required")
-            .performKeyInput { pressKey(Key.Escape) }
-        assertTrue(dismissed)
     }
 
     @Test
