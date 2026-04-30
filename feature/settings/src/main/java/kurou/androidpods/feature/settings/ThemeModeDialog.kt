@@ -20,13 +20,13 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kurou.androidpods.core.domain.OverlayPosition
+import kurou.androidpods.core.domain.ThemeMode
 
 @Composable
-internal fun OverlayPositionDialog(
-    currentPosition: OverlayPosition,
+internal fun ThemeModeDialog(
+    currentMode: ThemeMode,
     onDismiss: () -> Unit,
-    onPositionSelected: (OverlayPosition) -> Unit,
+    onModeSelected: (ThemeMode) -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -38,23 +38,23 @@ internal fun OverlayPositionDialog(
                 false
             }
         },
-        title = { Text(stringResource(R.string.overlay_position_label)) },
+        title = { Text(stringResource(R.string.theme_mode_label)) },
         text = {
             Column {
-                OverlayPosition.entries.forEach { position ->
+                ThemeMode.entries.forEach { mode ->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier =
                             Modifier
                                 .fillMaxWidth()
-                                .clickable { onPositionSelected(position) }
+                                .clickable { onModeSelected(mode) }
                                 .padding(vertical = 4.dp),
                     ) {
                         RadioButton(
-                            selected = position == currentPosition,
-                            onClick = { onPositionSelected(position) },
+                            selected = mode == currentMode,
+                            onClick = { onModeSelected(mode) },
                         )
-                        Text(stringResource(position.toStringRes()))
+                        Text(stringResource(mode.toStringRes()))
                     }
                 }
             }
@@ -70,10 +70,6 @@ internal fun OverlayPositionDialog(
 
 @Preview(showBackground = true, widthDp = 400, heightDp = 700)
 @Composable
-private fun OverlayPositionDialogPreview() {
-    OverlayPositionDialog(
-        currentPosition = OverlayPosition.TOP,
-        onDismiss = {},
-        onPositionSelected = {},
-    )
+private fun ThemeModeDialogPreview() {
+    ThemeModeDialog(currentMode = ThemeMode.SYSTEM, onDismiss = {}, onModeSelected = {})
 }
