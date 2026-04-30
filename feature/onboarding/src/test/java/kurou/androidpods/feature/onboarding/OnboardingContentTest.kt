@@ -27,6 +27,7 @@ class OnboardingContentTest {
             OnboardingContent(
                 pagerState = rememberPagerState(pageCount = { PAGE_COUNT }),
                 onButtonClick = {},
+                onBackClick = {},
             )
         }
 
@@ -45,6 +46,7 @@ class OnboardingContentTest {
             OnboardingContent(
                 pagerState = pagerState,
                 onButtonClick = {},
+                onBackClick = {},
             )
         }
 
@@ -63,6 +65,7 @@ class OnboardingContentTest {
             OnboardingContent(
                 pagerState = pagerState,
                 onButtonClick = {},
+                onBackClick = {},
             )
         }
 
@@ -81,6 +84,7 @@ class OnboardingContentTest {
             OnboardingContent(
                 pagerState = pagerState,
                 onButtonClick = {},
+                onBackClick = {},
             )
         }
 
@@ -95,6 +99,7 @@ class OnboardingContentTest {
             OnboardingContent(
                 pagerState = rememberPagerState(pageCount = { PAGE_COUNT }),
                 onButtonClick = { clicked = true },
+                onBackClick = {},
             )
         }
 
@@ -112,6 +117,7 @@ class OnboardingContentTest {
                 onButtonClick = {
                     scope.launch { pagerState.scrollToPage(pagerState.currentPage + 1) }
                 },
+                onBackClick = {},
             )
         }
 
