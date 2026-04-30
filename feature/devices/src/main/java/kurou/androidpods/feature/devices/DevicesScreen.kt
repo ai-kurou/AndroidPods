@@ -30,8 +30,8 @@ fun DevicesScreen(
     val devices by viewModel.devices.collectAsStateWithLifecycle()
     val columns =
         when {
-            windowSizeClass.isWidthAtLeastBreakpoint(840) -> 4
-            windowSizeClass.isWidthAtLeastBreakpoint(600) -> 3
+            windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND) -> 4
+            windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND) -> 3
             else -> 2
         }
 

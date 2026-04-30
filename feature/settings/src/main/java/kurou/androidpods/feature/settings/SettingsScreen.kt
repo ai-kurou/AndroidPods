@@ -145,8 +145,8 @@ fun SettingsScreen(
 
     val columns =
         when {
-            windowSizeClass.isWidthAtLeastBreakpoint(840) -> 3
-            windowSizeClass.isWidthAtLeastBreakpoint(600) -> 2
+            windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND) -> 3
+            windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND) -> 2
             else -> 1
         }
 
