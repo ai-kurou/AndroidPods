@@ -2,6 +2,7 @@ package kurou.androidpods.feature.devices
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -86,7 +87,8 @@ private fun DeviceItem(
             modifier
                 .clip(RoundedCornerShape(8.dp))
                 .background(MaterialTheme.colorScheme.surfaceVariant)
-                .padding(12.dp),
+                .padding(12.dp)
+                .focusable(),
     ) {
         Box(
             modifier = Modifier.fillMaxWidth().weight(1f).padding(8.dp),
