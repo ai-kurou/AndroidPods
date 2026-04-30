@@ -6,6 +6,7 @@ import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -40,7 +41,8 @@ internal fun DevicesContent(
         columns = GridCells.Fixed(columns),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = modifier.fillMaxSize().padding(16.dp),
+        contentPadding = PaddingValues(16.dp),
+        modifier = modifier.fillMaxSize(),
     ) {
         items(devices) { device ->
             DeviceItem(device = device, modifier = Modifier.animateItem().fillMaxWidth().aspectRatio(1f))
