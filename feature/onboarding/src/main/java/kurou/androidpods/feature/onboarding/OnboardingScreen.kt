@@ -144,6 +144,13 @@ fun OnboardingScreen(
 
     OnboardingContent(
         pagerState = pagerState,
+        onBackClick = {
+            if (pagerState.currentPage > 0) {
+                coroutineScope.launch {
+                    pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                }
+            }
+        },
         onButtonClick = {
             handleOnboardingButtonClick(
                 page = pagerState.currentPage,

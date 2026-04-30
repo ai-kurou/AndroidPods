@@ -1,9 +1,12 @@
 package kurou.androidpods.feature.onboarding
 
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performKeyInput
+import androidx.compose.ui.test.pressKey
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -38,6 +41,18 @@ class BluetoothUnavailableDialogTest {
         }
 
         composeTestRule.onNodeWithText("OK").performClick()
+        assertTrue(dismissed)
+    }
+
+    @Test
+    fun `EscapeキーでonDismissが呼ばれる`() {
+        var dismissed = false
+        composeTestRule.setContent {
+            BluetoothUnavailableDialog(onDismiss = { dismissed = true })
+        }
+
+        composeTestRule.onNodeWithText("Bluetooth Unavailable")
+            .performKeyInput { pressKey(Key.Escape) }
         assertTrue(dismissed)
     }
 }

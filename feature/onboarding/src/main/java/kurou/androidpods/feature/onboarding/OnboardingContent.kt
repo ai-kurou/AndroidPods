@@ -22,10 +22,19 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -72,8 +81,15 @@ internal val pages =
 internal fun OnboardingContent(
     pagerState: PagerState,
     onButtonClick: () -> Unit,
+    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(pagerState.currentPage) {
+        focusRequester.requestFocus()
+    }
+
     Column(
         modifier = modifier.fillMaxSize().padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -97,7 +113,29 @@ internal fun OnboardingContent(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 16.dp),
+                    .padding(bottom = 16.dp)
+                    .focusRequester(focusRequester)
+                    .onKeyEvent { event ->
+                        if (event.type == KeyEventType.KeyDown) {
+                            when (event.key) {
+                                Key.DirectionRight -> {
+                                    onButtonClick()
+                                    true
+                                }
+                                Key.DirectionLeft, Key.Backspace, Key.Escape -> {
+                                    if (pagerState.currentPage == 0) {
+                                        false
+                                    } else {
+                                        onBackClick()
+                                        true
+                                    }
+                                }
+                                else -> false
+                            }
+                        } else {
+                            false
+                        }
+                    },
         ) {
             Text(
                 text =
@@ -207,5 +245,6 @@ private fun OnboardingContentPreview() {
     OnboardingContent(
         pagerState = rememberPagerState(pageCount = { PAGE_COUNT }),
         onButtonClick = {},
+        onBackClick = {},
     )
 }
