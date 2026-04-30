@@ -9,6 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +22,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -31,6 +33,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -75,21 +82,32 @@ internal fun SettingsContent(
     val isBluetoothUnavailable = bluetoothAdapterState == null
     val isBluetoothOff = bluetoothAdapterState != null && bluetoothAdapterState != BluetoothAdapter.STATE_ON
 
+    val bannerState = BannerState(
+        hasNotGranted = hasNotGranted,
+        isBluetoothUnavailable = isBluetoothUnavailable,
+        isBluetoothOff = isBluetoothOff,
+        updateAvailable = updateAvailable,
+        isNotificationsDisabled = isNotificationsDisabled,
+        isDeviceScanChannelDisabled = isDeviceScanChannelDisabled,
+    )
+    val bannerCount = bannerState.count()
+    val gridState = rememberLazyGridState()
+    var prevBannerCount by remember { mutableStateOf<Int?>(null) }
+    LaunchedEffect(bannerCount) {
+        if (prevBannerCount != null) gridState.animateScrollToItem(0)
+        prevBannerCount = bannerCount
+    }
+
     LazyVerticalGrid(
+        state = gridState,
         columns = GridCells.Fixed(columns),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = modifier.fillMaxSize().padding(16.dp).testTag("SettingsGrid"),
+        contentPadding = PaddingValues(16.dp),
+        modifier = modifier.fillMaxSize().testTag("SettingsGrid"),
     ) {
         bannerItems(
-            state = BannerState(
-                hasNotGranted = hasNotGranted,
-                isBluetoothUnavailable = isBluetoothUnavailable,
-                isBluetoothOff = isBluetoothOff,
-                updateAvailable = updateAvailable,
-                isNotificationsDisabled = isNotificationsDisabled,
-                isDeviceScanChannelDisabled = isDeviceScanChannelDisabled,
-            ),
+            state = bannerState,
             onPermissionWarningClick = onPermissionWarningClick,
             onBluetoothWarningClick = onBluetoothWarningClick,
             onNotificationWarningClick = onNotificationWarningClick,
@@ -126,7 +144,15 @@ private data class BannerState(
     val updateAvailable: Boolean,
     val isNotificationsDisabled: Boolean,
     val isDeviceScanChannelDisabled: Boolean,
-)
+) {
+    fun count(): Int = listOf(
+        hasNotGranted,
+        isBluetoothUnavailable || isBluetoothOff,
+        updateAvailable,
+        isNotificationsDisabled,
+        isDeviceScanChannelDisabled,
+    ).count { it }
+}
 
 private fun LazyGridScope.bannerItems(
     state: BannerState,
