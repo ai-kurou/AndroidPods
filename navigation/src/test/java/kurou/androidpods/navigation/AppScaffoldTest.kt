@@ -3,7 +3,6 @@ package kurou.androidpods.navigation
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.os.Build
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
@@ -58,7 +57,6 @@ class AppScaffoldTest {
         composeTestRule.setContent {
             AppScaffold(
                 isFirstLaunch = true,
-                windowWidthSizeClass = WindowWidthSizeClass.Compact,
                 onOnboardingComplete = { completeCalled = true },
                 onStartScanService = {},
                 onStopScanService = {},
@@ -86,7 +84,6 @@ class AppScaffoldTest {
         composeTestRule.setContent {
             AppScaffold(
                 isFirstLaunch = false,
-                windowWidthSizeClass = WindowWidthSizeClass.Compact,
                 onOnboardingComplete = {},
                 onStartScanService = {},
                 onStopScanService = {},

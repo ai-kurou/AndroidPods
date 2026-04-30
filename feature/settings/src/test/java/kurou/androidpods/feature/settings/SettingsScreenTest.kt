@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.provider.Settings
 import androidx.activity.ComponentActivity
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -20,6 +19,8 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.test.core.app.ApplicationProvider
+import androidx.window.core.layout.WindowSizeClass
+import androidx.window.core.layout.computeWindowSizeClass
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.every
@@ -64,6 +65,9 @@ class SettingsScreenTest {
         unmockkAll()
     }
 
+    private fun windowSizeClassOf(widthDp: Float) =
+        WindowSizeClass.BREAKPOINTS_V1.computeWindowSizeClass(widthDp = widthDp, heightDp = 800f)
+
     private fun grantRequiredPermissions(context: Context) {
         shadowOf(context as Application).grantPermissions(
             Manifest.permission.BLUETOOTH_CONNECT,
@@ -90,11 +94,11 @@ class SettingsScreenTest {
 
     @Test
     fun `Compact・Medium・ExpandedのwindowWidthSizeClassでSettingsScreenが表示される`() {
-        var widthSizeClass by mutableStateOf(WindowWidthSizeClass.Compact)
+        var windowSizeClass by mutableStateOf(windowSizeClassOf(400f))
 
         composeTestRule.setContent {
             SettingsScreen(
-                windowWidthSizeClass = widthSizeClass,
+                windowSizeClass = windowSizeClass,
                 onStartScanService = {},
                 onStopScanService = {},
                 onLicensesClick = {},
@@ -104,11 +108,11 @@ class SettingsScreenTest {
         }
 
         listOf(
-            WindowWidthSizeClass.Compact,
-            WindowWidthSizeClass.Medium,
-            WindowWidthSizeClass.Expanded,
+            windowSizeClassOf(400f), // Compact
+            windowSizeClassOf(700f), // Medium
+            windowSizeClassOf(1000f), // Expanded
         ).forEach { sizeClass ->
-            widthSizeClass = sizeClass
+            windowSizeClass = sizeClass
             composeTestRule.waitForIdle()
             composeTestRule.onNodeWithText("AndroidPods").assertIsDisplayed()
         }
@@ -118,7 +122,7 @@ class SettingsScreenTest {
     fun `権限警告をタップするとACTION_APPLICATION_DETAILS_SETTINGSのインテントが発行される`() {
         composeTestRule.setContent {
             SettingsScreen(
-                windowWidthSizeClass = WindowWidthSizeClass.Compact,
+                windowSizeClass = windowSizeClassOf(400f),
                 onStartScanService = {},
                 onStopScanService = {},
                 onLicensesClick = {},
@@ -145,7 +149,7 @@ class SettingsScreenTest {
 
         composeTestRule.setContent {
             SettingsScreen(
-                windowWidthSizeClass = WindowWidthSizeClass.Compact,
+                windowSizeClass = windowSizeClassOf(400f),
                 onStartScanService = {},
                 onStopScanService = {},
                 onLicensesClick = {},
@@ -172,7 +176,7 @@ class SettingsScreenTest {
 
         composeTestRule.setContent {
             SettingsScreen(
-                windowWidthSizeClass = WindowWidthSizeClass.Compact,
+                windowSizeClass = windowSizeClassOf(400f),
                 onStartScanService = {},
                 onStopScanService = {},
                 onLicensesClick = {},
@@ -198,7 +202,7 @@ class SettingsScreenTest {
 
         composeTestRule.setContent {
             SettingsScreen(
-                windowWidthSizeClass = WindowWidthSizeClass.Compact,
+                windowSizeClass = windowSizeClassOf(400f),
                 onStartScanService = {},
                 onStopScanService = {},
                 onLicensesClick = {},
@@ -222,7 +226,7 @@ class SettingsScreenTest {
 
         composeTestRule.setContent {
             SettingsScreen(
-                windowWidthSizeClass = WindowWidthSizeClass.Compact,
+                windowSizeClass = windowSizeClassOf(400f),
                 onStartScanService = {},
                 onStopScanService = {},
                 onLicensesClick = {},
@@ -246,7 +250,7 @@ class SettingsScreenTest {
 
         composeTestRule.setContent {
             SettingsScreen(
-                windowWidthSizeClass = WindowWidthSizeClass.Compact,
+                windowSizeClass = windowSizeClassOf(400f),
                 onStartScanService = {},
                 onStopScanService = {},
                 onLicensesClick = {},
@@ -272,7 +276,7 @@ class SettingsScreenTest {
 
         composeTestRule.setContent {
             SettingsScreen(
-                windowWidthSizeClass = WindowWidthSizeClass.Compact,
+                windowSizeClass = windowSizeClassOf(400f),
                 onStartScanService = {},
                 onStopScanService = {},
                 onLicensesClick = {},
@@ -304,7 +308,7 @@ class SettingsScreenTest {
 
         composeTestRule.setContent {
             SettingsScreen(
-                windowWidthSizeClass = WindowWidthSizeClass.Compact,
+                windowSizeClass = windowSizeClassOf(400f),
                 onStartScanService = {},
                 onStopScanService = {},
                 onLicensesClick = {},
@@ -336,7 +340,7 @@ class SettingsScreenTest {
 
         composeTestRule.setContent {
             SettingsScreen(
-                windowWidthSizeClass = WindowWidthSizeClass.Compact,
+                windowSizeClass = windowSizeClassOf(400f),
                 onStartScanService = {},
                 onStopScanService = {},
                 onLicensesClick = {},

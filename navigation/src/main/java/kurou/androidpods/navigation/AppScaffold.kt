@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
@@ -28,13 +28,13 @@ private object Route {
 @Composable
 fun AppScaffold(
     isFirstLaunch: Boolean,
-    windowWidthSizeClass: WindowWidthSizeClass,
     onOnboardingComplete: () -> Unit,
     onStartScanService: () -> Unit,
     onStopScanService: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val navController = rememberNavController()
+    val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val startDestination = if (isFirstLaunch) Route.ONBOARDING else Route.SETTINGS
 
     Scaffold(
@@ -62,7 +62,7 @@ fun AppScaffold(
             }
             composable(Route.SETTINGS) {
                 SettingsScreen(
-                    windowWidthSizeClass = windowWidthSizeClass,
+                    windowSizeClass = windowSizeClass,
                     onStartScanService = onStartScanService,
                     onStopScanService = onStopScanService,
                     onLicensesClick = { navController.navigate(Route.LICENSES) },
@@ -72,7 +72,7 @@ fun AppScaffold(
             composable(Route.DEVICES) {
                 DevicesScreen(
                     onBack = { navController.popBackStack() },
-                    windowWidthSizeClass = windowWidthSizeClass,
+                    windowSizeClass = windowSizeClass,
                 )
             }
             composable(Route.LICENSES) {

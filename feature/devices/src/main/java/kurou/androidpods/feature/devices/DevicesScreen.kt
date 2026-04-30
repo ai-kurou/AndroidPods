@@ -10,7 +10,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -18,21 +17,22 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.window.core.layout.WindowSizeClass
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DevicesScreen(
     onBack: () -> Unit,
-    windowWidthSizeClass: WindowWidthSizeClass,
+    windowSizeClass: WindowSizeClass,
     modifier: Modifier = Modifier,
     viewModel: DevicesViewModel = hiltViewModel(),
 ) {
     val devices by viewModel.devices.collectAsStateWithLifecycle()
     val columns =
-        when (windowWidthSizeClass) {
-            WindowWidthSizeClass.Compact -> 2
-            WindowWidthSizeClass.Medium -> 3
-            else -> 4
+        when {
+            windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND) -> 4
+            windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND) -> 3
+            else -> 2
         }
 
     Scaffold(

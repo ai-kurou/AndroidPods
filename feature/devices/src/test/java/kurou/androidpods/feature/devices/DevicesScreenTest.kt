@@ -1,11 +1,12 @@
 package kurou.androidpods.feature.devices
 
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.window.core.layout.WindowSizeClass
+import androidx.window.core.layout.computeWindowSizeClass
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -32,28 +33,31 @@ class DevicesScreenTest {
         )
     private val onBack = mockk<() -> Unit>(relaxed = true)
 
+    private fun windowSizeClassOf(widthDp: Float) =
+        WindowSizeClass.BREAKPOINTS_V1.computeWindowSizeClass(widthDp = widthDp, heightDp = 800f)
+
     @Test
     fun `WindowWidthSizeClassがCompactの場合`() {
-        assertIsDisplayedWithBack(WindowWidthSizeClass.Compact)
+        assertIsDisplayedWithBack(windowSizeClassOf(400f))
     }
 
     @Test
     fun `WindowWidthSizeClassがMediumの場合`() {
-        assertIsDisplayedWithBack(WindowWidthSizeClass.Medium)
+        assertIsDisplayedWithBack(windowSizeClassOf(700f))
     }
 
     @Test
     fun `WindowWidthSizeClassがExpandedの場合`() {
-        assertIsDisplayedWithBack(WindowWidthSizeClass.Expanded)
+        assertIsDisplayedWithBack(windowSizeClassOf(1000f))
     }
 
-    private fun assertIsDisplayedWithBack(size: WindowWidthSizeClass) {
+    private fun assertIsDisplayedWithBack(size: WindowSizeClass) {
         every { useCase() } returns devices
 
         composeTestRule.setContent {
             DevicesScreen(
                 onBack = onBack,
-                windowWidthSizeClass = size,
+                windowSizeClass = size,
                 viewModel = DevicesViewModel(useCase),
             )
         }
