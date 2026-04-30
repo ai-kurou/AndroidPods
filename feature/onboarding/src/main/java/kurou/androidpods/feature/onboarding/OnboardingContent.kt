@@ -130,6 +130,10 @@ internal fun OnboardingContent(
                                     onBackClick()
                                     true
                                 }
+                                Key.Escape -> {
+                                    onBackClick()
+                                    true
+                                }
                                 else -> false
                             }
                         } else {

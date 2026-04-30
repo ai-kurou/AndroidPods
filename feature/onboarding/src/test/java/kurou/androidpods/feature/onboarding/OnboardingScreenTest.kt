@@ -166,6 +166,44 @@ class OnboardingScreenTest {
 
     @Test
     @Config(qualifiers = "port")
+    fun `Spaceキーでページ1から4へ遷移しEscapeキーでページ1まで戻る`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        grantRequiredPermissions(context)
+        ShadowSettings.setCanDrawOverlays(true)
+
+        composeTestRule.setContent {
+            OnboardingScreen(onComplete = {})
+        }
+
+        composeTestRule.onNodeWithText("Next")
+            .performKeyInput { pressKey(Key.Spacebar) } // page 0 → 1
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Grant Permission")
+            .performKeyInput { pressKey(Key.Spacebar) } // page 1 → 2
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Allow Overlay")
+            .performKeyInput { pressKey(Key.Spacebar) } // page 2 → 3
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Enable Bluetooth").assertIsDisplayed()
+
+        composeTestRule.onNodeWithText("Enable Bluetooth")
+            .performKeyInput { pressKey(Key.Escape) } // page 3 → 2
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Allow Overlay").assertIsDisplayed()
+
+        composeTestRule.onNodeWithText("Allow Overlay")
+            .performKeyInput { pressKey(Key.Escape) } // page 2 → 1
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Grant Permission").assertIsDisplayed()
+
+        composeTestRule.onNodeWithText("Grant Permission")
+            .performKeyInput { pressKey(Key.Escape) } // page 1 → 0
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Next").assertIsDisplayed()
+    }
+
+    @Test
+    @Config(qualifiers = "port")
     fun `DirectionRightでページ1から4へ遷移しDirectionLeftでページ1まで戻る`() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         grantRequiredPermissions(context)
