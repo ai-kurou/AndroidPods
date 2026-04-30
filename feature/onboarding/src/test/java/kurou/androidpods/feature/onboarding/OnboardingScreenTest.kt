@@ -8,13 +8,16 @@ import android.content.Context
 import android.os.Build
 import android.provider.Settings
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.test.swipeLeft
 import androidx.test.core.app.ApplicationProvider
 import org.junit.Assert.assertEquals
@@ -159,6 +162,44 @@ class OnboardingScreenTest {
 
         val started = shadowOf(composeTestRule.activity).nextStartedActivityForResult
         assertEquals(BluetoothAdapter.ACTION_REQUEST_ENABLE, started?.intent?.action)
+    }
+
+    @Test
+    @Config(qualifiers = "port")
+    fun `DirectionRightでページ1から4へ遷移しDirectionLeftでページ1まで戻る`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        grantRequiredPermissions(context)
+        ShadowSettings.setCanDrawOverlays(true)
+
+        composeTestRule.setContent {
+            OnboardingScreen(onComplete = {})
+        }
+
+        composeTestRule.onNodeWithText("Next")
+            .performKeyInput { pressKey(Key.DirectionRight) } // page 0 → 1
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Grant Permission")
+            .performKeyInput { pressKey(Key.DirectionRight) } // page 1 → 2
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Allow Overlay")
+            .performKeyInput { pressKey(Key.DirectionRight) } // page 2 → 3
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Enable Bluetooth").assertIsDisplayed()
+
+        composeTestRule.onNodeWithText("Enable Bluetooth")
+            .performKeyInput { pressKey(Key.DirectionLeft) } // page 3 → 2
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Allow Overlay").assertIsDisplayed()
+
+        composeTestRule.onNodeWithText("Allow Overlay")
+            .performKeyInput { pressKey(Key.DirectionLeft) } // page 2 → 1
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Grant Permission").assertIsDisplayed()
+
+        composeTestRule.onNodeWithText("Grant Permission")
+            .performKeyInput { pressKey(Key.DirectionLeft) } // page 1 → 0
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Next").assertIsDisplayed()
     }
 
     private fun assertNavigationAndComplete() {

@@ -126,6 +126,10 @@ internal fun OnboardingContent(
                                     onBackClick()
                                     true
                                 }
+                                Key.Backspace -> {
+                                    onBackClick()
+                                    true
+                                }
                                 else -> false
                             }
                         } else {
