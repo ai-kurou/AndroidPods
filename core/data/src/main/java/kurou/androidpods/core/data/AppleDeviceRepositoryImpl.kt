@@ -69,6 +69,7 @@ internal class AppleDeviceRepositoryImpl @Inject constructor(
     /** 範囲外デバイスの定期クリーンアップ用スコープ */
     private val scope = CoroutineScope(Dispatchers.Default)
     private var cleanupJob: Job? = null
+    private var retryJob: Job? = null
 
     /**
      * BLE スキャン結果のコールバック。
@@ -121,6 +122,7 @@ internal class AppleDeviceRepositoryImpl @Inject constructor(
      */
     @SuppressLint("MissingPermission")
     override fun startScan() {
+        retryJob?.cancel()
         // 既にスキャン中の場合は先に停止する（コールバックの二重登録を防止）
         try {
             scanner?.stopScan(scanCallback)
@@ -128,7 +130,24 @@ internal class AppleDeviceRepositoryImpl @Inject constructor(
         }
 
         // Bluetooth OFF 時は bluetoothLeScanner が null になるため、毎回取得する
-        val btScanner = bluetoothManager?.adapter?.bluetoothLeScanner ?: return
+        val btScanner = bluetoothManager?.adapter?.bluetoothLeScanner
+        if (btScanner != null) {
+            startScanWith(btScanner)
+        } else {
+            // STATE_ON 受信直後はまだ null の場合があるためリトライする
+            retryJob = scope.launch {
+                repeat(5) {
+                    delay(500L)
+                    val s = bluetoothManager?.adapter?.bluetoothLeScanner ?: return@repeat
+                    startScanWith(s)
+                    return@launch
+                }
+            }
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun startScanWith(btScanner: BluetoothLeScanner) {
         scanner = btScanner
 
         // --- スキャンフィルタの構築 ---
@@ -177,6 +196,7 @@ internal class AppleDeviceRepositoryImpl @Inject constructor(
     /** BLE スキャンを停止し、検出済みデバイスの一覧をクリアする。 */
     @SuppressLint("MissingPermission")
     override fun stopScan() {
+        retryJob?.cancel()
         cleanupJob?.cancel()
         try {
             scanner?.stopScan(scanCallback)
