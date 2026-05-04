@@ -86,6 +86,8 @@ internal fun OnboardingContent(
     modifier: Modifier = Modifier,
 ) {
     val focusRequester = remember { FocusRequester() }
+    val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+    val useVerticalLayout = windowSizeClass.isHeightAtLeastBreakpoint(WindowSizeClass.HEIGHT_DP_MEDIUM_LOWER_BOUND)
 
     LaunchedEffect(pagerState.currentPage) {
         focusRequester.requestFocus()
@@ -100,7 +102,7 @@ internal fun OnboardingContent(
             userScrollEnabled = false,
             modifier = Modifier.weight(1f).fillMaxWidth(),
         ) { page ->
-            OnboardingPage(pageData = pages[page])
+            OnboardingPage(pageData = pages[page], useVerticalLayout = useVerticalLayout)
         }
 
         PageIndicator(
@@ -156,11 +158,9 @@ internal fun OnboardingContent(
 @Composable
 private fun OnboardingPage(
     pageData: OnboardingPageData,
+    useVerticalLayout: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
-    val useVerticalLayout = windowSizeClass.isHeightAtLeastBreakpoint(WindowSizeClass.HEIGHT_DP_MEDIUM_LOWER_BOUND)
-
     if (useVerticalLayout) {
         Column(
             modifier = modifier.fillMaxSize().padding(36.dp),
