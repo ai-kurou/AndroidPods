@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -35,13 +36,13 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.window.core.layout.WindowSizeClass
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
@@ -85,6 +86,8 @@ internal fun OnboardingContent(
     modifier: Modifier = Modifier,
 ) {
     val focusRequester = remember { FocusRequester() }
+    val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+    val useVerticalLayout = windowSizeClass.isHeightAtLeastBreakpoint(WindowSizeClass.HEIGHT_DP_MEDIUM_LOWER_BOUND)
 
     LaunchedEffect(pagerState.currentPage) {
         focusRequester.requestFocus()
@@ -99,7 +102,7 @@ internal fun OnboardingContent(
             userScrollEnabled = false,
             modifier = Modifier.weight(1f).fillMaxWidth(),
         ) { page ->
-            OnboardingPage(pageData = pages[page])
+            OnboardingPage(pageData = pages[page], useVerticalLayout = useVerticalLayout)
         }
 
         PageIndicator(
@@ -155,12 +158,10 @@ internal fun OnboardingContent(
 @Composable
 private fun OnboardingPage(
     pageData: OnboardingPageData,
+    useVerticalLayout: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val configuration = LocalConfiguration.current
-    val isPortrait = configuration.screenHeightDp > configuration.screenWidthDp
-
-    if (isPortrait) {
+    if (useVerticalLayout) {
         Column(
             modifier = modifier.fillMaxSize().padding(36.dp),
             verticalArrangement = Arrangement.Center,
