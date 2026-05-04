@@ -159,9 +159,9 @@ private fun OnboardingPage(
     modifier: Modifier = Modifier,
 ) {
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
-    val isPortrait = windowSizeClass.isHeightAtLeastBreakpoint(WindowSizeClass.HEIGHT_DP_MEDIUM_LOWER_BOUND)
+    val useVerticalLayout = windowSizeClass.isHeightAtLeastBreakpoint(WindowSizeClass.HEIGHT_DP_MEDIUM_LOWER_BOUND)
 
-    if (isPortrait) {
+    if (useVerticalLayout) {
         Column(
             modifier = modifier.fillMaxSize().padding(36.dp),
             verticalArrangement = Arrangement.Center,
