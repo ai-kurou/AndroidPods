@@ -53,7 +53,7 @@ Kotlin + Jetpack Composeによるマルチモジュール構成のClean Architec
 ## Contributing
 
 このプロジェクトはプルリクエストを受け付けていません。  
-個人利用目的でのフォーク・改変は歓迎します。
+[GPL-3.0 ライセンス](LICENSE)の条件のもと、自由にフォーク・改変・再配布できます。
 
 ## License
 

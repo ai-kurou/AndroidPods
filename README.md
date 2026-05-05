@@ -53,7 +53,7 @@ Clean Architecture with multi-module structure using Kotlin + Jetpack Compose.
 ## Contributing
 
 This project does not accept pull requests.  
-You are welcome to fork and modify for personal use.
+You are free to fork, modify, and redistribute this project under the terms of the [GPL-3.0 license](LICENSE).
 
 ## License
 
