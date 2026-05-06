@@ -9,6 +9,8 @@
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/a05213d7b70f4578a9fc43cab1b4190c)](https://app.codacy.com/gh/ai-kurou/AndroidPods/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![License](https://img.shields.io/github/license/ai-kurou/AndroidPods)](LICENSE)
 [![GitHub Release](https://img.shields.io/github/v/release/ai-kurou/AndroidPods)](https://github.com/ai-kurou/AndroidPods/releases)
+![Android](https://img.shields.io/badge/Android-API%2028%2B-green?logo=android)
+![Kotlin](https://img.shields.io/badge/Kotlin-2.3.21-7F52FF?logo=kotlin)
 
 An Android app that displays real-time battery levels of Apple Bluetooth earphones (AirPods, etc.) via a system overlay.
 
