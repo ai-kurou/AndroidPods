@@ -3,6 +3,7 @@ package kurou.androidpods.feature.settings
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.PowerManager
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -80,7 +81,7 @@ fun SettingsScreen(
         rememberLauncherForActivityResult(
             ActivityResultContracts.StartActivityForResult(),
         ) {
-            val pm = context.getSystemService(android.os.PowerManager::class.java)
+            val pm = context.getSystemService(PowerManager::class.java)
             viewModel.refreshBatteryOptimizationState(pm.isIgnoringBatteryOptimizations(context.packageName))
         }
 
@@ -202,13 +203,13 @@ fun SettingsScreen(
             }
         },
         onBatteryOptimizationClick = {
-            val pm = context.getSystemService(android.os.PowerManager::class.java)
+            val pm = context.getSystemService(PowerManager::class.java)
             val intent = if (pm.isIgnoringBatteryOptimizations(context.packageName)) {
-                Intent(android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+                Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
             } else {
                 Intent(
-                    android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
-                    android.net.Uri.parse("package:${context.packageName}"),
+                    Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+                    "package:${context.packageName}".toUri(),
                 )
             }
             batteryOptimizationLauncher.launch(intent)
@@ -258,7 +259,7 @@ private fun SettingsEffects(
             )
         }
         viewModel.refreshOverlayState()
-        val pm = context.getSystemService(android.os.PowerManager::class.java)
+        val pm = context.getSystemService(PowerManager::class.java)
         viewModel.refreshBatteryOptimizationState(pm.isIgnoringBatteryOptimizations(context.packageName))
         val notificationManager = NotificationManagerCompat.from(context)
         val notificationsEnabled = notificationManager.areNotificationsEnabled()
