@@ -369,6 +369,30 @@ class SettingsScreenTest {
     }
 
     @Test
+    fun `オーバーレイ位置アイテムをタップするとダイアログが表示される`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        grantRequiredPermissions(context)
+
+        composeTestRule.setContent {
+            SettingsScreen(
+                windowSizeClass = windowSizeClassOf(400f),
+                onStartScanService = {},
+                onStopScanService = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                viewModel = createViewModel(BluetoothAdapter.STATE_ON),
+            )
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Overlay position"))
+        composeTestRule.onNodeWithText("Overlay position").performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Top").assertExists()
+    }
+
+    @Test
     fun `ダイアログでモードを選択するとダイアログが閉じる`() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         grantRequiredPermissions(context)
