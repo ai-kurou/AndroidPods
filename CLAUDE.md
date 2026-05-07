@@ -61,8 +61,13 @@ Lintで指摘がある場合は修正してからレポートする。
 さらに、**Composable画面を変更した場合は、スクリーンショットテストを実行して差分がないか確認すること**。
 
 ```bash
-# スクリーンショットの差分を確認
+# スクリーンショットを再記録し、差分を確認
 ./gradlew recordRoborazziDebug
+
+# 差分の有無は git status で app/src/test/snapshots/ を確認する
+# （@Preview のスクリーンショットは :app の PreviewScreenshotTest が一括管理するため
+#   app/src/test/snapshots/ に格納される）
+git status app/src/test/snapshots/
 ```
 
 差分が生じた場合はユーザーに報告すること。ベースライン画像のコミットはユーザーが行う。
@@ -197,7 +202,7 @@ main へのマージ時に `.github/workflows/on-main-merge.yml` が実行され
 - **unit-test ジョブ**: `koverXmlReport` → Codecov へアップロード（`koverXmlReport` がコンパイル・テスト・カバレッジ計測を包含するため `assembleDebug` は不要）
 - **instrumented-test ジョブ**: Android エミュレータ（API 36）で `connectedDebugAndroidTest`
 
-スクリーンショットのベースラインは各モジュールの `src/test/snapshots/` に格納してgit管理する。UI変更後は `./gradlew recordRoborazziDebug` で再記録してコミットすること。
+スクリーンショットのベースラインは `app/src/test/snapshots/` に格納してgit管理する（`:app` の `PreviewScreenshotTest` が全モジュールの `@Preview` を一括スキャンするため）。UI変更後は `./gradlew recordRoborazziDebug` で再記録し、`git status app/src/test/snapshots/` で差分を確認してコミットすること。
 
 ## 文字列リソース
 
