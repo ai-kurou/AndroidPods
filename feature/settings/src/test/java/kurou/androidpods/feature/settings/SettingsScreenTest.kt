@@ -145,37 +145,7 @@ class SettingsScreenTest {
     }
 
     @Test
-    fun `Bluetooth警告をタップするとACTION_BLUETOOTH_SETTINGSのインテントが発行される`() {
-        val context = ApplicationProvider.getApplicationContext<Context>()
-        grantRequiredPermissions(context)
-
-        composeTestRule.setContent {
-            SettingsScreen(
-                windowSizeClass = windowSizeClassOf(400f),
-                onStartScanService = {},
-                onStopScanService = {},
-                onLicensesClick = {},
-                onDevicesClick = {},
-                viewModel = createViewModel(bluetoothAdapterState = BluetoothAdapter.STATE_OFF),
-            )
-        }
-        composeTestRule.waitForIdle()
-
-        composeTestRule
-            .onNodeWithText(
-                "Bluetooth is off. Please enable Bluetooth.",
-            ).performClick()
-        composeTestRule.waitForIdle()
-
-        val started = shadowOf(composeTestRule.activity).nextStartedActivity
-        assertEquals(Settings.ACTION_BLUETOOTH_SETTINGS, started?.action)
-    }
-
-    @Test
-    fun `GitHubリポジトリをタップするとACTION_VIEWのインテントが発行される`() {
-        val context = ApplicationProvider.getApplicationContext<Context>()
-        grantRequiredPermissions(context)
-
+    fun `権限リクエスト後に権限が拒否されるとPermissionRequiredDialogが表示される`() {
         composeTestRule.setContent {
             SettingsScreen(
                 windowSizeClass = windowSizeClassOf(400f),
@@ -188,86 +158,23 @@ class SettingsScreenTest {
         }
         composeTestRule.waitForIdle()
 
-        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("GitHub Repository"))
-        composeTestRule.onNodeWithText("GitHub Repository").performClick()
-        composeTestRule.waitForIdle()
-
-        val started = shadowOf(composeTestRule.activity).nextStartedActivity
-        assertEquals(Intent.ACTION_VIEW, started?.action)
-        assertEquals("https://github.com/ai-kurou/AndroidPods", started?.dataString)
-    }
-
-    @Test
-    fun `オーバーレイトグルをタップするとACTION_MANAGE_OVERLAY_PERMISSIONのインテントが発行される`() {
-        val context = ApplicationProvider.getApplicationContext<Context>()
-        grantRequiredPermissions(context)
-
-        composeTestRule.setContent {
-            SettingsScreen(
-                windowSizeClass = windowSizeClassOf(400f),
-                onStartScanService = {},
-                onStopScanService = {},
-                onLicensesClick = {},
-                onDevicesClick = {},
-                viewModel = createViewModel(BluetoothAdapter.STATE_ON),
+        // RequestMultiplePermissionsランチャーのコールバックを手動で発火してinitialRequestDone=trueにする
+        composeTestRule.activityRule.scenario.onActivity { activity ->
+            val request = shadowOf(activity).lastRequestedPermission ?: return@onActivity
+            activity.onRequestPermissionsResult(
+                request.requestCode,
+                request.requestedPermissions,
+                IntArray(request.requestedPermissions.size) { PackageManager.PERMISSION_DENIED },
             )
         }
         composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithText("Show battery overlay").performClick()
+        // ON_RESUMEを再トリガーしてonShowSettingsDialogが呼ばれるようにする
+        composeTestRule.activityRule.scenario.moveToState(Lifecycle.State.STARTED)
+        composeTestRule.activityRule.scenario.moveToState(Lifecycle.State.RESUMED)
         composeTestRule.waitForIdle()
 
-        val started = shadowOf(composeTestRule.activity).nextStartedActivityForResult
-        assertEquals(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, started?.intent?.action)
-    }
-
-    @Test
-    fun `再起動アイテムをタップするとSnackbarが表示される`() {
-        val context = ApplicationProvider.getApplicationContext<Context>()
-        grantRequiredPermissions(context)
-
-        composeTestRule.setContent {
-            SettingsScreen(
-                windowSizeClass = windowSizeClassOf(400f),
-                onStartScanService = {},
-                onStopScanService = {},
-                onLicensesClick = {},
-                onDevicesClick = {},
-                viewModel = createViewModel(BluetoothAdapter.STATE_ON),
-            )
-        }
-        composeTestRule.waitForIdle()
-
-        composeTestRule.onNodeWithText("Restart scan service").performClick()
-        composeTestRule.mainClock.advanceTimeBy(5001)
-        composeTestRule.waitForIdle()
-
-        composeTestRule.onNodeWithText("Scan service restarted").assertIsDisplayed()
-    }
-
-    @Test
-    fun `テーマアイテムをタップするとダイアログが表示される`() {
-        val context = ApplicationProvider.getApplicationContext<Context>()
-        grantRequiredPermissions(context)
-
-        composeTestRule.setContent {
-            SettingsScreen(
-                windowSizeClass = windowSizeClassOf(400f),
-                onStartScanService = {},
-                onStopScanService = {},
-                onLicensesClick = {},
-                onDevicesClick = {},
-                viewModel = createViewModel(BluetoothAdapter.STATE_ON),
-            )
-        }
-        composeTestRule.waitForIdle()
-
-        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Theme"))
-        composeTestRule.onNodeWithText("Theme").performClick()
-        composeTestRule.waitForIdle()
-
-        composeTestRule.onNodeWithText("Light").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Dark").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Bluetooth Permission Required").assertExists()
     }
 
     @Test
@@ -336,7 +243,37 @@ class SettingsScreenTest {
     }
 
     @Test
-    fun `権限リクエスト後に権限が拒否されるとPermissionRequiredDialogが表示される`() {
+    fun `Bluetooth警告をタップするとACTION_BLUETOOTH_SETTINGSのインテントが発行される`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        grantRequiredPermissions(context)
+
+        composeTestRule.setContent {
+            SettingsScreen(
+                windowSizeClass = windowSizeClassOf(400f),
+                onStartScanService = {},
+                onStopScanService = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                viewModel = createViewModel(bluetoothAdapterState = BluetoothAdapter.STATE_OFF),
+            )
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule
+            .onNodeWithText(
+                "Bluetooth is off. Please enable Bluetooth.",
+            ).performClick()
+        composeTestRule.waitForIdle()
+
+        val started = shadowOf(composeTestRule.activity).nextStartedActivity
+        assertEquals(Settings.ACTION_BLUETOOTH_SETTINGS, started?.action)
+    }
+
+    @Test
+    fun `オーバーレイトグルをタップするとACTION_MANAGE_OVERLAY_PERMISSIONのインテントが発行される`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        grantRequiredPermissions(context)
+
         composeTestRule.setContent {
             SettingsScreen(
                 windowSizeClass = windowSizeClassOf(400f),
@@ -349,23 +286,11 @@ class SettingsScreenTest {
         }
         composeTestRule.waitForIdle()
 
-        // RequestMultiplePermissionsランチャーのコールバックを手動で発火してinitialRequestDone=trueにする
-        composeTestRule.activityRule.scenario.onActivity { activity ->
-            val request = shadowOf(activity).lastRequestedPermission ?: return@onActivity
-            activity.onRequestPermissionsResult(
-                request.requestCode,
-                request.requestedPermissions,
-                IntArray(request.requestedPermissions.size) { PackageManager.PERMISSION_DENIED },
-            )
-        }
+        composeTestRule.onNodeWithText("Show battery overlay").performClick()
         composeTestRule.waitForIdle()
 
-        // ON_RESUMEを再トリガーしてonShowSettingsDialogが呼ばれるようにする
-        composeTestRule.activityRule.scenario.moveToState(Lifecycle.State.STARTED)
-        composeTestRule.activityRule.scenario.moveToState(Lifecycle.State.RESUMED)
-        composeTestRule.waitForIdle()
-
-        composeTestRule.onNodeWithText("Bluetooth Permission Required").assertExists()
+        val started = shadowOf(composeTestRule.activity).nextStartedActivityForResult
+        assertEquals(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, started?.intent?.action)
     }
 
     @Test
@@ -393,6 +318,55 @@ class SettingsScreenTest {
     }
 
     @Test
+    fun `再起動アイテムをタップするとSnackbarが表示される`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        grantRequiredPermissions(context)
+
+        composeTestRule.setContent {
+            SettingsScreen(
+                windowSizeClass = windowSizeClassOf(400f),
+                onStartScanService = {},
+                onStopScanService = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                viewModel = createViewModel(BluetoothAdapter.STATE_ON),
+            )
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Restart scan service").performClick()
+        composeTestRule.mainClock.advanceTimeBy(5001)
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Scan service restarted").assertIsDisplayed()
+    }
+
+    @Test
+    fun `テーマアイテムをタップするとダイアログが表示される`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        grantRequiredPermissions(context)
+
+        composeTestRule.setContent {
+            SettingsScreen(
+                windowSizeClass = windowSizeClassOf(400f),
+                onStartScanService = {},
+                onStopScanService = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                viewModel = createViewModel(BluetoothAdapter.STATE_ON),
+            )
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Theme"))
+        composeTestRule.onNodeWithText("Theme").performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Light").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Dark").assertIsDisplayed()
+    }
+
+    @Test
     fun `ダイアログでモードを選択するとダイアログが閉じる`() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         grantRequiredPermissions(context)
@@ -416,5 +390,31 @@ class SettingsScreenTest {
         composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithText("Light").assertDoesNotExist()
+    }
+
+    @Test
+    fun `GitHubリポジトリをタップするとACTION_VIEWのインテントが発行される`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        grantRequiredPermissions(context)
+
+        composeTestRule.setContent {
+            SettingsScreen(
+                windowSizeClass = windowSizeClassOf(400f),
+                onStartScanService = {},
+                onStopScanService = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                viewModel = createViewModel(BluetoothAdapter.STATE_ON),
+            )
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("GitHub Repository"))
+        composeTestRule.onNodeWithText("GitHub Repository").performClick()
+        composeTestRule.waitForIdle()
+
+        val started = shadowOf(composeTestRule.activity).nextStartedActivity
+        assertEquals(Intent.ACTION_VIEW, started?.action)
+        assertEquals("https://github.com/ai-kurou/AndroidPods", started?.dataString)
     }
 }
