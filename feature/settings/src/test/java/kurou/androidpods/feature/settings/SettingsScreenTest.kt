@@ -5,6 +5,7 @@ import android.app.Application
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.getValue
@@ -18,6 +19,7 @@ import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
+import androidx.lifecycle.Lifecycle
 import androidx.test.core.app.ApplicationProvider
 import androidx.window.core.layout.WindowSizeClass
 import androidx.window.core.layout.computeWindowSizeClass
@@ -331,6 +333,39 @@ class SettingsScreenTest {
         assertEquals(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS, started?.action)
         assertEquals(composeTestRule.activity.packageName, started?.getStringExtra(Settings.EXTRA_APP_PACKAGE))
         assertEquals(NotificationChannels.DEVICE_SCAN, started?.getStringExtra(Settings.EXTRA_CHANNEL_ID))
+    }
+
+    @Test
+    fun `権限リクエスト後に権限が拒否されるとPermissionRequiredDialogが表示される`() {
+        composeTestRule.setContent {
+            SettingsScreen(
+                windowSizeClass = windowSizeClassOf(400f),
+                onStartScanService = {},
+                onStopScanService = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                viewModel = createViewModel(BluetoothAdapter.STATE_ON),
+            )
+        }
+        composeTestRule.waitForIdle()
+
+        // RequestMultiplePermissionsランチャーのコールバックを手動で発火してinitialRequestDone=trueにする
+        composeTestRule.activityRule.scenario.onActivity { activity ->
+            val request = shadowOf(activity).lastRequestedPermission ?: return@onActivity
+            activity.onRequestPermissionsResult(
+                request.requestCode,
+                request.requestedPermissions,
+                IntArray(request.requestedPermissions.size) { PackageManager.PERMISSION_DENIED },
+            )
+        }
+        composeTestRule.waitForIdle()
+
+        // ON_RESUMEを再トリガーしてonShowSettingsDialogが呼ばれるようにする
+        composeTestRule.activityRule.scenario.moveToState(Lifecycle.State.STARTED)
+        composeTestRule.activityRule.scenario.moveToState(Lifecycle.State.RESUMED)
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Bluetooth Permission Required").assertExists()
     }
 
     @Test
