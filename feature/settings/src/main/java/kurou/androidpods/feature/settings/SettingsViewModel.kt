@@ -33,6 +33,7 @@ private data class InternalState(
     val updateAvailable: Boolean,
     val isNotificationsDisabled: Boolean,
     val isDeviceScanChannelDisabled: Boolean,
+    val isBatteryOptimizationExempt: Boolean,
 )
 
 data class SettingsUiState(
@@ -44,6 +45,7 @@ data class SettingsUiState(
     val overlayPosition: OverlayPosition = OverlayPosition.BOTTOM,
     val isNotificationsDisabled: Boolean = false,
     val isDeviceScanChannelDisabled: Boolean = false,
+    val isBatteryOptimizationExempt: Boolean = false,
 )
 
 @HiltViewModel
@@ -59,6 +61,7 @@ class SettingsViewModel @Inject constructor(
     private val _updateAvailable = MutableStateFlow(false)
     private val _isNotificationsDisabled = MutableStateFlow(false)
     private val _isDeviceScanChannelDisabled = MutableStateFlow(false)
+    private val _isBatteryOptimizationExempt = MutableStateFlow(false)
 
     val uiState: StateFlow<SettingsUiState> =
         combine(
@@ -71,12 +74,14 @@ class SettingsViewModel @Inject constructor(
                 UseCaseState(bluetoothAdapterState, appleDevices, themeSettings, overlayPosition)
             },
             combine(
-                _overlayEnabled,
-                _updateAvailable,
-                _isNotificationsDisabled,
-                _isDeviceScanChannelDisabled,
-            ) { overlayEnabled, updateAvailable, isNotificationsDisabled, isDeviceScanChannelDisabled ->
-                InternalState(overlayEnabled, updateAvailable, isNotificationsDisabled, isDeviceScanChannelDisabled)
+                combine(_overlayEnabled, _updateAvailable) { a, b -> a to b },
+                combine(
+                    _isNotificationsDisabled,
+                    _isDeviceScanChannelDisabled,
+                    _isBatteryOptimizationExempt,
+                ) { c, d, e -> Triple(c, d, e) },
+            ) { pair, triple ->
+                InternalState(pair.first, pair.second, triple.first, triple.second, triple.third)
             },
         ) { useCaseState, internalState ->
             SettingsUiState(
@@ -88,6 +93,7 @@ class SettingsViewModel @Inject constructor(
                 updateAvailable = internalState.updateAvailable,
                 isNotificationsDisabled = internalState.isNotificationsDisabled,
                 isDeviceScanChannelDisabled = internalState.isDeviceScanChannelDisabled,
+                isBatteryOptimizationExempt = internalState.isBatteryOptimizationExempt,
             )
         }.stateIn(
             scope = viewModelScope,
@@ -111,6 +117,10 @@ class SettingsViewModel @Inject constructor(
 
     fun refreshDeviceScanChannelState(isDisabled: Boolean) {
         _isDeviceScanChannelDisabled.update { isDisabled }
+    }
+
+    fun refreshBatteryOptimizationState(isExempt: Boolean) {
+        _isBatteryOptimizationExempt.update { isExempt }
     }
 
     fun updateThemeSettings(settings: ThemeSettings) {

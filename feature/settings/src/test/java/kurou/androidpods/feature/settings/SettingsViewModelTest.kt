@@ -294,4 +294,28 @@ class SettingsViewModelTest {
                 overlayPositionUseCase,
             )
         }
+
+    @Test
+    fun `refreshBatteryOptimizationStateでisBatteryOptimizationExemptが更新される`() =
+        runTest {
+            fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
+            assertEquals(false, viewModel.uiState.value.isBatteryOptimizationExempt)
+
+            viewModel.refreshBatteryOptimizationState(isExempt = true)
+
+            assertEquals(true, viewModel.uiState.value.isBatteryOptimizationExempt)
+            verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
+            verify(exactly = 1) { getAppleDevicesUseCase.observe() }
+            verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
+            verify(exactly = 1) { themeSettingsUseCase.observe() }
+            verify(exactly = 1) { overlayPositionUseCase.observe() }
+            confirmVerified(
+                getBluetoothAdapterStateUseCase,
+                getAppleDevicesUseCase,
+                getOverlaySettingsUseCase,
+                checkUpdateUseCase,
+                themeSettingsUseCase,
+                overlayPositionUseCase,
+            )
+        }
 }
