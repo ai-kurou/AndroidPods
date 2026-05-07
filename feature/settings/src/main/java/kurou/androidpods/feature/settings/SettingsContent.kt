@@ -535,6 +535,7 @@ private fun SettingsItem(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
         ),
         modifier = modifier
+            .fillMaxWidth()
             .clip(MaterialTheme.shapes.small)
             .then(if (onClick != null && enabled) Modifier.clickable(onClick = onClick) else Modifier),
     )
