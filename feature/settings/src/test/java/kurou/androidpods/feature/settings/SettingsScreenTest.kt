@@ -26,6 +26,7 @@ import androidx.window.core.layout.WindowSizeClass
 import androidx.window.core.layout.computeWindowSizeClass
 import io.mockk.Runs
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
@@ -39,7 +40,6 @@ import kurou.androidpods.core.domain.GetOverlaySettingsUseCase
 import kurou.androidpods.core.domain.NotificationChannels
 import kurou.androidpods.core.domain.OverlayPosition
 import kurou.androidpods.core.domain.OverlayPositionUseCase
-import kurou.androidpods.core.domain.ThemeMode
 import kurou.androidpods.core.domain.ThemeSettings
 import kurou.androidpods.core.domain.ThemeSettingsUseCase
 import org.junit.After
@@ -85,7 +85,7 @@ class SettingsScreenTest {
         every { overlayUseCase.isEnabled() } returns false
         every { themeSettingsUseCase.observe() } returns MutableStateFlow(ThemeSettings())
         every { overlayPositionUseCase.observe() } returns MutableStateFlow(OverlayPosition.BOTTOM)
-        coEvery { themeSettingsUseCase.update(ThemeSettings(themeMode = ThemeMode.DARK)) } just Runs
+        coEvery { themeSettingsUseCase.update(any()) } just Runs
         return SettingsViewModel(
             btUseCase,
             appleDevicesUseCase,
@@ -403,6 +403,30 @@ class SettingsScreenTest {
         composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithText("Light").assertDoesNotExist()
+    }
+
+    @Test
+    fun `ダイナミックカラートグルをタップするとuseDynamicColorが更新される`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        grantRequiredPermissions(context)
+
+        composeTestRule.setContent {
+            SettingsScreen(
+                windowSizeClass = windowSizeClassOf(400f),
+                onStartScanService = {},
+                onStopScanService = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                viewModel = createViewModel(BluetoothAdapter.STATE_ON),
+            )
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Dynamic Color"))
+        composeTestRule.onNodeWithText("Dynamic Color").performClick()
+        composeTestRule.waitForIdle()
+
+        coVerify { themeSettingsUseCase.update(ThemeSettings(useDynamicColor = false)) }
     }
 
     @Test
