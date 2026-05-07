@@ -16,6 +16,7 @@ import kotlinx.coroutines.test.setMain
 import kurou.androidpods.core.data.DataModule
 import kurou.androidpods.core.domain.AppleDevice
 import kurou.androidpods.core.domain.DeviceImages
+import kurou.androidpods.core.domain.NotificationChannels
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -117,15 +118,17 @@ class DeviceScanServiceTest {
     }
 
     @Test
-    fun `onStartCommandで通知が作成される`() {
+    fun `onStartCommandで通知が正しいパラメータで作成される`() {
         controller.create().startCommand(0, 0)
 
         val context = ApplicationProvider.getApplicationContext<Context>()
         val nm = context.getSystemService(NotificationManager::class.java)
-        val notifications = nm.activeNotifications
+        val notification = nm.activeNotifications.first().notification
 
-        assertEquals(1, notifications.size)
-        assertNotNull(notifications[0])
+        assertNotNull(notification.smallIcon)
+        assertEquals(NotificationChannels.DEVICE_SCAN, notification.channelId)
+        assertEquals(android.app.Notification.CATEGORY_SERVICE, notification.category)
+        assertTrue(notification.flags and android.app.Notification.FLAG_ONGOING_EVENT != 0)
     }
 
     @Test

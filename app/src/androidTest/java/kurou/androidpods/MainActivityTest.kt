@@ -46,6 +46,7 @@ class MainActivityTest {
     @Test
     fun `MainActivity起動後_オンボーディングを経てSettingsからDevicesとLicensesへ遷移できる`() {
         // オンボーディング: Page 0 「Next」
+        waitForText("Next")
         composeTestRule.onNodeWithText("Next").performClick()
 
         // オンボーディング: Page 1 「Grant Permission」（GrantPermissionRule で自動付与済み）
