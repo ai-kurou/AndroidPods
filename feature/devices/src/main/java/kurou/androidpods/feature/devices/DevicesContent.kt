@@ -109,7 +109,7 @@ private fun DeviceItem(
                             Box(modifier = Modifier.weight(2f).fillMaxHeight()) {
                                 Image(
                                     painter = painterResource(img.case),
-                                    contentDescription = device.name,
+                                    contentDescription = null,
                                     contentScale = ContentScale.Fit,
                                     modifier = Modifier.fillMaxSize(),
                                 )
@@ -128,7 +128,7 @@ private fun DeviceItem(
                     is DeviceImages.Single -> {
                         Image(
                             painter = painterResource(img.body),
-                            contentDescription = device.name,
+                            contentDescription = null,
                             contentScale = ContentScale.Fit,
                             modifier = Modifier.fillMaxSize(),
                         )
