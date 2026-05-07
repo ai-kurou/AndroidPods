@@ -25,6 +25,7 @@ class SettingsContentTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
+    @Suppress("LongParameterList")
     private fun setSettingsContent(
         permissionStates: Map<String, Boolean> = emptyMap(),
         bluetoothAdapterState: Int = BluetoothAdapter.STATE_ON,
