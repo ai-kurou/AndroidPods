@@ -202,10 +202,15 @@ fun SettingsScreen(
             }
         },
         onBatteryOptimizationClick = {
-            val intent = Intent(
-                android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
-                android.net.Uri.parse("package:${context.packageName}"),
-            )
+            val pm = context.getSystemService(android.os.PowerManager::class.java)
+            val intent = if (pm.isIgnoringBatteryOptimizations(context.packageName)) {
+                Intent(android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+            } else {
+                Intent(
+                    android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+                    android.net.Uri.parse("package:${context.packageName}"),
+                )
+            }
             batteryOptimizationLauncher.launch(intent)
         },
         onThemeModeClick = { showThemeModeDialog = true },
