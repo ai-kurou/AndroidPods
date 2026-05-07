@@ -8,13 +8,11 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -29,6 +27,8 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -265,7 +265,7 @@ private fun LazyGridScope.scanServiceSectionItems(
             modifier = Modifier.animateItem(),
         ) {
             if (isServiceRestarting) {
-                CircularProgressIndicator(modifier = Modifier.size(20.dp))
+                CircularProgressIndicator(modifier = Modifier.size(24.dp))
             } else {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
@@ -522,36 +522,22 @@ private fun SettingsItem(
     enabled: Boolean = true,
     trailing: @Composable () -> Unit,
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant)
-                .then(if (onClick != null && enabled) Modifier.clickable(onClick = onClick) else Modifier)
-                .padding(12.dp),
-    ) {
-        Icon(
-            painter = icon,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(20.dp),
-        )
-        Spacer(modifier = Modifier.width(12.dp))
-        Text(
-            text = label,
-            modifier = Modifier.weight(1f),
-        )
-        // M3 の minimumInteractiveComponentSize (48.dp) に揃えることで
-        // Switch と Icon の高さを構造的に一致させる
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.heightIn(min = 48.dp),
-        ) {
-            trailing()
-        }
-    }
+    ListItem(
+        headlineContent = { Text(label) },
+        leadingContent = {
+            Icon(
+                painter = icon,
+                contentDescription = null,
+            )
+        },
+        trailingContent = trailing,
+        colors = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+        ),
+        modifier = modifier
+            .clip(MaterialTheme.shapes.small)
+            .then(if (onClick != null && enabled) Modifier.clickable(onClick = onClick) else Modifier),
+    )
 }
 
 internal fun ThemeMode.toStringRes(): Int =
