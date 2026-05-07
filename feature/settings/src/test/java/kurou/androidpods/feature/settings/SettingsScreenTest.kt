@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.PowerManager
 import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.getValue
@@ -431,6 +432,63 @@ class SettingsScreenTest {
 
         val started = shadowOf(composeTestRule.activity).nextStartedActivity
         assertEquals(Intent.ACTION_VIEW, started?.action)
+    }
+
+    @Test
+    fun `バッテリー最適化未除外のときアイテムをタップするとACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONSのインテントが発行される`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        grantRequiredPermissions(context)
+        val viewModel = createViewModel(BluetoothAdapter.STATE_ON)
+
+        composeTestRule.setContent {
+            SettingsScreen(
+                windowSizeClass = windowSizeClassOf(400f),
+                onStartScanService = {},
+                onStopScanService = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                viewModel = viewModel,
+            )
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst()
+            .performScrollToNode(hasText("Disable battery optimization"))
+        composeTestRule.onNodeWithText("Disable battery optimization").performClick()
+        composeTestRule.waitForIdle()
+
+        val started = shadowOf(composeTestRule.activity).nextStartedActivityForResult
+        assertEquals(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, started?.intent?.action)
+    }
+
+    @Test
+    fun `バッテリー最適化除外済みのときアイテムをタップするとACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGSのインテントが発行される`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        grantRequiredPermissions(context)
+        val viewModel = createViewModel(BluetoothAdapter.STATE_ON)
+        shadowOf(context.getSystemService(PowerManager::class.java))
+            .setIgnoringBatteryOptimizations(context.packageName, true)
+
+        composeTestRule.setContent {
+            SettingsScreen(
+                windowSizeClass = windowSizeClassOf(400f),
+                onStartScanService = {},
+                onStopScanService = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                viewModel = viewModel,
+            )
+        }
+        viewModel.refreshBatteryOptimizationState(isExempt = true)
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst()
+            .performScrollToNode(hasText("Disable battery optimization"))
+        composeTestRule.onNodeWithText("Disable battery optimization").performClick()
+        composeTestRule.waitForIdle()
+
+        val started = shadowOf(composeTestRule.activity).nextStartedActivity
+        assertEquals(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS, started?.action)
     }
 
     @Test
