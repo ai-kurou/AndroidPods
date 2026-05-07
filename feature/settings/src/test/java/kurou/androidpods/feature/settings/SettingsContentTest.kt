@@ -149,34 +149,17 @@ class SettingsContentTest {
     }
 
     @Test
-    fun `対応デバイスアイテムをタップするとonDevicesClickが呼ばれる`() {
+    fun `アップデートバナーをタップするとonUpdateClickが呼ばれる`() {
         var clicked = false
-        setSettingsContent(onDevicesClick = { clicked = true })
+        setSettingsContent(
+            updateAvailable = true,
+            onUpdateClick = { clicked = true },
+        )
 
-        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Compatible devices"))
-        composeTestRule.onNodeWithText("Compatible devices").performClick()
-
-        assertTrue(clicked)
-    }
-
-    @Test
-    fun `ライセンスアイテムをタップするとonLicensesClickが呼ばれる`() {
-        var clicked = false
-        setSettingsContent(onLicensesClick = { clicked = true })
-
-        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Open Source Licenses"))
-        composeTestRule.onNodeWithText("Open Source Licenses").performClick()
-
-        assertTrue(clicked)
-    }
-
-    @Test
-    fun `GithubレポジトリアイテムをタップするとonGithubClickが呼ばれる`() {
-        var clicked = false
-        setSettingsContent(onGithubClick = { clicked = true })
-
-        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("GitHub Repository"))
-        composeTestRule.onNodeWithText("GitHub Repository").performClick()
+        composeTestRule
+            .onNodeWithText(
+                "A new version is available. Tap to update.",
+            ).performClick()
 
         assertTrue(clicked)
     }
@@ -210,6 +193,16 @@ class SettingsContentTest {
     }
 
     @Test
+    fun `オーバーレイ位置アイテムをタップするとonOverlayPositionClickが呼ばれる`() {
+        var clicked = false
+        setSettingsContent(onOverlayPositionClick = { clicked = true })
+
+        composeTestRule.onNodeWithText("Overlay position").performClick()
+
+        assertTrue(clicked)
+    }
+
+    @Test
     fun `再起動アイテムをタップするとonRestartServiceClickが呼ばれる`() {
         var clicked = false
         setSettingsContent(onRestartServiceClick = { clicked = true })
@@ -235,17 +228,13 @@ class SettingsContentTest {
     }
 
     @Test
-    fun `アップデートバナーをタップするとonUpdateClickが呼ばれる`() {
+    fun `バッテリー最適化アイテムをタップするとonBatteryOptimizationClickが呼ばれる`() {
         var clicked = false
-        setSettingsContent(
-            updateAvailable = true,
-            onUpdateClick = { clicked = true },
-        )
+        setSettingsContent(onBatteryOptimizationClick = { clicked = true })
 
-        composeTestRule
-            .onNodeWithText(
-                "A new version is available. Tap to update.",
-            ).performClick()
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst()
+            .performScrollToNode(hasText("Disable battery optimization"))
+        composeTestRule.onNodeWithText("Disable battery optimization").performClick()
 
         assertTrue(clicked)
     }
@@ -298,23 +287,34 @@ class SettingsContentTest {
     }
 
     @Test
-    fun `オーバーレイ位置アイテムをタップするとonOverlayPositionClickが呼ばれる`() {
+    fun `対応デバイスアイテムをタップするとonDevicesClickが呼ばれる`() {
         var clicked = false
-        setSettingsContent(onOverlayPositionClick = { clicked = true })
+        setSettingsContent(onDevicesClick = { clicked = true })
 
-        composeTestRule.onNodeWithText("Overlay position").performClick()
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Compatible devices"))
+        composeTestRule.onNodeWithText("Compatible devices").performClick()
 
         assertTrue(clicked)
     }
 
     @Test
-    fun `バッテリー最適化アイテムをタップするとonBatteryOptimizationClickが呼ばれる`() {
+    fun `ライセンスアイテムをタップするとonLicensesClickが呼ばれる`() {
         var clicked = false
-        setSettingsContent(onBatteryOptimizationClick = { clicked = true })
+        setSettingsContent(onLicensesClick = { clicked = true })
 
-        composeTestRule.onAllNodes(hasScrollAction()).onFirst()
-            .performScrollToNode(hasText("Disable battery optimization"))
-        composeTestRule.onNodeWithText("Disable battery optimization").performClick()
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Open Source Licenses"))
+        composeTestRule.onNodeWithText("Open Source Licenses").performClick()
+
+        assertTrue(clicked)
+    }
+
+    @Test
+    fun `GithubレポジトリアイテムをタップするとonGithubClickが呼ばれる`() {
+        var clicked = false
+        setSettingsContent(onGithubClick = { clicked = true })
+
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("GitHub Repository"))
+        composeTestRule.onNodeWithText("GitHub Repository").performClick()
 
         assertTrue(clicked)
     }
