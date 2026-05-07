@@ -74,14 +74,24 @@ class SettingsViewModel @Inject constructor(
                 UseCaseState(bluetoothAdapterState, appleDevices, themeSettings, overlayPosition)
             },
             combine(
-                combine(_overlayEnabled, _updateAvailable) { a, b -> a to b },
-                combine(
-                    _isNotificationsDisabled,
-                    _isDeviceScanChannelDisabled,
-                    _isBatteryOptimizationExempt,
-                ) { c, d, e -> Triple(c, d, e) },
-            ) { pair, triple ->
-                InternalState(pair.first, pair.second, triple.first, triple.second, triple.third)
+                _overlayEnabled,
+                _updateAvailable,
+                _isNotificationsDisabled,
+                _isDeviceScanChannelDisabled,
+                _isBatteryOptimizationExempt,
+            ) { overlayEnabled,
+                updateAvailable,
+                isNotificationsDisabled,
+                isDeviceScanChannelDisabled,
+                isBatteryOptimizationExempt,
+                ->
+                InternalState(
+                    overlayEnabled,
+                    updateAvailable,
+                    isNotificationsDisabled,
+                    isDeviceScanChannelDisabled,
+                    isBatteryOptimizationExempt,
+                )
             },
         ) { useCaseState, internalState ->
             SettingsUiState(
