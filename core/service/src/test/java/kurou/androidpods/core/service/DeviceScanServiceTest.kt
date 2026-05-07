@@ -16,8 +16,8 @@ import kotlinx.coroutines.test.setMain
 import kurou.androidpods.core.data.DataModule
 import kurou.androidpods.core.domain.AppleDevice
 import kurou.androidpods.core.domain.DeviceImages
-import org.junit.After
 import kurou.androidpods.core.domain.NotificationChannels
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
