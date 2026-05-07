@@ -1,7 +1,6 @@
 package kurou.androidpods.feature.devices
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,13 +15,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -83,71 +81,70 @@ private fun DeviceItem(
     device: CompatibleDevice,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier =
-            modifier
-                .clip(RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant)
-                .padding(12.dp)
-                .focusable(),
+    ElevatedCard(
+        modifier = modifier.focusable(),
     ) {
-        Box(
-            modifier = Modifier.fillMaxWidth().weight(1f).padding(8.dp),
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(12.dp),
         ) {
-            when (val img = device.images) {
-                is DeviceImages.Tws -> {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.fillMaxSize().padding(16.dp),
-                    ) {
-                        Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
-                            Image(
-                                painter = painterResource(img.left),
-                                contentDescription = null,
-                                contentScale = ContentScale.Fit,
-                                modifier = Modifier.fillMaxSize().padding(2.dp),
-                            )
-                        }
-                        Box(modifier = Modifier.weight(2f).fillMaxHeight()) {
-                            Image(
-                                painter = painterResource(img.case),
-                                contentDescription = device.name,
-                                contentScale = ContentScale.Fit,
-                                modifier = Modifier.fillMaxSize(),
-                            )
-                        }
-                        Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
-                            Image(
-                                painter = painterResource(img.right),
-                                contentDescription = null,
-                                contentScale = ContentScale.Fit,
-                                modifier = Modifier.fillMaxSize().padding(2.dp),
-                            )
+            Box(
+                modifier = Modifier.fillMaxWidth().weight(1f).padding(8.dp),
+            ) {
+                when (val img = device.images) {
+                    is DeviceImages.Tws -> {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.fillMaxSize().padding(16.dp),
+                        ) {
+                            Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                                Image(
+                                    painter = painterResource(img.left),
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Fit,
+                                    modifier = Modifier.fillMaxSize().padding(2.dp),
+                                )
+                            }
+                            Box(modifier = Modifier.weight(2f).fillMaxHeight()) {
+                                Image(
+                                    painter = painterResource(img.case),
+                                    contentDescription = device.name,
+                                    contentScale = ContentScale.Fit,
+                                    modifier = Modifier.fillMaxSize(),
+                                )
+                            }
+                            Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                                Image(
+                                    painter = painterResource(img.right),
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Fit,
+                                    modifier = Modifier.fillMaxSize().padding(2.dp),
+                                )
+                            }
                         }
                     }
-                }
 
-                is DeviceImages.Single -> {
-                    Image(
-                        painter = painterResource(img.body),
-                        contentDescription = device.name,
-                        contentScale = ContentScale.Fit,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                }
+                    is DeviceImages.Single -> {
+                        Image(
+                            painter = painterResource(img.body),
+                            contentDescription = device.name,
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                    }
 
-                null -> {
-                    Unit
+                    null -> {
+                        Unit
+                    }
                 }
             }
+            Text(
+                text = device.name,
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(8.dp),
+            )
         }
-        Text(
-            text = device.name,
-            style = MaterialTheme.typography.bodySmall,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(8.dp),
-        )
     }
 }
