@@ -75,56 +75,6 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun `refreshOverlayStateでisEnabledの最新値が反映される`() =
-        runTest {
-            // combineはすべてのupstreamが1回以上emitするまで値を出さないため、
-            // bluetoothFlowに初期値を流してcombineを動作可能にする
-            fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
-            assertEquals(false, viewModel.uiState.value.overlayEnabled)
-
-            every { getOverlaySettingsUseCase.isEnabled() } returns true
-            viewModel.refreshOverlayState()
-
-            assertEquals(true, viewModel.uiState.value.overlayEnabled)
-            verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
-            verify(exactly = 1) { getAppleDevicesUseCase.observe() }
-            // コンストラクタで1回 + refreshOverlayState()で1回 = 合計2回
-            verify(exactly = 2) { getOverlaySettingsUseCase.isEnabled() }
-            verify(exactly = 1) { themeSettingsUseCase.observe() }
-            verify(exactly = 1) { overlayPositionUseCase.observe() }
-            confirmVerified(
-                getBluetoothAdapterStateUseCase,
-                getAppleDevicesUseCase,
-                getOverlaySettingsUseCase,
-                checkUpdateUseCase,
-                themeSettingsUseCase,
-                overlayPositionUseCase,
-            )
-        }
-
-    @Test
-    fun `startScanとstopScanでUseCaseのメソッドが呼ばれる`() {
-        viewModel.startScan()
-        viewModel.stopScan()
-
-        verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
-        verify(exactly = 1) { getAppleDevicesUseCase.observe() }
-        verify(exactly = 1) { getAppleDevicesUseCase.startScan() }
-        verify(exactly = 1) { getAppleDevicesUseCase.stopScan() }
-        verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
-        verify(exactly = 1) { themeSettingsUseCase.observe() }
-        verify(exactly = 1) { overlayPositionUseCase.observe() }
-        confirmVerified(
-            getBluetoothAdapterStateUseCase,
-            getAppleDevicesUseCase,
-            getOverlaySettingsUseCase,
-            checkUpdateUseCase,
-            themeSettingsUseCase,
-            overlayPositionUseCase,
-        )
-    }
-
-    @Test
     fun `checkUpdateがResult_success_trueを返すとupdateAvailableがtrueになる`() =
         runTest {
             fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
@@ -203,19 +153,23 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun `updateThemeSettingsでUseCaseのupdateが呼ばれる`() =
+    fun `refreshOverlayStateでisEnabledの最新値が反映される`() =
         runTest {
-            val settings = ThemeSettings(themeMode = ThemeMode.LIGHT, useDynamicColor = true)
-            coEvery { themeSettingsUseCase.update(settings) } just Runs
+            // combineはすべてのupstreamが1回以上emitするまで値を出さないため、
+            // bluetoothFlowに初期値を流してcombineを動作可能にする
+            fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
+            assertEquals(false, viewModel.uiState.value.overlayEnabled)
 
-            viewModel.updateThemeSettings(settings)
+            every { getOverlaySettingsUseCase.isEnabled() } returns true
+            viewModel.refreshOverlayState()
 
+            assertEquals(true, viewModel.uiState.value.overlayEnabled)
             verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
             verify(exactly = 1) { getAppleDevicesUseCase.observe() }
-            verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
+            // コンストラクタで1回 + refreshOverlayState()で1回 = 合計2回
+            verify(exactly = 2) { getOverlaySettingsUseCase.isEnabled() }
             verify(exactly = 1) { themeSettingsUseCase.observe() }
             verify(exactly = 1) { overlayPositionUseCase.observe() }
-            coVerify(exactly = 1) { themeSettingsUseCase.update(settings) }
             confirmVerified(
                 getBluetoothAdapterStateUseCase,
                 getAppleDevicesUseCase,
@@ -275,6 +229,54 @@ class SettingsViewModelTest {
         }
 
     @Test
+    fun `refreshBatteryOptimizationStateでisBatteryOptimizationExemptが更新される`() =
+        runTest {
+            fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
+            assertEquals(false, viewModel.uiState.value.isBatteryOptimizationExempt)
+
+            viewModel.refreshBatteryOptimizationState(isExempt = true)
+
+            assertEquals(true, viewModel.uiState.value.isBatteryOptimizationExempt)
+            verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
+            verify(exactly = 1) { getAppleDevicesUseCase.observe() }
+            verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
+            verify(exactly = 1) { themeSettingsUseCase.observe() }
+            verify(exactly = 1) { overlayPositionUseCase.observe() }
+            confirmVerified(
+                getBluetoothAdapterStateUseCase,
+                getAppleDevicesUseCase,
+                getOverlaySettingsUseCase,
+                checkUpdateUseCase,
+                themeSettingsUseCase,
+                overlayPositionUseCase,
+            )
+        }
+
+    @Test
+    fun `updateThemeSettingsでUseCaseのupdateが呼ばれる`() =
+        runTest {
+            val settings = ThemeSettings(themeMode = ThemeMode.LIGHT, useDynamicColor = true)
+            coEvery { themeSettingsUseCase.update(settings) } just Runs
+
+            viewModel.updateThemeSettings(settings)
+
+            verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
+            verify(exactly = 1) { getAppleDevicesUseCase.observe() }
+            verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
+            verify(exactly = 1) { themeSettingsUseCase.observe() }
+            verify(exactly = 1) { overlayPositionUseCase.observe() }
+            coVerify(exactly = 1) { themeSettingsUseCase.update(settings) }
+            confirmVerified(
+                getBluetoothAdapterStateUseCase,
+                getAppleDevicesUseCase,
+                getOverlaySettingsUseCase,
+                checkUpdateUseCase,
+                themeSettingsUseCase,
+                overlayPositionUseCase,
+            )
+        }
+
+    @Test
     fun `updateOverlayPositionでUseCaseのupdateが呼ばれる`() =
         runTest {
             viewModel.updateOverlayPosition(OverlayPosition.TOP)
@@ -294,4 +296,26 @@ class SettingsViewModelTest {
                 overlayPositionUseCase,
             )
         }
+
+    @Test
+    fun `startScanとstopScanでUseCaseのメソッドが呼ばれる`() {
+        viewModel.startScan()
+        viewModel.stopScan()
+
+        verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
+        verify(exactly = 1) { getAppleDevicesUseCase.observe() }
+        verify(exactly = 1) { getAppleDevicesUseCase.startScan() }
+        verify(exactly = 1) { getAppleDevicesUseCase.stopScan() }
+        verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
+        verify(exactly = 1) { themeSettingsUseCase.observe() }
+        verify(exactly = 1) { overlayPositionUseCase.observe() }
+        confirmVerified(
+            getBluetoothAdapterStateUseCase,
+            getAppleDevicesUseCase,
+            getOverlaySettingsUseCase,
+            checkUpdateUseCase,
+            themeSettingsUseCase,
+            overlayPositionUseCase,
+        )
+    }
 }

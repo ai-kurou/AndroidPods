@@ -25,39 +25,73 @@ class SettingsContentTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    @Test
-    fun `全て許可済みのとき権限警告が表示されない`() {
+    @Suppress("LongParameterList")
+    private fun setSettingsContent(
+        permissionStates: Map<String, Boolean> = emptyMap(),
+        bluetoothAdapterState: Int = BluetoothAdapter.STATE_ON,
+        overlayEnabled: Boolean = false,
+        overlayPosition: OverlayPosition = OverlayPosition.BOTTOM,
+        updateAvailable: Boolean = false,
+        isNotificationsDisabled: Boolean = false,
+        isDeviceScanChannelDisabled: Boolean = false,
+        isServiceRestarting: Boolean = false,
+        isBatteryOptimizationExempt: Boolean = false,
+        columns: Int = 1,
+        themeSettings: ThemeSettings = ThemeSettings(),
+        onPermissionWarningClick: () -> Unit = {},
+        onBluetoothWarningClick: () -> Unit = {},
+        onNotificationWarningClick: () -> Unit = {},
+        onDeviceScanChannelWarningClick: () -> Unit = {},
+        onOverlayToggle: (Boolean) -> Unit = {},
+        onOverlayPositionClick: () -> Unit = {},
+        onRestartServiceClick: () -> Unit = {},
+        onBatteryOptimizationClick: () -> Unit = {},
+        onThemeModeClick: () -> Unit = {},
+        onDynamicColorToggle: (Boolean) -> Unit = {},
+        onUpdateClick: () -> Unit = {},
+        onLicensesClick: () -> Unit = {},
+        onDevicesClick: () -> Unit = {},
+        onGithubClick: () -> Unit = {},
+    ) {
         composeTestRule.setContent {
             SettingsContent(
-                permissionStates =
-                    mapOf(
-                        Manifest.permission.BLUETOOTH_CONNECT to true,
-                        Manifest.permission.BLUETOOTH_SCAN to true,
-                    ),
-                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
-                overlayEnabled = false,
-                updateAvailable = false,
-                isNotificationsDisabled = false,
-                isDeviceScanChannelDisabled = false,
-                isServiceRestarting = false,
-                columns = 1,
-                onPermissionWarningClick = {},
-                onBluetoothWarningClick = {},
-                onNotificationWarningClick = {},
-                onDeviceScanChannelWarningClick = {},
-                onOverlayToggle = {},
-                overlayPosition = OverlayPosition.BOTTOM,
-                onOverlayPositionClick = {},
-                onRestartServiceClick = {},
-                themeSettings = ThemeSettings(),
-                onThemeModeClick = {},
-                onDynamicColorToggle = {},
-                onUpdateClick = {},
-                onLicensesClick = {},
-                onDevicesClick = {},
-                onGithubClick = {},
+                permissionStates = permissionStates,
+                bluetoothAdapterState = bluetoothAdapterState,
+                overlayEnabled = overlayEnabled,
+                overlayPosition = overlayPosition,
+                updateAvailable = updateAvailable,
+                isNotificationsDisabled = isNotificationsDisabled,
+                isDeviceScanChannelDisabled = isDeviceScanChannelDisabled,
+                isServiceRestarting = isServiceRestarting,
+                isBatteryOptimizationExempt = isBatteryOptimizationExempt,
+                columns = columns,
+                themeSettings = themeSettings,
+                onPermissionWarningClick = onPermissionWarningClick,
+                onBluetoothWarningClick = onBluetoothWarningClick,
+                onNotificationWarningClick = onNotificationWarningClick,
+                onDeviceScanChannelWarningClick = onDeviceScanChannelWarningClick,
+                onOverlayToggle = onOverlayToggle,
+                onOverlayPositionClick = onOverlayPositionClick,
+                onRestartServiceClick = onRestartServiceClick,
+                onBatteryOptimizationClick = onBatteryOptimizationClick,
+                onThemeModeClick = onThemeModeClick,
+                onDynamicColorToggle = onDynamicColorToggle,
+                onUpdateClick = onUpdateClick,
+                onLicensesClick = onLicensesClick,
+                onDevicesClick = onDevicesClick,
+                onGithubClick = onGithubClick,
             )
         }
+    }
+
+    @Test
+    fun `全て許可済みのとき権限警告が表示されない`() {
+        setSettingsContent(
+            permissionStates = mapOf(
+                Manifest.permission.BLUETOOTH_CONNECT to true,
+                Manifest.permission.BLUETOOTH_SCAN to true,
+            ),
+        )
 
         composeTestRule
             .onNodeWithText(
@@ -68,37 +102,13 @@ class SettingsContentTest {
     @Test
     fun `未許可の権限があるとき権限警告が表示され、タップするとコールバックが呼ばれる`() {
         var clicked = false
-        composeTestRule.setContent {
-            SettingsContent(
-                permissionStates =
-                    mapOf(
-                        Manifest.permission.BLUETOOTH_CONNECT to true,
-                        Manifest.permission.BLUETOOTH_SCAN to false,
-                    ),
-                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
-                overlayEnabled = false,
-                updateAvailable = false,
-                isNotificationsDisabled = false,
-                isDeviceScanChannelDisabled = false,
-                isServiceRestarting = false,
-                columns = 1,
-                onPermissionWarningClick = { clicked = true },
-                onBluetoothWarningClick = {},
-                onNotificationWarningClick = {},
-                onDeviceScanChannelWarningClick = {},
-                onOverlayToggle = {},
-                overlayPosition = OverlayPosition.BOTTOM,
-                onOverlayPositionClick = {},
-                onRestartServiceClick = {},
-                themeSettings = ThemeSettings(),
-                onThemeModeClick = {},
-                onDynamicColorToggle = {},
-                onUpdateClick = {},
-                onLicensesClick = {},
-                onDevicesClick = {},
-                onGithubClick = {},
-            )
-        }
+        setSettingsContent(
+            permissionStates = mapOf(
+                Manifest.permission.BLUETOOTH_CONNECT to true,
+                Manifest.permission.BLUETOOTH_SCAN to false,
+            ),
+            onPermissionWarningClick = { clicked = true },
+        )
 
         composeTestRule
             .onNodeWithText(
@@ -111,33 +121,10 @@ class SettingsContentTest {
     @Test
     fun `通知が無効のとき通知無効警告が表示され、タップするとコールバックが呼ばれる`() {
         var clicked = false
-        composeTestRule.setContent {
-            SettingsContent(
-                permissionStates = emptyMap(),
-                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
-                overlayEnabled = false,
-                updateAvailable = false,
-                isNotificationsDisabled = true,
-                isDeviceScanChannelDisabled = false,
-                isServiceRestarting = false,
-                columns = 1,
-                onPermissionWarningClick = {},
-                onBluetoothWarningClick = {},
-                onNotificationWarningClick = { clicked = true },
-                onDeviceScanChannelWarningClick = {},
-                onOverlayToggle = {},
-                overlayPosition = OverlayPosition.BOTTOM,
-                onOverlayPositionClick = {},
-                onRestartServiceClick = {},
-                themeSettings = ThemeSettings(),
-                onThemeModeClick = {},
-                onDynamicColorToggle = {},
-                onUpdateClick = {},
-                onLicensesClick = {},
-                onDevicesClick = {},
-                onGithubClick = {},
-            )
-        }
+        setSettingsContent(
+            isNotificationsDisabled = true,
+            onNotificationWarningClick = { clicked = true },
+        )
 
         composeTestRule
             .onNodeWithText("App notifications are disabled. Tap to open notification settings.")
@@ -149,33 +136,10 @@ class SettingsContentTest {
     @Test
     fun `BluetoothがOFFのときBluetooth警告が表示され、タップするとコールバックが呼ばれる`() {
         var clicked = false
-        composeTestRule.setContent {
-            SettingsContent(
-                permissionStates = emptyMap(),
-                bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
-                overlayEnabled = false,
-                updateAvailable = false,
-                isNotificationsDisabled = false,
-                isDeviceScanChannelDisabled = false,
-                isServiceRestarting = false,
-                columns = 1,
-                onPermissionWarningClick = {},
-                onBluetoothWarningClick = { clicked = true },
-                onNotificationWarningClick = {},
-                onDeviceScanChannelWarningClick = {},
-                onOverlayToggle = {},
-                overlayPosition = OverlayPosition.BOTTOM,
-                onOverlayPositionClick = {},
-                onRestartServiceClick = {},
-                themeSettings = ThemeSettings(),
-                onThemeModeClick = {},
-                onDynamicColorToggle = {},
-                onUpdateClick = {},
-                onLicensesClick = {},
-                onDevicesClick = {},
-                onGithubClick = {},
-            )
-        }
+        setSettingsContent(
+            bluetoothAdapterState = BluetoothAdapter.STATE_OFF,
+            onBluetoothWarningClick = { clicked = true },
+        )
 
         composeTestRule
             .onNodeWithText(
@@ -186,294 +150,12 @@ class SettingsContentTest {
     }
 
     @Test
-    fun `対応デバイスアイテムをタップするとonDevicesClickが呼ばれる`() {
-        var clicked = false
-        composeTestRule.setContent {
-            SettingsContent(
-                permissionStates = emptyMap(),
-                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
-                overlayEnabled = false,
-                updateAvailable = false,
-                isNotificationsDisabled = false,
-                isDeviceScanChannelDisabled = false,
-                isServiceRestarting = false,
-                columns = 1,
-                onPermissionWarningClick = {},
-                onBluetoothWarningClick = {},
-                onNotificationWarningClick = {},
-                onDeviceScanChannelWarningClick = {},
-                onOverlayToggle = {},
-                overlayPosition = OverlayPosition.BOTTOM,
-                onOverlayPositionClick = {},
-                onRestartServiceClick = {},
-                themeSettings = ThemeSettings(),
-                onThemeModeClick = {},
-                onDynamicColorToggle = {},
-                onUpdateClick = {},
-                onLicensesClick = {},
-                onDevicesClick = { clicked = true },
-                onGithubClick = {},
-            )
-        }
-
-        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Compatible devices"))
-        composeTestRule.onNodeWithText("Compatible devices").performClick()
-
-        assertTrue(clicked)
-    }
-
-    @Test
-    fun `ライセンスアイテムをタップするとonLicensesClickが呼ばれる`() {
-        var clicked = false
-        composeTestRule.setContent {
-            SettingsContent(
-                permissionStates = emptyMap(),
-                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
-                overlayEnabled = false,
-                updateAvailable = false,
-                isNotificationsDisabled = false,
-                isDeviceScanChannelDisabled = false,
-                isServiceRestarting = false,
-                columns = 1,
-                onPermissionWarningClick = {},
-                onBluetoothWarningClick = {},
-                onNotificationWarningClick = {},
-                onDeviceScanChannelWarningClick = {},
-                onOverlayToggle = {},
-                overlayPosition = OverlayPosition.BOTTOM,
-                onOverlayPositionClick = {},
-                onRestartServiceClick = {},
-                themeSettings = ThemeSettings(),
-                onThemeModeClick = {},
-                onDynamicColorToggle = {},
-                onUpdateClick = {},
-                onLicensesClick = { clicked = true },
-                onDevicesClick = {},
-                onGithubClick = {},
-            )
-        }
-
-        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Open Source Licenses"))
-        composeTestRule.onNodeWithText("Open Source Licenses").performClick()
-
-        assertTrue(clicked)
-    }
-
-    @Test
-    fun `GithubレポジトリアイテムをタップするとonGithubClickが呼ばれる`() {
-        var clicked = false
-        composeTestRule.setContent {
-            SettingsContent(
-                permissionStates = emptyMap(),
-                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
-                overlayEnabled = false,
-                updateAvailable = false,
-                isNotificationsDisabled = false,
-                isDeviceScanChannelDisabled = false,
-                isServiceRestarting = false,
-                columns = 1,
-                onPermissionWarningClick = {},
-                onBluetoothWarningClick = {},
-                onNotificationWarningClick = {},
-                onDeviceScanChannelWarningClick = {},
-                onOverlayToggle = {},
-                overlayPosition = OverlayPosition.BOTTOM,
-                onOverlayPositionClick = {},
-                onRestartServiceClick = {},
-                themeSettings = ThemeSettings(),
-                onThemeModeClick = {},
-                onDynamicColorToggle = {},
-                onUpdateClick = {},
-                onLicensesClick = {},
-                onDevicesClick = {},
-                onGithubClick = { clicked = true },
-            )
-        }
-
-        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("GitHub Repository"))
-        composeTestRule.onNodeWithText("GitHub Repository").performClick()
-
-        assertTrue(clicked)
-    }
-
-    @Test
-    fun `オーバーレイがオフのときアイテムをタップするとtrueでonOverlayToggleが呼ばれる`() {
-        var toggledValue: Boolean? = null
-        composeTestRule.setContent {
-            SettingsContent(
-                permissionStates = emptyMap(),
-                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
-                overlayEnabled = false,
-                updateAvailable = false,
-                isNotificationsDisabled = false,
-                isDeviceScanChannelDisabled = false,
-                isServiceRestarting = false,
-                columns = 1,
-                onPermissionWarningClick = {},
-                onBluetoothWarningClick = {},
-                onNotificationWarningClick = {},
-                onDeviceScanChannelWarningClick = {},
-                onOverlayToggle = { toggledValue = it },
-                overlayPosition = OverlayPosition.BOTTOM,
-                onOverlayPositionClick = {},
-                onRestartServiceClick = {},
-                themeSettings = ThemeSettings(),
-                onThemeModeClick = {},
-                onDynamicColorToggle = {},
-                onUpdateClick = {},
-                onLicensesClick = {},
-                onDevicesClick = {},
-                onGithubClick = {},
-            )
-        }
-
-        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Show battery overlay"))
-        composeTestRule.onNodeWithText("Show battery overlay").performClick()
-
-        assertTrue(toggledValue == true)
-    }
-
-    @Test
-    fun `オーバーレイがオンのときアイテムをタップするとfalseでonOverlayToggleが呼ばれる`() {
-        var toggledValue: Boolean? = null
-        composeTestRule.setContent {
-            SettingsContent(
-                permissionStates = emptyMap(),
-                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
-                overlayEnabled = true,
-                updateAvailable = false,
-                isNotificationsDisabled = false,
-                isDeviceScanChannelDisabled = false,
-                isServiceRestarting = false,
-                columns = 1,
-                onPermissionWarningClick = {},
-                onBluetoothWarningClick = {},
-                onNotificationWarningClick = {},
-                onDeviceScanChannelWarningClick = {},
-                onOverlayToggle = { toggledValue = it },
-                overlayPosition = OverlayPosition.BOTTOM,
-                onOverlayPositionClick = {},
-                onRestartServiceClick = {},
-                themeSettings = ThemeSettings(),
-                onThemeModeClick = {},
-                onDynamicColorToggle = {},
-                onUpdateClick = {},
-                onLicensesClick = {},
-                onDevicesClick = {},
-                onGithubClick = {},
-            )
-        }
-
-        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Show battery overlay"))
-        composeTestRule.onNodeWithText("Show battery overlay").performClick()
-
-        assertTrue(toggledValue == false)
-    }
-
-    @Test
-    fun `再起動アイテムをタップするとonRestartServiceClickが呼ばれる`() {
-        var clicked = false
-        composeTestRule.setContent {
-            SettingsContent(
-                permissionStates = emptyMap(),
-                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
-                overlayEnabled = false,
-                updateAvailable = false,
-                isNotificationsDisabled = false,
-                isDeviceScanChannelDisabled = false,
-                isServiceRestarting = false,
-                columns = 1,
-                onPermissionWarningClick = {},
-                onBluetoothWarningClick = {},
-                onNotificationWarningClick = {},
-                onDeviceScanChannelWarningClick = {},
-                onOverlayToggle = {},
-                overlayPosition = OverlayPosition.BOTTOM,
-                onOverlayPositionClick = {},
-                onRestartServiceClick = { clicked = true },
-                themeSettings = ThemeSettings(),
-                onThemeModeClick = {},
-                onDynamicColorToggle = {},
-                onUpdateClick = {},
-                onLicensesClick = {},
-                onDevicesClick = {},
-                onGithubClick = {},
-            )
-        }
-
-        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Restart scan service"))
-        composeTestRule.onNodeWithText("Restart scan service").performClick()
-
-        assertTrue(clicked)
-    }
-
-    @Test
-    fun `isServiceRestartingがtrueのとき再起動アイテムをタップしてもコールバックが呼ばれない`() {
-        var clicked = false
-        composeTestRule.setContent {
-            SettingsContent(
-                permissionStates = emptyMap(),
-                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
-                overlayEnabled = false,
-                updateAvailable = false,
-                isNotificationsDisabled = false,
-                isDeviceScanChannelDisabled = false,
-                isServiceRestarting = true,
-                columns = 1,
-                onPermissionWarningClick = {},
-                onBluetoothWarningClick = {},
-                onNotificationWarningClick = {},
-                onDeviceScanChannelWarningClick = {},
-                onOverlayToggle = {},
-                overlayPosition = OverlayPosition.BOTTOM,
-                onOverlayPositionClick = {},
-                onRestartServiceClick = { clicked = true },
-                themeSettings = ThemeSettings(),
-                onThemeModeClick = {},
-                onDynamicColorToggle = {},
-                onUpdateClick = {},
-                onLicensesClick = {},
-                onDevicesClick = {},
-                onGithubClick = {},
-            )
-        }
-
-        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Restart scan service"))
-        composeTestRule.onNodeWithText("Restart scan service").performClick()
-
-        assertTrue(!clicked)
-    }
-
-    @Test
     fun `アップデートバナーをタップするとonUpdateClickが呼ばれる`() {
         var clicked = false
-        composeTestRule.setContent {
-            SettingsContent(
-                permissionStates = emptyMap(),
-                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
-                overlayEnabled = false,
-                updateAvailable = true,
-                isNotificationsDisabled = false,
-                isDeviceScanChannelDisabled = false,
-                isServiceRestarting = false,
-                columns = 1,
-                onPermissionWarningClick = {},
-                onBluetoothWarningClick = {},
-                onNotificationWarningClick = {},
-                onDeviceScanChannelWarningClick = {},
-                onOverlayToggle = {},
-                overlayPosition = OverlayPosition.BOTTOM,
-                onOverlayPositionClick = {},
-                onRestartServiceClick = {},
-                themeSettings = ThemeSettings(),
-                onThemeModeClick = {},
-                onDynamicColorToggle = {},
-                onUpdateClick = { clicked = true },
-                onLicensesClick = {},
-                onDevicesClick = {},
-                onGithubClick = {},
-            )
-        }
+        setSettingsContent(
+            updateAvailable = true,
+            onUpdateClick = { clicked = true },
+        )
 
         composeTestRule
             .onNodeWithText(
@@ -484,35 +166,84 @@ class SettingsContentTest {
     }
 
     @Test
+    fun `オーバーレイがオフのときアイテムをタップするとtrueでonOverlayToggleが呼ばれる`() {
+        var toggledValue: Boolean? = null
+        setSettingsContent(
+            overlayEnabled = false,
+            onOverlayToggle = { toggledValue = it },
+        )
+
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Show battery overlay"))
+        composeTestRule.onNodeWithText("Show battery overlay").performClick()
+
+        assertTrue(toggledValue == true)
+    }
+
+    @Test
+    fun `オーバーレイがオンのときアイテムをタップするとfalseでonOverlayToggleが呼ばれる`() {
+        var toggledValue: Boolean? = null
+        setSettingsContent(
+            overlayEnabled = true,
+            onOverlayToggle = { toggledValue = it },
+        )
+
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Show battery overlay"))
+        composeTestRule.onNodeWithText("Show battery overlay").performClick()
+
+        assertTrue(toggledValue == false)
+    }
+
+    @Test
+    fun `オーバーレイ位置アイテムをタップするとonOverlayPositionClickが呼ばれる`() {
+        var clicked = false
+        setSettingsContent(onOverlayPositionClick = { clicked = true })
+
+        composeTestRule.onNodeWithText("Overlay position").performClick()
+
+        assertTrue(clicked)
+    }
+
+    @Test
+    fun `再起動アイテムをタップするとonRestartServiceClickが呼ばれる`() {
+        var clicked = false
+        setSettingsContent(onRestartServiceClick = { clicked = true })
+
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Restart scan service"))
+        composeTestRule.onNodeWithText("Restart scan service").performClick()
+
+        assertTrue(clicked)
+    }
+
+    @Test
+    fun `isServiceRestartingがtrueのとき再起動アイテムをタップしてもコールバックが呼ばれない`() {
+        var clicked = false
+        setSettingsContent(
+            isServiceRestarting = true,
+            onRestartServiceClick = { clicked = true },
+        )
+
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Restart scan service"))
+        composeTestRule.onNodeWithText("Restart scan service").performClick()
+
+        assertTrue(!clicked)
+    }
+
+    @Test
+    fun `バッテリー最適化アイテムをタップするとonBatteryOptimizationClickが呼ばれる`() {
+        var clicked = false
+        setSettingsContent(onBatteryOptimizationClick = { clicked = true })
+
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst()
+            .performScrollToNode(hasText("Disable battery optimization"))
+        composeTestRule.onNodeWithText("Disable battery optimization").performClick()
+
+        assertTrue(clicked)
+    }
+
+    @Test
     fun `テーマアイテムをタップするとonThemeModeClickが呼ばれる`() {
         var clicked = false
-        composeTestRule.setContent {
-            SettingsContent(
-                permissionStates = emptyMap(),
-                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
-                overlayEnabled = false,
-                updateAvailable = false,
-                isNotificationsDisabled = false,
-                isDeviceScanChannelDisabled = false,
-                isServiceRestarting = false,
-                columns = 1,
-                themeSettings = ThemeSettings(),
-                onPermissionWarningClick = {},
-                onBluetoothWarningClick = {},
-                onNotificationWarningClick = {},
-                onDeviceScanChannelWarningClick = {},
-                onOverlayToggle = {},
-                overlayPosition = OverlayPosition.BOTTOM,
-                onOverlayPositionClick = {},
-                onRestartServiceClick = {},
-                onThemeModeClick = { clicked = true },
-                onDynamicColorToggle = {},
-                onUpdateClick = {},
-                onLicensesClick = {},
-                onDevicesClick = {},
-                onGithubClick = {},
-            )
-        }
+        setSettingsContent(onThemeModeClick = { clicked = true })
 
         composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Theme"))
         composeTestRule.onNodeWithText("Theme").performClick()
@@ -523,33 +254,10 @@ class SettingsContentTest {
     @Test
     fun `ダイナミックカラーがオフのときタップするとtrueでonDynamicColorToggleが呼ばれる`() {
         var toggledValue: Boolean? = null
-        composeTestRule.setContent {
-            SettingsContent(
-                permissionStates = emptyMap(),
-                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
-                overlayEnabled = false,
-                updateAvailable = false,
-                isNotificationsDisabled = false,
-                isDeviceScanChannelDisabled = false,
-                isServiceRestarting = false,
-                columns = 1,
-                themeSettings = ThemeSettings(useDynamicColor = false),
-                onPermissionWarningClick = {},
-                onBluetoothWarningClick = {},
-                onNotificationWarningClick = {},
-                onDeviceScanChannelWarningClick = {},
-                onOverlayToggle = {},
-                overlayPosition = OverlayPosition.BOTTOM,
-                onOverlayPositionClick = {},
-                onRestartServiceClick = {},
-                onThemeModeClick = {},
-                onDynamicColorToggle = { toggledValue = it },
-                onUpdateClick = {},
-                onLicensesClick = {},
-                onDevicesClick = {},
-                onGithubClick = {},
-            )
-        }
+        setSettingsContent(
+            themeSettings = ThemeSettings(useDynamicColor = false),
+            onDynamicColorToggle = { toggledValue = it },
+        )
 
         composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Dynamic Color"))
         composeTestRule.onNodeWithText("Dynamic Color").performClick()
@@ -560,33 +268,10 @@ class SettingsContentTest {
     @Test
     fun `ダイナミックカラーがオンのときタップするとfalseでonDynamicColorToggleが呼ばれる`() {
         var toggledValue: Boolean? = null
-        composeTestRule.setContent {
-            SettingsContent(
-                permissionStates = emptyMap(),
-                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
-                overlayEnabled = false,
-                updateAvailable = false,
-                isNotificationsDisabled = false,
-                isDeviceScanChannelDisabled = false,
-                isServiceRestarting = false,
-                columns = 1,
-                themeSettings = ThemeSettings(useDynamicColor = true),
-                onPermissionWarningClick = {},
-                onBluetoothWarningClick = {},
-                onNotificationWarningClick = {},
-                onDeviceScanChannelWarningClick = {},
-                onOverlayToggle = {},
-                overlayPosition = OverlayPosition.BOTTOM,
-                onOverlayPositionClick = {},
-                onRestartServiceClick = {},
-                onThemeModeClick = {},
-                onDynamicColorToggle = { toggledValue = it },
-                onUpdateClick = {},
-                onLicensesClick = {},
-                onDevicesClick = {},
-                onGithubClick = {},
-            )
-        }
+        setSettingsContent(
+            themeSettings = ThemeSettings(useDynamicColor = true),
+            onDynamicColorToggle = { toggledValue = it },
+        )
 
         composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Dynamic Color"))
         composeTestRule.onNodeWithText("Dynamic Color").performClick()
@@ -597,69 +282,40 @@ class SettingsContentTest {
     @Test
     @Config(sdk = [30])
     fun `Android12未満ではダイナミックカラーアイテムが表示されない`() {
-        composeTestRule.setContent {
-            SettingsContent(
-                permissionStates = emptyMap(),
-                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
-                overlayEnabled = false,
-                updateAvailable = false,
-                isNotificationsDisabled = false,
-                isDeviceScanChannelDisabled = false,
-                isServiceRestarting = false,
-                columns = 1,
-                themeSettings = ThemeSettings(),
-                onPermissionWarningClick = {},
-                onBluetoothWarningClick = {},
-                onNotificationWarningClick = {},
-                onDeviceScanChannelWarningClick = {},
-                onOverlayToggle = {},
-                overlayPosition = OverlayPosition.BOTTOM,
-                onOverlayPositionClick = {},
-                onRestartServiceClick = {},
-                onThemeModeClick = {},
-                onDynamicColorToggle = {},
-                onUpdateClick = {},
-                onLicensesClick = {},
-                onDevicesClick = {},
-                onGithubClick = {},
-            )
-        }
+        setSettingsContent()
 
         composeTestRule.onNodeWithText("Dynamic Color").assertDoesNotExist()
     }
 
     @Test
-    fun `オーバーレイ位置アイテムをタップするとonOverlayPositionClickが呼ばれる`() {
+    fun `対応デバイスアイテムをタップするとonDevicesClickが呼ばれる`() {
         var clicked = false
-        composeTestRule.setContent {
-            SettingsContent(
-                permissionStates = emptyMap(),
-                bluetoothAdapterState = BluetoothAdapter.STATE_ON,
-                overlayEnabled = false,
-                overlayPosition = OverlayPosition.BOTTOM,
-                updateAvailable = false,
-                isNotificationsDisabled = false,
-                isDeviceScanChannelDisabled = false,
-                isServiceRestarting = false,
-                columns = 1,
-                themeSettings = ThemeSettings(),
-                onPermissionWarningClick = {},
-                onBluetoothWarningClick = {},
-                onNotificationWarningClick = {},
-                onDeviceScanChannelWarningClick = {},
-                onOverlayToggle = {},
-                onOverlayPositionClick = { clicked = true },
-                onRestartServiceClick = {},
-                onThemeModeClick = {},
-                onDynamicColorToggle = {},
-                onUpdateClick = {},
-                onLicensesClick = {},
-                onDevicesClick = {},
-                onGithubClick = {},
-            )
-        }
+        setSettingsContent(onDevicesClick = { clicked = true })
 
-        composeTestRule.onNodeWithText("Overlay position").performClick()
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Compatible devices"))
+        composeTestRule.onNodeWithText("Compatible devices").performClick()
+
+        assertTrue(clicked)
+    }
+
+    @Test
+    fun `ライセンスアイテムをタップするとonLicensesClickが呼ばれる`() {
+        var clicked = false
+        setSettingsContent(onLicensesClick = { clicked = true })
+
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Open Source Licenses"))
+        composeTestRule.onNodeWithText("Open Source Licenses").performClick()
+
+        assertTrue(clicked)
+    }
+
+    @Test
+    fun `GithubレポジトリアイテムをタップするとonGithubClickが呼ばれる`() {
+        var clicked = false
+        setSettingsContent(onGithubClick = { clicked = true })
+
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("GitHub Repository"))
+        composeTestRule.onNodeWithText("GitHub Repository").performClick()
 
         assertTrue(clicked)
     }

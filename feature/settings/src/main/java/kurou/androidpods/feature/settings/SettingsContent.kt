@@ -61,6 +61,7 @@ internal fun SettingsContent(
     isNotificationsDisabled: Boolean,
     isDeviceScanChannelDisabled: Boolean,
     isServiceRestarting: Boolean,
+    isBatteryOptimizationExempt: Boolean,
     columns: Int,
     themeSettings: ThemeSettings,
     onPermissionWarningClick: () -> Unit,
@@ -70,6 +71,7 @@ internal fun SettingsContent(
     onOverlayToggle: (Boolean) -> Unit,
     onOverlayPositionClick: () -> Unit,
     onRestartServiceClick: () -> Unit,
+    onBatteryOptimizationClick: () -> Unit,
     onThemeModeClick: () -> Unit,
     onDynamicColorToggle: (Boolean) -> Unit,
     onUpdateClick: () -> Unit,
@@ -122,7 +124,9 @@ internal fun SettingsContent(
         )
         scanServiceSectionItems(
             isServiceRestarting = isServiceRestarting,
+            isBatteryOptimizationExempt = isBatteryOptimizationExempt,
             onRestartServiceClick = onRestartServiceClick,
+            onBatteryOptimizationClick = onBatteryOptimizationClick,
         )
         appearanceSectionItems(
             themeSettings = themeSettings,
@@ -247,7 +251,9 @@ private fun LazyGridScope.overlaySectionItems(
 
 private fun LazyGridScope.scanServiceSectionItems(
     isServiceRestarting: Boolean,
+    isBatteryOptimizationExempt: Boolean,
     onRestartServiceClick: () -> Unit,
+    onBatteryOptimizationClick: () -> Unit,
 ) {
     sectionLabel(R.string.scan_service_section_label)
     item(key = R.string.restart_service, span = { GridItemSpan(1) }) {
@@ -266,6 +272,19 @@ private fun LazyGridScope.scanServiceSectionItems(
                     contentDescription = null,
                 )
             }
+        }
+    }
+    item(key = R.string.battery_optimization_label, span = { GridItemSpan(1) }) {
+        SettingsItem(
+            label = stringResource(R.string.battery_optimization_label),
+            icon = painterResource(R.drawable.ic_battery_optimization),
+            onClick = onBatteryOptimizationClick,
+            modifier = Modifier.animateItem(),
+        ) {
+            Switch(
+                checked = isBatteryOptimizationExempt,
+                onCheckedChange = null,
+            )
         }
     }
 }
@@ -572,6 +591,8 @@ private fun SettingsContentPreviewNoWarning() {
         onOverlayToggle = {},
         onOverlayPositionClick = {},
         onRestartServiceClick = {},
+        onBatteryOptimizationClick = {},
+        isBatteryOptimizationExempt = false,
         themeSettings = ThemeSettings(),
         onThemeModeClick = {},
         onDynamicColorToggle = {},
@@ -602,6 +623,8 @@ private fun SettingsContentPreviewBluetoothUnavailable() {
         onOverlayToggle = {},
         onOverlayPositionClick = {},
         onRestartServiceClick = {},
+        onBatteryOptimizationClick = {},
+        isBatteryOptimizationExempt = false,
         themeSettings = ThemeSettings(),
         onThemeModeClick = {},
         onDynamicColorToggle = {},
@@ -636,6 +659,8 @@ private fun SettingsContentPreviewAllWarnings() {
         onOverlayToggle = {},
         onOverlayPositionClick = {},
         onRestartServiceClick = {},
+        onBatteryOptimizationClick = {},
+        isBatteryOptimizationExempt = false,
         themeSettings = ThemeSettings(),
         onThemeModeClick = {},
         onDynamicColorToggle = {},
@@ -670,6 +695,8 @@ private fun SettingsContentPreviewServiceRestarting() {
         onOverlayToggle = {},
         onOverlayPositionClick = {},
         onRestartServiceClick = {},
+        onBatteryOptimizationClick = {},
+        isBatteryOptimizationExempt = false,
         themeSettings = ThemeSettings(),
         onThemeModeClick = {},
         onDynamicColorToggle = {},
@@ -704,6 +731,8 @@ private fun SettingsContentPreviewTwoColumns() {
         onOverlayToggle = {},
         onOverlayPositionClick = {},
         onRestartServiceClick = {},
+        onBatteryOptimizationClick = {},
+        isBatteryOptimizationExempt = false,
         themeSettings = ThemeSettings(),
         onThemeModeClick = {},
         onDynamicColorToggle = {},
@@ -738,6 +767,8 @@ private fun SettingsContentPreviewThreeColumns() {
         onOverlayToggle = {},
         onOverlayPositionClick = {},
         onRestartServiceClick = {},
+        onBatteryOptimizationClick = {},
+        isBatteryOptimizationExempt = false,
         themeSettings = ThemeSettings(),
         onThemeModeClick = {},
         onDynamicColorToggle = {},

@@ -3,6 +3,7 @@ package kurou.androidpods.feature.settings
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.PowerManager
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -74,6 +75,14 @@ fun SettingsScreen(
             ActivityResultContracts.StartActivityForResult(),
         ) {
             viewModel.refreshOverlayState()
+        }
+
+    val batteryOptimizationLauncher =
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+        ) {
+            val pm = context.getSystemService(PowerManager::class.java)
+            viewModel.refreshBatteryOptimizationState(pm.isIgnoringBatteryOptimizations(context.packageName))
         }
 
     val launcher =
@@ -193,6 +202,18 @@ fun SettingsScreen(
                 snackbarHostState.showSnackbar(restartServiceMessage)
             }
         },
+        onBatteryOptimizationClick = {
+            val pm = context.getSystemService(PowerManager::class.java)
+            val intent = if (pm.isIgnoringBatteryOptimizations(context.packageName)) {
+                Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+            } else {
+                Intent(
+                    Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+                    "package:${context.packageName}".toUri(),
+                )
+            }
+            batteryOptimizationLauncher.launch(intent)
+        },
         onThemeModeClick = { showThemeModeDialog = true },
         onDynamicColorToggle = { enabled ->
             viewModel.updateThemeSettings(uiState.themeSettings.copy(useDynamicColor = enabled))
@@ -238,6 +259,8 @@ private fun SettingsEffects(
             )
         }
         viewModel.refreshOverlayState()
+        val pm = context.getSystemService(PowerManager::class.java)
+        viewModel.refreshBatteryOptimizationState(pm.isIgnoringBatteryOptimizations(context.packageName))
         val notificationManager = NotificationManagerCompat.from(context)
         val notificationsEnabled = notificationManager.areNotificationsEnabled()
         viewModel.refreshNotificationState(isDisabled = !notificationsEnabled)
@@ -276,6 +299,7 @@ private fun SettingsScaffold(
     onOverlayToggle: (Boolean) -> Unit,
     onOverlayPositionClick: () -> Unit,
     onRestartServiceClick: () -> Unit,
+    onBatteryOptimizationClick: () -> Unit,
     onThemeModeClick: () -> Unit,
     onDynamicColorToggle: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
@@ -299,6 +323,7 @@ private fun SettingsScaffold(
             isNotificationsDisabled = uiState.isNotificationsDisabled,
             isDeviceScanChannelDisabled = uiState.isDeviceScanChannelDisabled,
             isServiceRestarting = isServiceRestarting,
+            isBatteryOptimizationExempt = uiState.isBatteryOptimizationExempt,
             columns = columns,
             themeSettings = uiState.themeSettings,
             onPermissionWarningClick = onPermissionWarningClick,
@@ -312,6 +337,7 @@ private fun SettingsScaffold(
             onOverlayToggle = onOverlayToggle,
             onOverlayPositionClick = onOverlayPositionClick,
             onRestartServiceClick = onRestartServiceClick,
+            onBatteryOptimizationClick = onBatteryOptimizationClick,
             onThemeModeClick = onThemeModeClick,
             onDynamicColorToggle = onDynamicColorToggle,
             modifier = Modifier.padding(innerPadding),
