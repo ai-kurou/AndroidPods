@@ -46,6 +46,18 @@ Android モバイルアプリケーションのプロジェクト。**パブリ�
 
 Detektで指摘がある場合は修正してからレポートする。
 
+さらに、**Lintも実行してワーニングがないことを確認すること**。FQDN使用・非推奨API・不要なimportなどAndroid Studio上のワーニングを検出できる。
+
+```bash
+# 変更したモジュールのLintを実行（例: feature:settings を変更した場合）
+./gradlew :feature:settings:lintDebug
+
+# 複数モジュールを変更した場合は全体で実行
+./gradlew lintDebug
+```
+
+Lintで指摘がある場合は修正してからレポートする。
+
 さらに、**Composable画面を変更した場合は、スクリーンショットテストを実行して差分がないか確認すること**。
 
 ```bash
