@@ -141,6 +141,7 @@ class DeviceScanService : Service() {
                 .setSmallIcon(R.drawable.ic_notification)
                 .setContentText(contentText)
                 .setOngoing(true)
+                .setCategory(Notification.CATEGORY_SERVICE)
 
         val contentIntent = createLaunchPendingIntent(this)
         if (contentIntent != null) {
