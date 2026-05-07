@@ -30,6 +30,7 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.unmockkAll
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.runTest
 import kurou.androidpods.core.domain.CheckUpdateUseCase
 import kurou.androidpods.core.domain.GetAppleDevicesUseCase
 import kurou.androidpods.core.domain.GetBluetoothAdapterStateUseCase
@@ -401,6 +402,35 @@ class SettingsScreenTest {
         composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithText("Light").assertDoesNotExist()
+    }
+
+    @Test
+    fun `アップデートバナーをタップするとACTION_VIEWのインテントが発行される`() = runTest {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        grantRequiredPermissions(context)
+        val viewModel = createViewModel(BluetoothAdapter.STATE_ON)
+        coEvery { checkUpdateUseCase(any()) } returns Result.success(true)
+
+        composeTestRule.setContent {
+            SettingsScreen(
+                windowSizeClass = windowSizeClassOf(400f),
+                onStartScanService = {},
+                onStopScanService = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                viewModel = viewModel,
+            )
+        }
+        viewModel.checkUpdate("0.0.0")
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst()
+            .performScrollToNode(hasText("A new version is available. Tap to update."))
+        composeTestRule.onNodeWithText("A new version is available. Tap to update.").performClick()
+        composeTestRule.waitForIdle()
+
+        val started = shadowOf(composeTestRule.activity).nextStartedActivity
+        assertEquals(Intent.ACTION_VIEW, started?.action)
     }
 
     @Test
