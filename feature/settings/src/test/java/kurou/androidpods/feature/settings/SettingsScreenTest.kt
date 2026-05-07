@@ -175,6 +175,12 @@ class SettingsScreenTest {
         composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithText("Bluetooth Permission Required").assertExists()
+
+        composeTestRule.onNodeWithText("Open Settings").performClick()
+        composeTestRule.waitForIdle()
+
+        val started = shadowOf(composeTestRule.activity).nextStartedActivity
+        assertEquals(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, started?.action)
     }
 
     @Test
@@ -315,6 +321,11 @@ class SettingsScreenTest {
         composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithText("Top").assertExists()
+
+        composeTestRule.onNodeWithText("Top").performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Top").assertDoesNotExist()
     }
 
     @Test
