@@ -21,7 +21,6 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Warning
@@ -393,7 +392,7 @@ internal fun WarningBanner(text: String, onClick: () -> Unit, modifier: Modifier
         modifier =
             modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp))
+                .clip(MaterialTheme.shapes.medium)
                 .background(MaterialTheme.colorScheme.errorContainer)
                 .clickable(onClick = onClick)
                 .padding(12.dp),
@@ -442,7 +441,7 @@ private fun BluetoothWarningBanner(
         modifier =
             modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp))
+                .clip(MaterialTheme.shapes.medium)
                 .background(backgroundColor)
                 .then(
                     if (isBluetoothOff) {
@@ -488,7 +487,7 @@ private fun UpdateAvailableBanner(onClick: () -> Unit, modifier: Modifier = Modi
         modifier =
             modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp))
+                .clip(MaterialTheme.shapes.medium)
                 .background(MaterialTheme.colorScheme.primaryContainer)
                 .clickable(onClick = onClick)
                 .padding(12.dp),
