@@ -537,7 +537,7 @@ private fun SettingsItem(
         modifier = modifier
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.small)
-            .then(if (onClick != null && enabled) Modifier.clickable(onClick = onClick) else Modifier),
+            .then(if (onClick != null) Modifier.clickable(enabled = enabled, onClick = onClick) else Modifier),
     )
 }
 
