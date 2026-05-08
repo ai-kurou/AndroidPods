@@ -6,32 +6,32 @@ import org.junit.Test
 
 class ColorTest {
     @Test
-    fun `Purple80の色値が正しい`() {
-        assertEquals(Color(0xFFD0BCFF), Purple80)
+    fun `BlueGrey80の色値が正しい`() {
+        assertEquals(Color(0xFF81D3DB), BlueGrey80)
     }
 
     @Test
-    fun `PurpleGrey80の色値が正しい`() {
-        assertEquals(Color(0xFFCCC2DC), PurpleGrey80)
+    fun `BlueGreyNeutral80の色値が正しい`() {
+        assertEquals(Color(0xFFA5C8CE), BlueGreyNeutral80)
     }
 
     @Test
-    fun `Pink80の色値が正しい`() {
-        assertEquals(Color(0xFFEFB8C8), Pink80)
+    fun `CoolGrey80の色値が正しい`() {
+        assertEquals(Color(0xFFB9C8CC), CoolGrey80)
     }
 
     @Test
-    fun `Purple40の色値が正しい`() {
-        assertEquals(Color(0xFF6650a4), Purple40)
+    fun `BlueGrey40の色値が正しい`() {
+        assertEquals(Color(0xFF4A6268), BlueGrey40)
     }
 
     @Test
-    fun `PurpleGrey40の色値が正しい`() {
-        assertEquals(Color(0xFF625b71), PurpleGrey40)
+    fun `BlueGreyNeutral40の色値が正しい`() {
+        assertEquals(Color(0xFF525E62), BlueGreyNeutral40)
     }
 
     @Test
-    fun `Pink40の色値が正しい`() {
-        assertEquals(Color(0xFF7D5260), Pink40)
+    fun `CoolGrey40の色値が正しい`() {
+        assertEquals(Color(0xFF616971), CoolGrey40)
     }
 }
