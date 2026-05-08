@@ -22,7 +22,7 @@ class ThemeTest {
         composeTestRule.setContent {
             AndroidPodsTheme(darkTheme = false, dynamicColor = false) {
                 val primary = MaterialTheme.colorScheme.primary
-                assertEquals(Purple40, primary)
+                assertEquals(BlueGrey40, primary)
             }
         }
     }
@@ -32,7 +32,7 @@ class ThemeTest {
         composeTestRule.setContent {
             AndroidPodsTheme(darkTheme = true, dynamicColor = false) {
                 val primary = MaterialTheme.colorScheme.primary
-                assertEquals(Purple80, primary)
+                assertEquals(BlueGrey80, primary)
             }
         }
     }
@@ -42,7 +42,7 @@ class ThemeTest {
         composeTestRule.setContent {
             AndroidPodsTheme(darkTheme = false, dynamicColor = false) {
                 val secondary = MaterialTheme.colorScheme.secondary
-                assertEquals(PurpleGrey40, secondary)
+                assertEquals(BlueGreyNeutral40, secondary)
             }
         }
     }
@@ -52,7 +52,7 @@ class ThemeTest {
         composeTestRule.setContent {
             AndroidPodsTheme(darkTheme = true, dynamicColor = false) {
                 val secondary = MaterialTheme.colorScheme.secondary
-                assertEquals(PurpleGrey80, secondary)
+                assertEquals(BlueGreyNeutral80, secondary)
             }
         }
     }
@@ -62,7 +62,7 @@ class ThemeTest {
         composeTestRule.setContent {
             AndroidPodsTheme(darkTheme = false, dynamicColor = false) {
                 val tertiary = MaterialTheme.colorScheme.tertiary
-                assertEquals(Pink40, tertiary)
+                assertEquals(CoolGrey40, tertiary)
             }
         }
     }
@@ -72,7 +72,7 @@ class ThemeTest {
         composeTestRule.setContent {
             AndroidPodsTheme(darkTheme = true, dynamicColor = false) {
                 val tertiary = MaterialTheme.colorScheme.tertiary
-                assertEquals(Pink80, tertiary)
+                assertEquals(CoolGrey80, tertiary)
             }
         }
     }
@@ -95,7 +95,7 @@ class ThemeTest {
         composeTestRule.setContent {
             AndroidPodsTheme(darkTheme = false, dynamicColor = true) {
                 val primary = MaterialTheme.colorScheme.primary
-                assertEquals(Purple40, primary)
+                assertEquals(BlueGrey40, primary)
             }
         }
     }
@@ -106,7 +106,7 @@ class ThemeTest {
         composeTestRule.setContent {
             AndroidPodsTheme(darkTheme = true, dynamicColor = true) {
                 val primary = MaterialTheme.colorScheme.primary
-                assertEquals(Purple80, primary)
+                assertEquals(BlueGrey80, primary)
             }
         }
     }
@@ -121,7 +121,7 @@ class ThemeTest {
             }
         }
         assertNotEquals(Color.Unspecified, primary)
-        assertNotEquals(Purple40, primary)
+        assertNotEquals(BlueGrey40, primary)
     }
 
     @Test
@@ -134,6 +134,6 @@ class ThemeTest {
             }
         }
         assertNotEquals(Color.Unspecified, primary)
-        assertNotEquals(Purple80, primary)
+        assertNotEquals(BlueGrey80, primary)
     }
 }
