@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Looper
 import android.os.PowerManager
 import android.provider.Settings
 import androidx.activity.ComponentActivity
@@ -50,6 +51,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
+import java.util.concurrent.TimeUnit
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [35])
@@ -348,7 +350,7 @@ class SettingsScreenTest {
         composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithText("Restart scan service").performClick()
-        composeTestRule.mainClock.advanceTimeBy(5001)
+        shadowOf(Looper.getMainLooper()).idleFor(5001, TimeUnit.MILLISECONDS)
         composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithText("Scan service restarted").assertIsDisplayed()

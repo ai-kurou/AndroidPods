@@ -3,9 +3,13 @@ package kurou.androidpods.feature.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -20,6 +24,12 @@ import kurou.androidpods.core.domain.OverlayPositionUseCase
 import kurou.androidpods.core.domain.ThemeSettings
 import kurou.androidpods.core.domain.ThemeSettingsUseCase
 import javax.inject.Inject
+
+sealed interface ServiceEvent {
+    data object StopScan : ServiceEvent
+    data object StartScan : ServiceEvent
+    data object ShowRestartSnackbar : ServiceEvent
+}
 
 private data class UseCaseState(
     val bluetoothAdapterState: Int?,
@@ -47,6 +57,7 @@ data class SettingsUiState(
     val isDeviceScanChannelDisabled: Boolean = false,
     val isBatteryOptimizationExempt: Boolean = false,
     val permissionStates: Map<String, Boolean> = emptyMap(),
+    val isServiceRestarting: Boolean = false,
 )
 
 @HiltViewModel
@@ -64,6 +75,9 @@ class SettingsViewModel @Inject constructor(
     private val _isDeviceScanChannelDisabled = MutableStateFlow(false)
     private val _isBatteryOptimizationExempt = MutableStateFlow(false)
     private val _permissionStates = MutableStateFlow<Map<String, Boolean>>(emptyMap())
+    private val _isServiceRestarting = MutableStateFlow(false)
+    private val _serviceEvents = MutableSharedFlow<ServiceEvent>()
+    val serviceEvents: SharedFlow<ServiceEvent> = _serviceEvents.asSharedFlow()
 
     val uiState: StateFlow<SettingsUiState> =
         combine(
@@ -96,7 +110,8 @@ class SettingsViewModel @Inject constructor(
                 )
             },
             _permissionStates,
-        ) { useCaseState, internalState, permissionStates ->
+            _isServiceRestarting,
+        ) { useCaseState, internalState, permissionStates, isServiceRestarting ->
             SettingsUiState(
                 bluetoothAdapterState = useCaseState.bluetoothAdapterState,
                 appleDevices = useCaseState.appleDevices,
@@ -108,6 +123,7 @@ class SettingsViewModel @Inject constructor(
                 isDeviceScanChannelDisabled = internalState.isDeviceScanChannelDisabled,
                 isBatteryOptimizationExempt = internalState.isBatteryOptimizationExempt,
                 permissionStates = permissionStates,
+                isServiceRestarting = isServiceRestarting,
             )
         }.stateIn(
             scope = viewModelScope,
@@ -139,6 +155,17 @@ class SettingsViewModel @Inject constructor(
 
     fun refreshPermissionStates(states: Map<String, Boolean>) {
         _permissionStates.update { states }
+    }
+
+    fun restartService() {
+        viewModelScope.launch {
+            _isServiceRestarting.update { true }
+            _serviceEvents.emit(ServiceEvent.StopScan)
+            _serviceEvents.emit(ServiceEvent.StartScan)
+            delay(5_000)
+            _isServiceRestarting.update { false }
+            _serviceEvents.emit(ServiceEvent.ShowRestartSnackbar)
+        }
     }
 
     fun updateThemeSettings(settings: ThemeSettings) {

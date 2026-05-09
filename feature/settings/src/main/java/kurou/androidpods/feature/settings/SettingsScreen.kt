@@ -20,7 +20,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -33,8 +32,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.window.core.layout.WindowSizeClass
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kurou.androidpods.core.domain.NotificationChannels
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,7 +47,6 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
     val permissions = requiredPermissions()
-    val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -58,7 +54,18 @@ fun SettingsScreen(
     var showThemeModeDialog by remember { mutableStateOf(false) }
     var showOverlayPositionDialog by remember { mutableStateOf(false) }
     var initialRequestDone by remember { mutableStateOf(false) }
-    var isServiceRestarting by remember { mutableStateOf(false) }
+
+    val restartServiceMessage = stringResource(R.string.restart_service_completed)
+
+    LaunchedEffect(viewModel) {
+        viewModel.serviceEvents.collect { event ->
+            when (event) {
+                ServiceEvent.StopScan -> onStopScanService()
+                ServiceEvent.StartScan -> onStartScanService()
+                ServiceEvent.ShowRestartSnackbar -> snackbarHostState.showSnackbar(restartServiceMessage)
+            }
+        }
+    }
 
     val overlaySettingsLauncher =
         rememberLauncherForActivityResult(
@@ -141,14 +148,12 @@ fun SettingsScreen(
             else -> 1
         }
 
-    val restartServiceMessage = stringResource(R.string.restart_service_completed)
-
     SettingsScaffold(
         modifier = modifier,
         snackbarHostState = snackbarHostState,
         permissionStates = uiState.permissionStates,
         uiState = uiState,
-        isServiceRestarting = isServiceRestarting,
+        isServiceRestarting = uiState.isServiceRestarting,
         columns = columns,
         onPermissionWarningClick = {
             val intent =
@@ -184,16 +189,7 @@ fun SettingsScreen(
                 )
             overlaySettingsLauncher.launch(intent)
         },
-        onRestartServiceClick = {
-            scope.launch {
-                isServiceRestarting = true
-                onStopScanService()
-                onStartScanService()
-                delay(5000)
-                isServiceRestarting = false
-                snackbarHostState.showSnackbar(restartServiceMessage)
-            }
-        },
+        onRestartServiceClick = viewModel::restartService,
         onBatteryOptimizationClick = {
             val pm = context.getSystemService(PowerManager::class.java)
             val intent = if (pm.isIgnoringBatteryOptimizations(context.packageName)) {
