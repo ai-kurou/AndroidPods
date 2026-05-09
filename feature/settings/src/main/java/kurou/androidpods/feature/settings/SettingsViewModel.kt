@@ -46,6 +46,12 @@ private data class InternalState(
     val isBatteryOptimizationExempt: Boolean,
 )
 
+private data class DialogState(
+    val showPermissionRequiredDialog: Boolean = false,
+    val showThemeModeDialog: Boolean = false,
+    val showOverlayPositionDialog: Boolean = false,
+)
+
 data class SettingsUiState(
     val bluetoothAdapterState: Int? = null,
     val appleDevices: Map<String, AppleDevice> = emptyMap(),
@@ -58,6 +64,9 @@ data class SettingsUiState(
     val isBatteryOptimizationExempt: Boolean = false,
     val permissionStates: Map<String, Boolean> = emptyMap(),
     val isServiceRestarting: Boolean = false,
+    val showPermissionRequiredDialog: Boolean = false,
+    val showThemeModeDialog: Boolean = false,
+    val showOverlayPositionDialog: Boolean = false,
 )
 
 @HiltViewModel
@@ -75,6 +84,7 @@ class SettingsViewModel @Inject constructor(
     private val _isBatteryOptimizationExempt = MutableStateFlow(false)
     private val _permissionStates = MutableStateFlow<Map<String, Boolean>>(emptyMap())
     private val _isServiceRestarting = MutableStateFlow(false)
+    private val _dialogState = MutableStateFlow(DialogState())
     private val _serviceEvents = MutableSharedFlow<ServiceEvent>()
     val serviceEvents: SharedFlow<ServiceEvent> = _serviceEvents.asSharedFlow()
 
@@ -108,7 +118,8 @@ class SettingsViewModel @Inject constructor(
             },
             _permissionStates,
             _isServiceRestarting,
-        ) { useCaseState, internalState, permissionStates, isServiceRestarting ->
+            _dialogState,
+        ) { useCaseState, internalState, permissionStates, isServiceRestarting, dialogState ->
             SettingsUiState(
                 bluetoothAdapterState = useCaseState.bluetoothAdapterState,
                 appleDevices = useCaseState.appleDevices,
@@ -121,12 +132,33 @@ class SettingsViewModel @Inject constructor(
                 isBatteryOptimizationExempt = internalState.isBatteryOptimizationExempt,
                 permissionStates = permissionStates,
                 isServiceRestarting = isServiceRestarting,
+                showPermissionRequiredDialog = dialogState.showPermissionRequiredDialog,
+                showThemeModeDialog = dialogState.showThemeModeDialog,
+                showOverlayPositionDialog = dialogState.showOverlayPositionDialog,
             )
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
             initialValue = SettingsUiState(),
         )
+
+    fun showPermissionRequiredDialog() =
+        _dialogState.update { it.copy(showPermissionRequiredDialog = true) }
+
+    fun dismissPermissionRequiredDialog() =
+        _dialogState.update { it.copy(showPermissionRequiredDialog = false) }
+
+    fun showThemeModeDialog() =
+        _dialogState.update { it.copy(showThemeModeDialog = true) }
+
+    fun dismissThemeModeDialog() =
+        _dialogState.update { it.copy(showThemeModeDialog = false) }
+
+    fun showOverlayPositionDialog() =
+        _dialogState.update { it.copy(showOverlayPositionDialog = true) }
+
+    fun dismissOverlayPositionDialog() =
+        _dialogState.update { it.copy(showOverlayPositionDialog = false) }
 
     fun checkUpdate(currentVersion: String) {
         viewModelScope.launch {

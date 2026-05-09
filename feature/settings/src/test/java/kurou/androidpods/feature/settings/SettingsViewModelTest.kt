@@ -30,6 +30,8 @@ import kurou.androidpods.core.domain.ThemeSettings
 import kurou.androidpods.core.domain.ThemeSettingsUseCase
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
@@ -317,4 +319,55 @@ class SettingsViewModelTest {
             overlayPositionUseCase,
         )
     }
+
+    @Test
+    fun `showPermissionRequiredDialogを呼ぶとuiState_showPermissionRequiredDialogがtrueになる`() =
+        runTest {
+            fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
+            viewModel.showPermissionRequiredDialog()
+            assertTrue(viewModel.uiState.value.showPermissionRequiredDialog)
+        }
+
+    @Test
+    fun `dismissPermissionRequiredDialogを呼ぶとuiState_showPermissionRequiredDialogがfalseになる`() =
+        runTest {
+            fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
+            viewModel.showPermissionRequiredDialog()
+            viewModel.dismissPermissionRequiredDialog()
+            assertFalse(viewModel.uiState.value.showPermissionRequiredDialog)
+        }
+
+    @Test
+    fun `showThemeModeDialogを呼ぶとuiState_showThemeModeDialogがtrueになる`() =
+        runTest {
+            fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
+            viewModel.showThemeModeDialog()
+            assertTrue(viewModel.uiState.value.showThemeModeDialog)
+        }
+
+    @Test
+    fun `dismissThemeModeDialogを呼ぶとuiState_showThemeModeDialogがfalseになる`() =
+        runTest {
+            fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
+            viewModel.showThemeModeDialog()
+            viewModel.dismissThemeModeDialog()
+            assertFalse(viewModel.uiState.value.showThemeModeDialog)
+        }
+
+    @Test
+    fun `showOverlayPositionDialogを呼ぶとuiState_showOverlayPositionDialogがtrueになる`() =
+        runTest {
+            fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
+            viewModel.showOverlayPositionDialog()
+            assertTrue(viewModel.uiState.value.showOverlayPositionDialog)
+        }
+
+    @Test
+    fun `dismissOverlayPositionDialogを呼ぶとuiState_showOverlayPositionDialogがfalseになる`() =
+        runTest {
+            fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
+            viewModel.showOverlayPositionDialog()
+            viewModel.dismissOverlayPositionDialog()
+            assertFalse(viewModel.uiState.value.showOverlayPositionDialog)
+        }
 }
