@@ -13,16 +13,17 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import kotlinx.serialization.Serializable
 import kurou.androidpods.feature.devices.DevicesScreen
 import kurou.androidpods.feature.licenses.LicensesScreen
 import kurou.androidpods.feature.onboarding.OnboardingScreen
 import kurou.androidpods.feature.settings.SettingsScreen
 
-private object Route {
-    const val ONBOARDING = "onboarding"
-    const val SETTINGS = "settings"
-    const val LICENSES = "licenses"
-    const val DEVICES = "devices"
+private sealed interface Route {
+    @Serializable data object Onboarding : Route
+    @Serializable data object Settings : Route
+    @Serializable data object Licenses : Route
+    @Serializable data object Devices : Route
 }
 
 @Composable
@@ -35,7 +36,7 @@ fun AppScaffold(
 ) {
     val navController = rememberNavController()
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
-    val startDestination = if (isFirstLaunch) Route.ONBOARDING else Route.SETTINGS
+    val startDestination: Route = if (isFirstLaunch) Route.Onboarding else Route.Settings
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -50,32 +51,32 @@ fun AppScaffold(
             popEnterTransition = { slideInHorizontally { -it } },
             popExitTransition = { slideOutHorizontally { it } },
         ) {
-            composable(Route.ONBOARDING) {
+            composable<Route.Onboarding> {
                 OnboardingScreen(
                     onComplete = {
                         onOnboardingComplete()
-                        navController.navigate(Route.SETTINGS) {
-                            popUpTo(Route.ONBOARDING) { inclusive = true }
+                        navController.navigate(Route.Settings) {
+                            popUpTo<Route.Onboarding> { inclusive = true }
                         }
                     },
                 )
             }
-            composable(Route.SETTINGS) {
+            composable<Route.Settings> {
                 SettingsScreen(
                     windowSizeClass = windowSizeClass,
                     onStartScanService = onStartScanService,
                     onStopScanService = onStopScanService,
-                    onLicensesClick = { navController.navigate(Route.LICENSES) },
-                    onDevicesClick = { navController.navigate(Route.DEVICES) },
+                    onLicensesClick = { navController.navigate(Route.Licenses) },
+                    onDevicesClick = { navController.navigate(Route.Devices) },
                 )
             }
-            composable(Route.DEVICES) {
+            composable<Route.Devices> {
                 DevicesScreen(
                     onBack = { navController.popBackStack() },
                     windowSizeClass = windowSizeClass,
                 )
             }
-            composable(Route.LICENSES) {
+            composable<Route.Licenses> {
                 LicensesScreen(
                     onBack = { navController.popBackStack() },
                 )
