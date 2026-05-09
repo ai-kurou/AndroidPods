@@ -33,7 +33,7 @@ internal class ThemeSettingsRepositoryImpl @Inject constructor(
             .map { preferences ->
                 val mode =
                     preferences[themeModeKey]
-                        ?.let { runCatching { ThemeMode.valueOf(it) }.getOrNull() }
+                        ?.let { try { ThemeMode.valueOf(it) } catch (_: IllegalArgumentException) { null } }
                         ?: ThemeMode.SYSTEM
                 val dynamicColor = preferences[dynamicColorKey] ?: true
                 ThemeSettings(themeMode = mode, useDynamicColor = dynamicColor)
