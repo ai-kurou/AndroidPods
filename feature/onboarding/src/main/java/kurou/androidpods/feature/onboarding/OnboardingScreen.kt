@@ -17,16 +17,16 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.core.content.getSystemService
 import androidx.core.net.toUri
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
@@ -41,14 +41,13 @@ private fun requiredPermissions(): Array<String> =
 fun OnboardingScreen(
     onComplete: () -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: OnboardingViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
     val isPreview = LocalInspectionMode.current
     val pagerState = rememberPagerState(pageCount = { PAGE_COUNT })
     val coroutineScope = rememberCoroutineScope()
-    var showPermissionDeniedDialog by remember { mutableStateOf(false) }
-    var showBluetoothDeniedDialog by remember { mutableStateOf(false) }
-    var showBluetoothUnavailableDialog by remember { mutableStateOf(false) }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val bluetoothAdapter =
         remember {
             if (isPreview) null else context.getSystemService<BluetoothManager>()?.adapter
@@ -64,7 +63,7 @@ fun OnboardingScreen(
                         pagerState.animateScrollToPage(pagerState.currentPage + 1)
                     }
                 } else {
-                    showPermissionDeniedDialog = true
+                    viewModel.showPermissionDenied()
                 }
             }
         } else {
@@ -92,7 +91,7 @@ fun OnboardingScreen(
                 if (result.resultCode == Activity.RESULT_OK) {
                     onComplete()
                 } else {
-                    showBluetoothDeniedDialog = true
+                    viewModel.showBluetoothDenied()
                 }
             }
         } else {
@@ -103,7 +102,7 @@ fun OnboardingScreen(
         LaunchedEffect(pagerState) {
             snapshotFlow { pagerState.currentPage }.collect { page ->
                 if (page == BLUETOOTH_PAGE && bluetoothAdapter == null) {
-                    showBluetoothUnavailableDialog = true
+                    viewModel.showBluetoothUnavailable()
                 }
             }
         }
@@ -119,12 +118,12 @@ fun OnboardingScreen(
     }
 
     OnboardingDialogs(
-        showPermissionDeniedDialog = showPermissionDeniedDialog,
-        showBluetoothUnavailableDialog = showBluetoothUnavailableDialog,
-        showBluetoothDeniedDialog = showBluetoothDeniedDialog,
-        onDismissPermissionDenied = { showPermissionDeniedDialog = false },
+        showPermissionDeniedDialog = uiState.showPermissionDeniedDialog,
+        showBluetoothUnavailableDialog = uiState.showBluetoothUnavailableDialog,
+        showBluetoothDeniedDialog = uiState.showBluetoothDeniedDialog,
+        onDismissPermissionDenied = viewModel::dismissPermissionDenied,
         onConfirmPermissionDenied = {
-            showPermissionDeniedDialog = false
+            viewModel.dismissPermissionDenied()
             val intent =
                 Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                     data = Uri.fromParts("package", context.packageName, null)
@@ -132,12 +131,12 @@ fun OnboardingScreen(
             context.startActivity(intent)
         },
         onDismissBluetoothUnavailable = {
-            showBluetoothUnavailableDialog = false
+            viewModel.dismissBluetoothUnavailable()
             onComplete()
         },
-        onDismissBluetoothDenied = { showBluetoothDeniedDialog = false },
+        onDismissBluetoothDenied = viewModel::dismissBluetoothDenied,
         onConfirmBluetoothDenied = {
-            showBluetoothDeniedDialog = false
+            viewModel.dismissBluetoothDenied()
             context.startActivity(Intent(Settings.ACTION_BLUETOOTH_SETTINGS))
         },
     )
@@ -162,7 +161,7 @@ fun OnboardingScreen(
                     bluetoothEnable = bluetoothEnableLauncher,
                 ),
                 onComplete = onComplete,
-                onBluetoothUnavailable = { showBluetoothUnavailableDialog = true },
+                onBluetoothUnavailable = viewModel::showBluetoothUnavailable,
                 onScrollToNextPage = {
                     coroutineScope.launch {
                         pagerState.animateScrollToPage(pagerState.currentPage + 1)
