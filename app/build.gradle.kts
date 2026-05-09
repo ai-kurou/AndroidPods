@@ -114,7 +114,3 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
-
-roborazzi {
-    outputDir.set(file("src/test/snapshots"))
-}
