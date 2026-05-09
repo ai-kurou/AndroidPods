@@ -55,7 +55,10 @@ class OnboardingScreenTest {
         if (btEnabled) shadowOf(btAdapter(context)).setEnabled(true)
         grantRequiredPermissions(context)
         ShadowSettings.setCanDrawOverlays(true)
-        composeTestRule.setContent { OnboardingScreen(onComplete = onComplete) }
+        val viewModel = OnboardingViewModel()
+        composeTestRule.setContent {
+            OnboardingScreen(onComplete = onComplete, viewModel = viewModel)
+        }
     }
 
     private fun clickToPage(targetPage: Int) {
@@ -143,7 +146,10 @@ class OnboardingScreenTest {
         val context = ApplicationProvider.getApplicationContext<Context>()
         grantRequiredPermissions(context)
         ShadowSettings.setCanDrawOverlays(false)
-        composeTestRule.setContent { OnboardingScreen(onComplete = {}) }
+        val viewModel = OnboardingViewModel()
+        composeTestRule.setContent {
+            OnboardingScreen(onComplete = {}, viewModel = viewModel)
+        }
 
         clickToPage(2)
         composeTestRule.onNodeWithText("Allow Overlay").performClick()
@@ -215,8 +221,9 @@ class OnboardingScreenTest {
     }
 
     private fun assertSwipeDoesNotNavigate() {
+        val viewModel = OnboardingViewModel()
         composeTestRule.setContent {
-            OnboardingScreen(onComplete = {})
+            OnboardingScreen(onComplete = {}, viewModel = viewModel)
         }
 
         composeTestRule.onNodeWithTag("lottie_animation").assertIsDisplayed()

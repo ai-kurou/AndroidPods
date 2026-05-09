@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Looper
 import android.os.PowerManager
 import android.provider.Settings
 import androidx.activity.ComponentActivity
@@ -50,6 +51,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
+import java.util.concurrent.TimeUnit
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [35])
@@ -59,7 +61,7 @@ class SettingsScreenTest {
 
     private val btUseCase = mockk<GetBluetoothAdapterStateUseCase>()
     private val appleDevicesUseCase = mockk<GetAppleDevicesUseCase>(relaxUnitFun = true)
-    private val overlayUseCase = mockk<GetOverlaySettingsUseCase>()
+    private val overlayUseCase = mockk<GetOverlaySettingsUseCase>(relaxUnitFun = true)
     private val checkUpdateUseCase = mockk<CheckUpdateUseCase>()
     private val themeSettingsUseCase = mockk<ThemeSettingsUseCase>()
     private val overlayPositionUseCase = mockk<OverlayPositionUseCase>(relaxUnitFun = true)
@@ -82,7 +84,7 @@ class SettingsScreenTest {
     private fun createViewModel(bluetoothAdapterState: Int): SettingsViewModel {
         every { btUseCase.observe() } returns MutableStateFlow(bluetoothAdapterState)
         every { appleDevicesUseCase.observe() } returns MutableStateFlow(emptyMap())
-        every { overlayUseCase.isEnabled() } returns false
+        every { overlayUseCase.observe() } returns MutableStateFlow(false)
         every { themeSettingsUseCase.observe() } returns MutableStateFlow(ThemeSettings())
         every { overlayPositionUseCase.observe() } returns MutableStateFlow(OverlayPosition.BOTTOM)
         coEvery { themeSettingsUseCase.update(any()) } just Runs
@@ -348,7 +350,7 @@ class SettingsScreenTest {
         composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithText("Restart scan service").performClick()
-        composeTestRule.mainClock.advanceTimeBy(5001)
+        shadowOf(Looper.getMainLooper()).idleFor(5001, TimeUnit.MILLISECONDS)
         composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithText("Scan service restarted").assertIsDisplayed()

@@ -18,10 +18,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -34,8 +32,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.window.core.layout.WindowSizeClass
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kurou.androidpods.core.domain.NotificationChannels
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,22 +47,23 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
     val permissions = requiredPermissions()
-    val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    val permissionStates = remember { mutableStateMapOf<String, Boolean>() }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showSettingsDialog by remember { mutableStateOf(false) }
     var showThemeModeDialog by remember { mutableStateOf(false) }
     var showOverlayPositionDialog by remember { mutableStateOf(false) }
     var initialRequestDone by remember { mutableStateOf(false) }
-    var isServiceRestarting by remember { mutableStateOf(false) }
 
-    // 初期状態を設定
-    if (permissionStates.isEmpty()) {
-        permissions.forEach { permission ->
-            permissionStates[permission] =
-                ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+    val restartServiceMessage = stringResource(R.string.restart_service_completed)
+
+    LaunchedEffect(viewModel) {
+        viewModel.serviceEvents.collect { event ->
+            when (event) {
+                ServiceEvent.StopScan -> onStopScanService()
+                ServiceEvent.StartScan -> onStartScanService()
+                ServiceEvent.ShowRestartSnackbar -> snackbarHostState.showSnackbar(restartServiceMessage)
+            }
         }
     }
 
@@ -89,9 +86,7 @@ fun SettingsScreen(
         rememberLauncherForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions(),
         ) { results ->
-            results.forEach { (permission, granted) ->
-                permissionStates[permission] = granted
-            }
+            viewModel.refreshPermissionStates(results)
             initialRequestDone = true
         }
 
@@ -99,10 +94,14 @@ fun SettingsScreen(
         permissions = permissions,
         initialRequestDone = initialRequestDone,
         onLaunchPermissions = { launcher.launch(it) },
-        onUpdatePermissionState = { permission, granted -> permissionStates[permission] = granted },
         onShowSettingsDialog = { showSettingsDialog = true },
         onStartScanService = onStartScanService,
-        viewModel = viewModel,
+        onCheckUpdate = viewModel::checkUpdate,
+        onRefreshOverlayState = viewModel::refreshOverlayState,
+        onRefreshBatteryOptimizationState = viewModel::refreshBatteryOptimizationState,
+        onRefreshNotificationState = viewModel::refreshNotificationState,
+        onRefreshDeviceScanChannelState = viewModel::refreshDeviceScanChannelState,
+        onRefreshPermissionStates = viewModel::refreshPermissionStates,
     )
 
     // 設定画面への誘導ダイアログ
@@ -149,14 +148,12 @@ fun SettingsScreen(
             else -> 1
         }
 
-    val restartServiceMessage = stringResource(R.string.restart_service_completed)
-
     SettingsScaffold(
         modifier = modifier,
         snackbarHostState = snackbarHostState,
-        permissionStates = permissionStates,
+        permissionStates = uiState.permissionStates,
         uiState = uiState,
-        isServiceRestarting = isServiceRestarting,
+        isServiceRestarting = uiState.isServiceRestarting,
         columns = columns,
         onPermissionWarningClick = {
             val intent =
@@ -192,16 +189,7 @@ fun SettingsScreen(
                 )
             overlaySettingsLauncher.launch(intent)
         },
-        onRestartServiceClick = {
-            scope.launch {
-                isServiceRestarting = true
-                onStopScanService()
-                onStartScanService()
-                delay(5000)
-                isServiceRestarting = false
-                snackbarHostState.showSnackbar(restartServiceMessage)
-            }
-        },
+        onRestartServiceClick = viewModel::restartService,
         onBatteryOptimizationClick = {
             val pm = context.getSystemService(PowerManager::class.java)
             val intent = if (pm.isIgnoringBatteryOptimizations(context.packageName)) {
@@ -227,10 +215,14 @@ private fun SettingsEffects(
     permissions: List<String>,
     initialRequestDone: Boolean,
     onLaunchPermissions: (Array<String>) -> Unit,
-    onUpdatePermissionState: (String, Boolean) -> Unit,
     onShowSettingsDialog: () -> Unit,
     onStartScanService: () -> Unit,
-    viewModel: SettingsViewModel,
+    onCheckUpdate: (String) -> Unit,
+    onRefreshOverlayState: () -> Unit,
+    onRefreshBatteryOptimizationState: (Boolean) -> Unit,
+    onRefreshNotificationState: (Boolean) -> Unit,
+    onRefreshDeviceScanChannelState: (Boolean) -> Unit,
+    onRefreshPermissionStates: (Map<String, Boolean>) -> Unit,
 ) {
     val context = LocalContext.current
 
@@ -248,24 +240,23 @@ private fun SettingsEffects(
             runCatching {
                 context.packageManager.getPackageInfo(context.packageName, 0).versionName
             }.getOrNull() ?: return@LaunchedEffect
-        viewModel.checkUpdate(versionName)
+        onCheckUpdate(versionName)
     }
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-        permissions.forEach { permission ->
-            onUpdatePermissionState(
-                permission,
-                ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED,
-            )
-        }
-        viewModel.refreshOverlayState()
+        onRefreshPermissionStates(
+            permissions.associateWith {
+                ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+            },
+        )
+        onRefreshOverlayState()
         val pm = context.getSystemService(PowerManager::class.java)
-        viewModel.refreshBatteryOptimizationState(pm.isIgnoringBatteryOptimizations(context.packageName))
+        onRefreshBatteryOptimizationState(pm.isIgnoringBatteryOptimizations(context.packageName))
         val notificationManager = NotificationManagerCompat.from(context)
         val notificationsEnabled = notificationManager.areNotificationsEnabled()
-        viewModel.refreshNotificationState(isDisabled = !notificationsEnabled)
-        viewModel.refreshDeviceScanChannelState(
-            isDisabled = notificationsEnabled &&
+        onRefreshNotificationState(!notificationsEnabled)
+        onRefreshDeviceScanChannelState(
+            notificationsEnabled &&
                 notificationManager.getNotificationChannel(NotificationChannels.DEVICE_SCAN)
                     ?.importance == android.app.NotificationManager.IMPORTANCE_NONE,
         )
