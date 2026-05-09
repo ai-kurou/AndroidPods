@@ -55,17 +55,3 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
 
-roborazzi {
-    outputDir.set(file("src/test/snapshots"))
-}
-
-// モジュール毎に記述しないと動作しなかった
-kover {
-    reports {
-        filters {
-            excludes {
-                annotatedBy("androidx.compose.ui.tooling.preview.Preview")
-            }
-        }
-    }
-}

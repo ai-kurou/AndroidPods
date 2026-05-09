@@ -61,6 +61,22 @@ subprojects {
             }
         }
     }
+    pluginManager.withPlugin("io.github.takahirom.roborazzi") {
+        extensions.configure<io.github.takahirom.roborazzi.RoborazziExtension> {
+            outputDir.set(file("src/test/snapshots"))
+        }
+    }
+    pluginManager.withPlugin("org.jetbrains.kotlinx.kover") {
+        extensions.configure<kotlinx.kover.gradle.plugin.dsl.KoverProjectExtension> {
+            reports {
+                filters {
+                    excludes {
+                        annotatedBy("androidx.compose.ui.tooling.preview.Preview")
+                    }
+                }
+            }
+        }
+    }
 }
 
 moduleGraphAssert {
