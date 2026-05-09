@@ -16,7 +16,7 @@ internal class OverlaySettingsRepositoryImpl @Inject constructor(
 ) : OverlaySettingsRepository {
     private val _enabled = MutableStateFlow(Settings.canDrawOverlays(context))
 
-    override fun isEnabled(): Boolean = Settings.canDrawOverlays(context)
+    override fun isEnabled(): Boolean = _enabled.value
 
     override fun observe(): Flow<Boolean> = _enabled
 
