@@ -50,9 +50,6 @@ fun SettingsScreen(
     val snackbarHostState = remember { SnackbarHostState() }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    var showSettingsDialog by remember { mutableStateOf(false) }
-    var showThemeModeDialog by remember { mutableStateOf(false) }
-    var showOverlayPositionDialog by remember { mutableStateOf(false) }
     var initialRequestDone by remember { mutableStateOf(false) }
 
     val restartServiceMessage = stringResource(R.string.restart_service_completed)
@@ -94,7 +91,7 @@ fun SettingsScreen(
         permissions = permissions,
         initialRequestDone = initialRequestDone,
         onLaunchPermissions = { launcher.launch(it) },
-        onShowSettingsDialog = { showSettingsDialog = true },
+        onShowSettingsDialog = viewModel::showPermissionRequiredDialog,
         onStartScanService = onStartScanService,
         onCheckUpdate = viewModel::checkUpdate,
         onRefreshOverlayState = viewModel::refreshOverlayState,
@@ -105,11 +102,11 @@ fun SettingsScreen(
     )
 
     // 設定画面への誘導ダイアログ
-    if (showSettingsDialog) {
+    if (uiState.showPermissionRequiredDialog) {
         PermissionRequiredDialog(
-            onDismiss = { showSettingsDialog = false },
+            onDismiss = viewModel::dismissPermissionRequiredDialog,
             onConfirm = {
-                showSettingsDialog = false
+                viewModel.dismissPermissionRequiredDialog()
                 val intent =
                     Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                         data = Uri.fromParts("package", context.packageName, null)
@@ -119,24 +116,24 @@ fun SettingsScreen(
         )
     }
 
-    if (showThemeModeDialog) {
+    if (uiState.showThemeModeDialog) {
         ThemeModeDialog(
             currentMode = uiState.themeSettings.themeMode,
-            onDismiss = { showThemeModeDialog = false },
+            onDismiss = viewModel::dismissThemeModeDialog,
             onModeSelected = { mode ->
                 viewModel.updateThemeSettings(uiState.themeSettings.copy(themeMode = mode))
-                showThemeModeDialog = false
+                viewModel.dismissThemeModeDialog()
             },
         )
     }
 
-    if (showOverlayPositionDialog) {
+    if (uiState.showOverlayPositionDialog) {
         OverlayPositionDialog(
             currentPosition = uiState.overlayPosition,
-            onDismiss = { showOverlayPositionDialog = false },
+            onDismiss = viewModel::dismissOverlayPositionDialog,
             onPositionSelected = { position ->
                 viewModel.updateOverlayPosition(position)
-                showOverlayPositionDialog = false
+                viewModel.dismissOverlayPositionDialog()
             },
         )
     }
@@ -202,11 +199,11 @@ fun SettingsScreen(
             }
             batteryOptimizationLauncher.launch(intent)
         },
-        onThemeModeClick = { showThemeModeDialog = true },
+        onThemeModeClick = viewModel::showThemeModeDialog,
         onDynamicColorToggle = { enabled ->
             viewModel.updateThemeSettings(uiState.themeSettings.copy(useDynamicColor = enabled))
         },
-        onOverlayPositionClick = { showOverlayPositionDialog = true },
+        onOverlayPositionClick = viewModel::showOverlayPositionDialog,
     )
 }
 
