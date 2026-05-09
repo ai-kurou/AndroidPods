@@ -15,12 +15,6 @@ android {
         minSdk = libs.versions.minSdk.get().toInt()
     }
 
-    testOptions {
-        unitTests {
-            isIncludeAndroidResources = true
-        }
-    }
-
     buildFeatures {
         compose = true
     }

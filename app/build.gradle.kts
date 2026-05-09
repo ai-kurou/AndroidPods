@@ -57,12 +57,6 @@ android {
             )
         }
     }
-    testOptions {
-        unitTests {
-            isIncludeAndroidResources = true
-        }
-    }
-
     buildFeatures {
         compose = true
     }

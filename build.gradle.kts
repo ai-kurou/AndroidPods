@@ -41,6 +41,11 @@ subprojects {
                 sourceCompatibility = JavaVersion.VERSION_11
                 targetCompatibility = JavaVersion.VERSION_11
             }
+            testOptions {
+                unitTests {
+                    isIncludeAndroidResources = true
+                }
+            }
         }
     }
     pluginManager.withPlugin("com.android.library") {
@@ -48,6 +53,11 @@ subprojects {
             compileOptions {
                 sourceCompatibility = JavaVersion.VERSION_11
                 targetCompatibility = JavaVersion.VERSION_11
+            }
+            testOptions {
+                unitTests {
+                    isIncludeAndroidResources = true
+                }
             }
         }
     }
