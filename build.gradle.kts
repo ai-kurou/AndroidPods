@@ -34,6 +34,49 @@ subprojects {
     dependencies {
         "detektPlugins"(rootProject.libs.detekt.formatting)
     }
+
+    pluginManager.withPlugin("com.android.application") {
+        extensions.configure<com.android.build.api.dsl.ApplicationExtension> {
+            compileOptions {
+                sourceCompatibility = JavaVersion.VERSION_11
+                targetCompatibility = JavaVersion.VERSION_11
+            }
+            testOptions {
+                unitTests {
+                    isIncludeAndroidResources = true
+                }
+            }
+        }
+    }
+    pluginManager.withPlugin("com.android.library") {
+        extensions.configure<com.android.build.api.dsl.LibraryExtension> {
+            compileOptions {
+                sourceCompatibility = JavaVersion.VERSION_11
+                targetCompatibility = JavaVersion.VERSION_11
+            }
+            testOptions {
+                unitTests {
+                    isIncludeAndroidResources = true
+                }
+            }
+        }
+    }
+    pluginManager.withPlugin("io.github.takahirom.roborazzi") {
+        extensions.configure<io.github.takahirom.roborazzi.RoborazziExtension> {
+            outputDir.set(file("src/test/snapshots"))
+        }
+    }
+    pluginManager.withPlugin("org.jetbrains.kotlinx.kover") {
+        extensions.configure<kotlinx.kover.gradle.plugin.dsl.KoverProjectExtension> {
+            reports {
+                filters {
+                    excludes {
+                        annotatedBy("androidx.compose.ui.tooling.preview.Preview")
+                    }
+                }
+            }
+        }
+    }
 }
 
 moduleGraphAssert {
@@ -192,6 +235,7 @@ dependencies {
     kover(project(":core:designsystem"))
     kover(project(":core:service"))
     kover(project(":feature:settings"))
+    kover(project(":feature:devices"))
     kover(project(":feature:onboarding"))
     kover(project(":feature:licenses"))
     kover(project(":navigation"))

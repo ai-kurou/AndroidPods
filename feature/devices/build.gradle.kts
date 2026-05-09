@@ -9,21 +9,10 @@ plugins {
 
 android {
     namespace = "kurou.androidpods.feature.devices"
-    compileSdk = 36
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        minSdk = 28
-    }
-
-    testOptions {
-        unitTests {
-            isIncludeAndroidResources = true
-        }
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        minSdk = libs.versions.minSdk.get().toInt()
     }
 
     buildFeatures {
@@ -70,17 +59,3 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
 
-roborazzi {
-    outputDir.set(file("src/test/snapshots"))
-}
-
-// モジュール毎に記述しないと動作しなかった
-kover {
-    reports {
-        filters {
-            excludes {
-                annotatedBy("androidx.compose.ui.tooling.preview.Preview")
-            }
-        }
-    }
-}

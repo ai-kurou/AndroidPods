@@ -19,14 +19,14 @@ val localProperties = Properties().apply {
 android {
     namespace = "kurou.androidpods"
     compileSdk {
-        version = release(36) {
+        version = release(libs.versions.compileSdk.get().toInt()) {
             minorApiLevel = 1
         }
     }
 
     defaultConfig {
         applicationId = "kurou.androidpods"
-        minSdk = 28
+        minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = 36
         versionCode = 29
         versionName = "0.14.0"
@@ -56,16 +56,6 @@ android {
                 "proguard-rules.pro"
             )
         }
-    }
-    testOptions {
-        unitTests {
-            isIncludeAndroidResources = true
-        }
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
     }
     buildFeatures {
         compose = true
@@ -123,8 +113,4 @@ dependencies {
     // Debug
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
-}
-
-roborazzi {
-    outputDir.set(file("src/test/snapshots"))
 }
