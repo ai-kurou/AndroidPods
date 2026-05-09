@@ -61,7 +61,7 @@ class SettingsScreenTest {
 
     private val btUseCase = mockk<GetBluetoothAdapterStateUseCase>()
     private val appleDevicesUseCase = mockk<GetAppleDevicesUseCase>(relaxUnitFun = true)
-    private val overlayUseCase = mockk<GetOverlaySettingsUseCase>()
+    private val overlayUseCase = mockk<GetOverlaySettingsUseCase>(relaxUnitFun = true)
     private val checkUpdateUseCase = mockk<CheckUpdateUseCase>()
     private val themeSettingsUseCase = mockk<ThemeSettingsUseCase>()
     private val overlayPositionUseCase = mockk<OverlayPositionUseCase>(relaxUnitFun = true)
@@ -84,7 +84,7 @@ class SettingsScreenTest {
     private fun createViewModel(bluetoothAdapterState: Int): SettingsViewModel {
         every { btUseCase.observe() } returns MutableStateFlow(bluetoothAdapterState)
         every { appleDevicesUseCase.observe() } returns MutableStateFlow(emptyMap())
-        every { overlayUseCase.isEnabled() } returns false
+        every { overlayUseCase.observe() } returns MutableStateFlow(false)
         every { themeSettingsUseCase.observe() } returns MutableStateFlow(ThemeSettings())
         every { overlayPositionUseCase.observe() } returns MutableStateFlow(OverlayPosition.BOTTOM)
         coEvery { themeSettingsUseCase.update(any()) } just Runs

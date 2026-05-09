@@ -36,10 +36,10 @@ private data class UseCaseState(
     val appleDevices: Map<String, AppleDevice>,
     val themeSettings: ThemeSettings,
     val overlayPosition: OverlayPosition,
+    val overlayEnabled: Boolean,
 )
 
 private data class InternalState(
-    val overlayEnabled: Boolean,
     val updateAvailable: Boolean,
     val isNotificationsDisabled: Boolean,
     val isDeviceScanChannelDisabled: Boolean,
@@ -69,7 +69,6 @@ class SettingsViewModel @Inject constructor(
     private val themeSettingsUseCase: ThemeSettingsUseCase,
     private val overlayPositionUseCase: OverlayPositionUseCase,
 ) : ViewModel() {
-    private val _overlayEnabled = MutableStateFlow(getOverlaySettingsUseCase.isEnabled())
     private val _updateAvailable = MutableStateFlow(false)
     private val _isNotificationsDisabled = MutableStateFlow(false)
     private val _isDeviceScanChannelDisabled = MutableStateFlow(false)
@@ -86,23 +85,21 @@ class SettingsViewModel @Inject constructor(
                 getAppleDevicesUseCase.observe(),
                 themeSettingsUseCase.observe(),
                 overlayPositionUseCase.observe(),
-            ) { bluetoothAdapterState, appleDevices, themeSettings, overlayPosition ->
-                UseCaseState(bluetoothAdapterState, appleDevices, themeSettings, overlayPosition)
+                getOverlaySettingsUseCase.observe(),
+            ) { bluetoothAdapterState, appleDevices, themeSettings, overlayPosition, overlayEnabled ->
+                UseCaseState(bluetoothAdapterState, appleDevices, themeSettings, overlayPosition, overlayEnabled)
             },
             combine(
-                _overlayEnabled,
                 _updateAvailable,
                 _isNotificationsDisabled,
                 _isDeviceScanChannelDisabled,
                 _isBatteryOptimizationExempt,
-            ) { overlayEnabled,
-                updateAvailable,
+            ) { updateAvailable,
                 isNotificationsDisabled,
                 isDeviceScanChannelDisabled,
                 isBatteryOptimizationExempt,
                 ->
                 InternalState(
-                    overlayEnabled,
                     updateAvailable,
                     isNotificationsDisabled,
                     isDeviceScanChannelDisabled,
@@ -117,7 +114,7 @@ class SettingsViewModel @Inject constructor(
                 appleDevices = useCaseState.appleDevices,
                 themeSettings = useCaseState.themeSettings,
                 overlayPosition = useCaseState.overlayPosition,
-                overlayEnabled = internalState.overlayEnabled,
+                overlayEnabled = useCaseState.overlayEnabled,
                 updateAvailable = internalState.updateAvailable,
                 isNotificationsDisabled = internalState.isNotificationsDisabled,
                 isDeviceScanChannelDisabled = internalState.isDeviceScanChannelDisabled,
@@ -138,7 +135,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun refreshOverlayState() {
-        _overlayEnabled.update { getOverlaySettingsUseCase.isEnabled() }
+        getOverlaySettingsUseCase.refresh()
     }
 
     fun refreshNotificationState(isDisabled: Boolean) {

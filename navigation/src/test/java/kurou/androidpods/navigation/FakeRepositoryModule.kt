@@ -48,6 +48,8 @@ object FakeRepositoryModule {
     fun provideOverlaySettingsRepository(): OverlaySettingsRepository =
         object : OverlaySettingsRepository {
             override fun isEnabled(): Boolean = false
+            override fun observe(): Flow<Boolean> = flowOf(false)
+            override fun refresh() {}
         }
 
     @Provides

@@ -42,9 +42,10 @@ class SettingsViewModelTest {
     private val fakeAppleDevicesFlow = MutableStateFlow<Map<String, AppleDevice>>(emptyMap())
     private val fakeThemeSettingsFlow = MutableStateFlow(ThemeSettings())
     private val fakeOverlayPositionFlow = MutableStateFlow(OverlayPosition.BOTTOM)
+    private val fakeOverlayEnabledFlow = MutableStateFlow(false)
     private val getBluetoothAdapterStateUseCase = mockk<GetBluetoothAdapterStateUseCase>()
     private val getAppleDevicesUseCase = mockk<GetAppleDevicesUseCase>(relaxUnitFun = true)
-    private val getOverlaySettingsUseCase = mockk<GetOverlaySettingsUseCase>()
+    private val getOverlaySettingsUseCase = mockk<GetOverlaySettingsUseCase>(relaxUnitFun = true)
     private val checkUpdateUseCase = mockk<CheckUpdateUseCase>()
     private val themeSettingsUseCase = mockk<ThemeSettingsUseCase>()
     private val overlayPositionUseCase = mockk<OverlayPositionUseCase>(relaxUnitFun = true)
@@ -54,7 +55,7 @@ class SettingsViewModelTest {
         Dispatchers.setMain(testDispatcher)
         every { getBluetoothAdapterStateUseCase.observe() } returns fakeBluetoothFlow
         every { getAppleDevicesUseCase.observe() } returns fakeAppleDevicesFlow
-        every { getOverlaySettingsUseCase.isEnabled() } returns false
+        every { getOverlaySettingsUseCase.observe() } returns fakeOverlayEnabledFlow
         every { themeSettingsUseCase.observe() } returns fakeThemeSettingsFlow
         every { overlayPositionUseCase.observe() } returns fakeOverlayPositionFlow
         viewModel =
@@ -86,7 +87,7 @@ class SettingsViewModelTest {
             assertEquals(true, viewModel.uiState.value.updateAvailable)
             verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
             verify(exactly = 1) { getAppleDevicesUseCase.observe() }
-            verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
+            verify(exactly = 1) { getOverlaySettingsUseCase.observe() }
             verify(exactly = 1) { themeSettingsUseCase.observe() }
             verify(exactly = 1) { overlayPositionUseCase.observe() }
             coVerify(exactly = 1) { checkUpdateUseCase(version) }
@@ -112,7 +113,7 @@ class SettingsViewModelTest {
             assertEquals(false, viewModel.uiState.value.updateAvailable)
             verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
             verify(exactly = 1) { getAppleDevicesUseCase.observe() }
-            verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
+            verify(exactly = 1) { getOverlaySettingsUseCase.observe() }
             verify(exactly = 1) { themeSettingsUseCase.observe() }
             verify(exactly = 1) { overlayPositionUseCase.observe() }
             coVerify(exactly = 1) { checkUpdateUseCase(version) }
@@ -138,7 +139,7 @@ class SettingsViewModelTest {
             assertEquals(false, viewModel.uiState.value.updateAvailable)
             verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
             verify(exactly = 1) { getAppleDevicesUseCase.observe() }
-            verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
+            verify(exactly = 1) { getOverlaySettingsUseCase.observe() }
             verify(exactly = 1) { themeSettingsUseCase.observe() }
             verify(exactly = 1) { overlayPositionUseCase.observe() }
             coVerify(exactly = 1) { checkUpdateUseCase(version) }
@@ -153,21 +154,19 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun `refreshOverlayStateでisEnabledの最新値が反映される`() =
+    fun `refreshOverlayStateを呼ぶとUseCaseのrefreshが呼ばれuiStateに反映される`() =
         runTest {
-            // combineはすべてのupstreamが1回以上emitするまで値を出さないため、
-            // bluetoothFlowに初期値を流してcombineを動作可能にする
             fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
             assertEquals(false, viewModel.uiState.value.overlayEnabled)
 
-            every { getOverlaySettingsUseCase.isEnabled() } returns true
+            fakeOverlayEnabledFlow.emit(true)
             viewModel.refreshOverlayState()
 
             assertEquals(true, viewModel.uiState.value.overlayEnabled)
             verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
             verify(exactly = 1) { getAppleDevicesUseCase.observe() }
-            // コンストラクタで1回 + refreshOverlayState()で1回 = 合計2回
-            verify(exactly = 2) { getOverlaySettingsUseCase.isEnabled() }
+            verify(exactly = 1) { getOverlaySettingsUseCase.observe() }
+            verify(exactly = 1) { getOverlaySettingsUseCase.refresh() }
             verify(exactly = 1) { themeSettingsUseCase.observe() }
             verify(exactly = 1) { overlayPositionUseCase.observe() }
             confirmVerified(
@@ -191,7 +190,7 @@ class SettingsViewModelTest {
             assertEquals(true, viewModel.uiState.value.isNotificationsDisabled)
             verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
             verify(exactly = 1) { getAppleDevicesUseCase.observe() }
-            verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
+            verify(exactly = 1) { getOverlaySettingsUseCase.observe() }
             verify(exactly = 1) { themeSettingsUseCase.observe() }
             verify(exactly = 1) { overlayPositionUseCase.observe() }
             confirmVerified(
@@ -215,7 +214,7 @@ class SettingsViewModelTest {
             assertEquals(true, viewModel.uiState.value.isDeviceScanChannelDisabled)
             verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
             verify(exactly = 1) { getAppleDevicesUseCase.observe() }
-            verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
+            verify(exactly = 1) { getOverlaySettingsUseCase.observe() }
             verify(exactly = 1) { themeSettingsUseCase.observe() }
             verify(exactly = 1) { overlayPositionUseCase.observe() }
             confirmVerified(
@@ -239,7 +238,7 @@ class SettingsViewModelTest {
             assertEquals(true, viewModel.uiState.value.isBatteryOptimizationExempt)
             verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
             verify(exactly = 1) { getAppleDevicesUseCase.observe() }
-            verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
+            verify(exactly = 1) { getOverlaySettingsUseCase.observe() }
             verify(exactly = 1) { themeSettingsUseCase.observe() }
             verify(exactly = 1) { overlayPositionUseCase.observe() }
             confirmVerified(
@@ -262,7 +261,7 @@ class SettingsViewModelTest {
 
             verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
             verify(exactly = 1) { getAppleDevicesUseCase.observe() }
-            verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
+            verify(exactly = 1) { getOverlaySettingsUseCase.observe() }
             verify(exactly = 1) { themeSettingsUseCase.observe() }
             verify(exactly = 1) { overlayPositionUseCase.observe() }
             coVerify(exactly = 1) { themeSettingsUseCase.update(settings) }
@@ -283,7 +282,7 @@ class SettingsViewModelTest {
 
             verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
             verify(exactly = 1) { getAppleDevicesUseCase.observe() }
-            verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
+            verify(exactly = 1) { getOverlaySettingsUseCase.observe() }
             verify(exactly = 1) { themeSettingsUseCase.observe() }
             verify(exactly = 1) { overlayPositionUseCase.observe() }
             coVerify(exactly = 1) { overlayPositionUseCase.update(OverlayPosition.TOP) }
@@ -306,7 +305,7 @@ class SettingsViewModelTest {
         verify(exactly = 1) { getAppleDevicesUseCase.observe() }
         verify(exactly = 1) { getAppleDevicesUseCase.startScan() }
         verify(exactly = 1) { getAppleDevicesUseCase.stopScan() }
-        verify(exactly = 1) { getOverlaySettingsUseCase.isEnabled() }
+        verify(exactly = 1) { getOverlaySettingsUseCase.observe() }
         verify(exactly = 1) { themeSettingsUseCase.observe() }
         verify(exactly = 1) { overlayPositionUseCase.observe() }
         confirmVerified(
