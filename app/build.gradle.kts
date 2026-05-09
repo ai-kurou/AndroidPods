@@ -19,14 +19,14 @@ val localProperties = Properties().apply {
 android {
     namespace = "kurou.androidpods"
     compileSdk {
-        version = release(36) {
+        version = release(libs.versions.compileSdk.get().toInt()) {
             minorApiLevel = 1
         }
     }
 
     defaultConfig {
         applicationId = "kurou.androidpods"
-        minSdk = 28
+        minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = 36
         versionCode = 29
         versionName = "0.14.0"

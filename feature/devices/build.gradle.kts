@@ -9,10 +9,10 @@ plugins {
 
 android {
     namespace = "kurou.androidpods.feature.devices"
-    compileSdk = 36
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        minSdk = 28
+        minSdk = libs.versions.minSdk.get().toInt()
     }
 
     testOptions {

@@ -5,10 +5,10 @@ plugins {
 
 android {
     namespace = "kurou.androidpods.core.domain"
-    compileSdk = 36
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        minSdk = 28
+        minSdk = libs.versions.minSdk.get().toInt()
     }
 
     compileOptions {
