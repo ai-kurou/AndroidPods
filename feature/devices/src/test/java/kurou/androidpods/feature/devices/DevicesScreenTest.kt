@@ -10,6 +10,7 @@ import androidx.window.core.layout.computeWindowSizeClass
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.flow.flowOf
 import kurou.androidpods.core.domain.CompatibleDevice
 import kurou.androidpods.core.domain.GetCompatibleDevicesUseCase
 import org.junit.Rule
@@ -52,7 +53,7 @@ class DevicesScreenTest {
     }
 
     private fun assertIsDisplayedWithBack(size: WindowSizeClass) {
-        every { useCase() } returns devices
+        every { useCase() } returns flowOf(devices)
 
         composeTestRule.setContent {
             DevicesScreen(

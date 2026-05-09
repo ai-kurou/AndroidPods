@@ -56,7 +56,7 @@ object FakeRepositoryModule {
     @Singleton
     fun provideCompatibleDeviceRepository(): CompatibleDeviceRepository =
         object : CompatibleDeviceRepository {
-            override fun getCompatibleDevices(): List<CompatibleDevice> = emptyList()
+            override fun getCompatibleDevices(): Flow<List<CompatibleDevice>> = flowOf(emptyList())
         }
 
     @Provides

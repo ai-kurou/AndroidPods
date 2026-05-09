@@ -1,16 +1,17 @@
 package kurou.androidpods.core.data
 
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import kotlin.text.contains
 
 class CompatibleDeviceRepositoryImplTest {
     private val repository = CompatibleDeviceRepositoryImpl()
 
     @Test
-    fun `getCompatibleDevicesはAPPLE_DEVICE_MODELSを返す`() {
-        val result = repository.getCompatibleDevices()
+    fun `getCompatibleDevicesはAPPLE_DEVICE_MODELSを返す`() = runTest {
+        val result = repository.getCompatibleDevices().first()
         val resultNames = result.map { it.name }.toSet()
         val missingImages = result.filter { it.images == null }.map { it.name }
 
