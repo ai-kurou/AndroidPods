@@ -46,6 +46,7 @@ data class SettingsUiState(
     val isNotificationsDisabled: Boolean = false,
     val isDeviceScanChannelDisabled: Boolean = false,
     val isBatteryOptimizationExempt: Boolean = false,
+    val permissionStates: Map<String, Boolean> = emptyMap(),
 )
 
 @HiltViewModel
@@ -62,6 +63,7 @@ class SettingsViewModel @Inject constructor(
     private val _isNotificationsDisabled = MutableStateFlow(false)
     private val _isDeviceScanChannelDisabled = MutableStateFlow(false)
     private val _isBatteryOptimizationExempt = MutableStateFlow(false)
+    private val _permissionStates = MutableStateFlow<Map<String, Boolean>>(emptyMap())
 
     val uiState: StateFlow<SettingsUiState> =
         combine(
@@ -93,7 +95,8 @@ class SettingsViewModel @Inject constructor(
                     isBatteryOptimizationExempt,
                 )
             },
-        ) { useCaseState, internalState ->
+            _permissionStates,
+        ) { useCaseState, internalState, permissionStates ->
             SettingsUiState(
                 bluetoothAdapterState = useCaseState.bluetoothAdapterState,
                 appleDevices = useCaseState.appleDevices,
@@ -104,6 +107,7 @@ class SettingsViewModel @Inject constructor(
                 isNotificationsDisabled = internalState.isNotificationsDisabled,
                 isDeviceScanChannelDisabled = internalState.isDeviceScanChannelDisabled,
                 isBatteryOptimizationExempt = internalState.isBatteryOptimizationExempt,
+                permissionStates = permissionStates,
             )
         }.stateIn(
             scope = viewModelScope,
@@ -131,6 +135,10 @@ class SettingsViewModel @Inject constructor(
 
     fun refreshBatteryOptimizationState(isExempt: Boolean) {
         _isBatteryOptimizationExempt.update { isExempt }
+    }
+
+    fun refreshPermissionStates(states: Map<String, Boolean>) {
+        _permissionStates.update { states }
     }
 
     fun updateThemeSettings(settings: ThemeSettings) {

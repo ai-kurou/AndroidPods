@@ -18,7 +18,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -54,21 +53,12 @@ fun SettingsScreen(
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    val permissionStates = remember { mutableStateMapOf<String, Boolean>() }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showSettingsDialog by remember { mutableStateOf(false) }
     var showThemeModeDialog by remember { mutableStateOf(false) }
     var showOverlayPositionDialog by remember { mutableStateOf(false) }
     var initialRequestDone by remember { mutableStateOf(false) }
     var isServiceRestarting by remember { mutableStateOf(false) }
-
-    // 初期状態を設定
-    if (permissionStates.isEmpty()) {
-        permissions.forEach { permission ->
-            permissionStates[permission] =
-                ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
-        }
-    }
 
     val overlaySettingsLauncher =
         rememberLauncherForActivityResult(
@@ -89,9 +79,7 @@ fun SettingsScreen(
         rememberLauncherForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions(),
         ) { results ->
-            results.forEach { (permission, granted) ->
-                permissionStates[permission] = granted
-            }
+            viewModel.refreshPermissionStates(results)
             initialRequestDone = true
         }
 
@@ -99,7 +87,6 @@ fun SettingsScreen(
         permissions = permissions,
         initialRequestDone = initialRequestDone,
         onLaunchPermissions = { launcher.launch(it) },
-        onUpdatePermissionState = { permission, granted -> permissionStates[permission] = granted },
         onShowSettingsDialog = { showSettingsDialog = true },
         onStartScanService = onStartScanService,
         onCheckUpdate = viewModel::checkUpdate,
@@ -107,6 +94,7 @@ fun SettingsScreen(
         onRefreshBatteryOptimizationState = viewModel::refreshBatteryOptimizationState,
         onRefreshNotificationState = viewModel::refreshNotificationState,
         onRefreshDeviceScanChannelState = viewModel::refreshDeviceScanChannelState,
+        onRefreshPermissionStates = viewModel::refreshPermissionStates,
     )
 
     // 設定画面への誘導ダイアログ
@@ -158,7 +146,7 @@ fun SettingsScreen(
     SettingsScaffold(
         modifier = modifier,
         snackbarHostState = snackbarHostState,
-        permissionStates = permissionStates,
+        permissionStates = uiState.permissionStates,
         uiState = uiState,
         isServiceRestarting = isServiceRestarting,
         columns = columns,
@@ -231,7 +219,6 @@ private fun SettingsEffects(
     permissions: List<String>,
     initialRequestDone: Boolean,
     onLaunchPermissions: (Array<String>) -> Unit,
-    onUpdatePermissionState: (String, Boolean) -> Unit,
     onShowSettingsDialog: () -> Unit,
     onStartScanService: () -> Unit,
     onCheckUpdate: (String) -> Unit,
@@ -239,6 +226,7 @@ private fun SettingsEffects(
     onRefreshBatteryOptimizationState: (Boolean) -> Unit,
     onRefreshNotificationState: (Boolean) -> Unit,
     onRefreshDeviceScanChannelState: (Boolean) -> Unit,
+    onRefreshPermissionStates: (Map<String, Boolean>) -> Unit,
 ) {
     val context = LocalContext.current
 
@@ -260,12 +248,11 @@ private fun SettingsEffects(
     }
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-        permissions.forEach { permission ->
-            onUpdatePermissionState(
-                permission,
-                ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED,
-            )
-        }
+        onRefreshPermissionStates(
+            permissions.associateWith {
+                ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+            },
+        )
         onRefreshOverlayState()
         val pm = context.getSystemService(PowerManager::class.java)
         onRefreshBatteryOptimizationState(pm.isIgnoringBatteryOptimizations(context.packageName))
