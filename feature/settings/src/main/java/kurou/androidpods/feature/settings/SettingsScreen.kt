@@ -102,7 +102,11 @@ fun SettingsScreen(
         onUpdatePermissionState = { permission, granted -> permissionStates[permission] = granted },
         onShowSettingsDialog = { showSettingsDialog = true },
         onStartScanService = onStartScanService,
-        viewModel = viewModel,
+        onCheckUpdate = viewModel::checkUpdate,
+        onRefreshOverlayState = viewModel::refreshOverlayState,
+        onRefreshBatteryOptimizationState = viewModel::refreshBatteryOptimizationState,
+        onRefreshNotificationState = viewModel::refreshNotificationState,
+        onRefreshDeviceScanChannelState = viewModel::refreshDeviceScanChannelState,
     )
 
     // 設定画面への誘導ダイアログ
@@ -230,7 +234,11 @@ private fun SettingsEffects(
     onUpdatePermissionState: (String, Boolean) -> Unit,
     onShowSettingsDialog: () -> Unit,
     onStartScanService: () -> Unit,
-    viewModel: SettingsViewModel,
+    onCheckUpdate: (String) -> Unit,
+    onRefreshOverlayState: () -> Unit,
+    onRefreshBatteryOptimizationState: (Boolean) -> Unit,
+    onRefreshNotificationState: (Boolean) -> Unit,
+    onRefreshDeviceScanChannelState: (Boolean) -> Unit,
 ) {
     val context = LocalContext.current
 
@@ -248,7 +256,7 @@ private fun SettingsEffects(
             runCatching {
                 context.packageManager.getPackageInfo(context.packageName, 0).versionName
             }.getOrNull() ?: return@LaunchedEffect
-        viewModel.checkUpdate(versionName)
+        onCheckUpdate(versionName)
     }
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
@@ -258,14 +266,14 @@ private fun SettingsEffects(
                 ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED,
             )
         }
-        viewModel.refreshOverlayState()
+        onRefreshOverlayState()
         val pm = context.getSystemService(PowerManager::class.java)
-        viewModel.refreshBatteryOptimizationState(pm.isIgnoringBatteryOptimizations(context.packageName))
+        onRefreshBatteryOptimizationState(pm.isIgnoringBatteryOptimizations(context.packageName))
         val notificationManager = NotificationManagerCompat.from(context)
         val notificationsEnabled = notificationManager.areNotificationsEnabled()
-        viewModel.refreshNotificationState(isDisabled = !notificationsEnabled)
-        viewModel.refreshDeviceScanChannelState(
-            isDisabled = notificationsEnabled &&
+        onRefreshNotificationState(!notificationsEnabled)
+        onRefreshDeviceScanChannelState(
+            notificationsEnabled &&
                 notificationManager.getNotificationChannel(NotificationChannels.DEVICE_SCAN)
                     ?.importance == android.app.NotificationManager.IMPORTANCE_NONE,
         )
