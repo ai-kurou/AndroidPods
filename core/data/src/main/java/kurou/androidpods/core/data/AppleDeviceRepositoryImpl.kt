@@ -11,7 +11,6 @@ import android.content.Context
 import android.os.SystemClock
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -54,6 +53,7 @@ private const val CLEANUP_INTERVAL_MS = 1_000L
 @Singleton
 internal class AppleDeviceRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
+    @ApplicationScope private val scope: CoroutineScope,
 ) : AppleDeviceRepository {
     private val bluetoothManager =
         context.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
@@ -66,8 +66,6 @@ internal class AppleDeviceRepositoryImpl @Inject constructor(
     /** 各デバイスのビーコンを最後に受信した時刻（SystemClock.elapsedRealtime ベース） */
     private val lastSeenAt = ConcurrentHashMap<String, Long>()
 
-    /** 範囲外デバイスの定期クリーンアップ用スコープ */
-    private val scope = CoroutineScope(Dispatchers.Default)
     private var cleanupJob: Job? = null
     private var retryJob: Job? = null
 
