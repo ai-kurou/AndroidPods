@@ -30,7 +30,7 @@ internal class OverlayPositionRepositoryImpl @Inject constructor(
             .catch { if (it is IOException) emit(emptyPreferences()) else throw it }
             .map { preferences ->
                 preferences[positionKey]
-                    ?.let { runCatching { OverlayPosition.valueOf(it) }.getOrNull() }
+                    ?.let { try { OverlayPosition.valueOf(it) } catch (_: IllegalArgumentException) { null } }
                     ?: OverlayPosition.BOTTOM
             }
 
