@@ -159,7 +159,7 @@ class SettingsViewModel @Inject constructor(
             _isServiceRestarting.update { true }
             _serviceEvents.emit(ServiceEvent.StopScan)
             _serviceEvents.emit(ServiceEvent.StartScan)
-            delay(5_000)
+            delay(RESTART_DELAY_MS)
             _isServiceRestarting.update { false }
             _serviceEvents.emit(ServiceEvent.ShowRestartSnackbar)
         }
@@ -183,5 +183,9 @@ class SettingsViewModel @Inject constructor(
 
     fun stopScan() {
         getAppleDevicesUseCase.stopScan()
+    }
+
+    companion object {
+        private const val RESTART_DELAY_MS = 5_000L
     }
 }
