@@ -235,6 +235,7 @@ dependencies {
     kover(project(":core:designsystem"))
     kover(project(":core:service"))
     kover(project(":feature:settings"))
+    kover(project(":feature:devices"))
     kover(project(":feature:onboarding"))
     kover(project(":feature:licenses"))
     kover(project(":navigation"))
