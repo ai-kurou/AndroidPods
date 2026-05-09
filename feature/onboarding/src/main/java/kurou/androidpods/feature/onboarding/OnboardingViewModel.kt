@@ -1,13 +1,10 @@
 package kurou.androidpods.feature.onboarding
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
@@ -19,23 +16,13 @@ data class OnboardingUiState(
 
 @HiltViewModel
 class OnboardingViewModel @Inject constructor() : ViewModel() {
-    private val _showPermissionDeniedDialog = MutableStateFlow(false)
-    private val _showBluetoothUnavailableDialog = MutableStateFlow(false)
-    private val _showBluetoothDeniedDialog = MutableStateFlow(false)
+    private val _uiState = MutableStateFlow(OnboardingUiState())
+    val uiState: StateFlow<OnboardingUiState> = _uiState.asStateFlow()
 
-    val uiState: StateFlow<OnboardingUiState> =
-        combine(
-            _showPermissionDeniedDialog,
-            _showBluetoothUnavailableDialog,
-            _showBluetoothDeniedDialog,
-        ) { permDenied, btUnavailable, btDenied ->
-            OnboardingUiState(permDenied, btUnavailable, btDenied)
-        }.stateIn(viewModelScope, SharingStarted.Eagerly, OnboardingUiState())
-
-    fun showPermissionDenied() { _showPermissionDeniedDialog.update { true } }
-    fun dismissPermissionDenied() { _showPermissionDeniedDialog.update { false } }
-    fun showBluetoothUnavailable() { _showBluetoothUnavailableDialog.update { true } }
-    fun dismissBluetoothUnavailable() { _showBluetoothUnavailableDialog.update { false } }
-    fun showBluetoothDenied() { _showBluetoothDeniedDialog.update { true } }
-    fun dismissBluetoothDenied() { _showBluetoothDeniedDialog.update { false } }
+    fun showPermissionDenied() { _uiState.update { it.copy(showPermissionDeniedDialog = true) } }
+    fun dismissPermissionDenied() { _uiState.update { it.copy(showPermissionDeniedDialog = false) } }
+    fun showBluetoothUnavailable() { _uiState.update { it.copy(showBluetoothUnavailableDialog = true) } }
+    fun dismissBluetoothUnavailable() { _uiState.update { it.copy(showBluetoothUnavailableDialog = false) } }
+    fun showBluetoothDenied() { _uiState.update { it.copy(showBluetoothDeniedDialog = true) } }
+    fun dismissBluetoothDenied() { _uiState.update { it.copy(showBluetoothDeniedDialog = false) } }
 }
