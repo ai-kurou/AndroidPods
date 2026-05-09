@@ -7,8 +7,11 @@ import io.mockk.unmockkAll
 import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kurou.androidpods.core.domain.CompatibleDevice
 import kurou.androidpods.core.domain.DeviceImages
@@ -34,7 +37,7 @@ class DevicesViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        every { getCompatibleDevicesUseCase() } returns devices
+        every { getCompatibleDevicesUseCase() } returns flowOf(devices)
         viewModel = DevicesViewModel(getCompatibleDevicesUseCase)
     }
 
@@ -45,8 +48,10 @@ class DevicesViewModelTest {
     }
 
     @Test
-    fun `UseCaseが返したデバイスリストがdevicesに反映される`() {
+    fun `UseCaseが返したデバイスリストがdevicesに反映される`() = runTest {
+        val job = launch(UnconfinedTestDispatcher()) { viewModel.devices.collect {} }
         assertEquals(devices, viewModel.devices.value)
+        job.cancel()
         verify(exactly = 1) { getCompatibleDevicesUseCase() }
         confirmVerified(getCompatibleDevicesUseCase)
     }
