@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kurou.androidpods.core.domain.UnknownDeviceRepository
@@ -51,8 +52,8 @@ internal class UnknownDeviceRepositoryImpl @Inject constructor(
                 setCustomKey(CRASHLYTICS_KEY_DEVICE_NAME, deviceName)
                 recordException(UnknownAppleDeviceException(hexCode))
             }
-        } catch (_: Exception) {
-            // Firebase未初期化環境（テスト等）では無視する
+        } catch (e: Exception) {
+            if (e is CancellationException) throw e
         }
         context.unknownDeviceDataStore.edit { preferences ->
             val current = preferences[reportedModelCodesKey] ?: emptySet()
