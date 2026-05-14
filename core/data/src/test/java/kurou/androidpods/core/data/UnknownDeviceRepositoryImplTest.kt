@@ -42,6 +42,13 @@ class UnknownDeviceRepositoryImplTest {
     }
 
     @Test
+    fun `observeUnknownModelCodes - unknownとreportedが両方未保存のとき空セットを返す`() =
+        runTest {
+            val codes = repository.observeUnknownModelCodes().first()
+            assertTrue(codes.isEmpty())
+        }
+
+    @Test
     fun `saveUnknownModelCode - 未知のモデルコードがhex文字列でDataStoreに保存される`() =
         runTest {
             repository.saveUnknownModelCode(0x1111)
