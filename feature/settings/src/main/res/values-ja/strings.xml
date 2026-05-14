@@ -40,7 +40,7 @@
     <string name="overlay_position_top">上部</string>
     <string name="overlay_position_bottom">下部</string>
     <string name="battery_optimization_label">バッテリーの最適化対象外</string>
-    <string name="unknown_device_warning">未知の Apple デバイスを検出しました。タップして報告できます。</string>
+    <string name="unknown_device_warning">未知のAppleデバイスを検出しました。タップして報告できます。</string>
     <string name="unknown_device_sheet_title">未知のデバイスを報告</string>
     <string name="unknown_device_sheet_description">モデルコード %1$s のデバイスを検出しました。何のデバイスを接続しようとしていましたか？</string>
     <string name="unknown_device_name_label">デバイス名</string>
