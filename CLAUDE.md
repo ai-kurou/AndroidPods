@@ -179,6 +179,7 @@ try {
 - `HorizontalPager`内のノードは`assertIsDisplayed()`が失敗することがある（boundsチェックの問題）。代わりに`assertExists()`を使う
 - 戻るボタンのシミュレーションは`composeTestRule.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }`で行う
 - `RequestMultiplePermissions`ランチャーはRobolectricで自動的にコールバックを呼ばないため、権限拒否のシミュレーションは複雑になる
+- `ModalBottomSheet` の dismiss は `onBackPressedDispatcher.onBackPressed()` やscrimクリックではRobolectricで動作しない。代わりにシートコンテンツのノードに `performTouchInput { swipeDown() }` を使う
 
 ## カバレッジ
 
