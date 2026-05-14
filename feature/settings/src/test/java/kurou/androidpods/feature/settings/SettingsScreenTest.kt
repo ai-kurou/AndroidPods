@@ -43,6 +43,7 @@ import kurou.androidpods.core.domain.OverlayPosition
 import kurou.androidpods.core.domain.OverlayPositionUseCase
 import kurou.androidpods.core.domain.ThemeSettings
 import kurou.androidpods.core.domain.ThemeSettingsUseCase
+import kurou.androidpods.core.domain.UnknownDeviceUseCase
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -65,6 +66,7 @@ class SettingsScreenTest {
     private val checkUpdateUseCase = mockk<CheckUpdateUseCase>()
     private val themeSettingsUseCase = mockk<ThemeSettingsUseCase>()
     private val overlayPositionUseCase = mockk<OverlayPositionUseCase>(relaxUnitFun = true)
+    private val unknownDeviceUseCase = mockk<UnknownDeviceUseCase>()
 
     @After
     fun tearDown() {
@@ -87,6 +89,7 @@ class SettingsScreenTest {
         every { overlayUseCase.observe() } returns MutableStateFlow(false)
         every { themeSettingsUseCase.observe() } returns MutableStateFlow(ThemeSettings())
         every { overlayPositionUseCase.observe() } returns MutableStateFlow(OverlayPosition.BOTTOM)
+        every { unknownDeviceUseCase.observe() } returns MutableStateFlow(emptySet())
         coEvery { themeSettingsUseCase.update(any()) } just Runs
         return SettingsViewModel(
             btUseCase,
@@ -95,6 +98,7 @@ class SettingsScreenTest {
             checkUpdateUseCase,
             themeSettingsUseCase,
             overlayPositionUseCase,
+            unknownDeviceUseCase,
         )
     }
 
