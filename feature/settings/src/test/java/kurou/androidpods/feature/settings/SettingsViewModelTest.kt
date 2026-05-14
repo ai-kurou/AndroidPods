@@ -397,6 +397,18 @@ class SettingsViewModelTest {
         }
 
     @Test
+    fun `showUnknownDeviceSheetとdismissUnknownDeviceSheetでシートの表示状態が切り替わる`() =
+        runTest {
+            fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
+
+            viewModel.showUnknownDeviceSheet()
+            assertTrue(viewModel.uiState.value.showUnknownDeviceSheet)
+
+            viewModel.dismissUnknownDeviceSheet()
+            assertFalse(viewModel.uiState.value.showUnknownDeviceSheet)
+        }
+
+    @Test
     fun `シートを表示後に報告するとUseCaseのreportが呼ばれシートが閉じる`() =
         runTest {
             fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
@@ -409,28 +421,5 @@ class SettingsViewModelTest {
 
             coVerify(exactly = 1) { unknownDeviceUseCase.report(0x1234, "AirPods Max") }
             assertFalse(viewModel.uiState.value.showUnknownDeviceSheet)
-        }
-
-    @Test
-    fun `未知モデルコードが存在するとhasUnknownDevicesがtrueになる`() =
-        runTest {
-            fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
-            assertFalse(viewModel.uiState.value.hasUnknownDevices)
-
-            fakeUnknownModelCodesFlow.emit(setOf("0x1234"))
-
-            assertTrue(viewModel.uiState.value.hasUnknownDevices)
-        }
-
-    @Test
-    fun `未知モデルコードが空になるとhasUnknownDevicesがfalseになる`() =
-        runTest {
-            fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
-            fakeUnknownModelCodesFlow.emit(setOf("0x1234"))
-            assertTrue(viewModel.uiState.value.hasUnknownDevices)
-
-            fakeUnknownModelCodesFlow.emit(emptySet())
-
-            assertFalse(viewModel.uiState.value.hasUnknownDevices)
         }
 }
