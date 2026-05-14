@@ -3,6 +3,7 @@ package kurou.androidpods.feature.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -182,9 +183,15 @@ class SettingsViewModel @Inject constructor(
 
     fun reportUnknownDevice(modelCode: String, deviceName: String) {
         viewModelScope.launch {
-            val code = modelCode.removePrefix("0x").toInt(16)
-            unknownDeviceUseCase.report(code, deviceName)
-            dismissUnknownDeviceSheet()
+            try {
+                val code = modelCode.removePrefix("0x").toInt(16)
+                unknownDeviceUseCase.report(code, deviceName)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (_: Exception) {
+            } finally {
+                dismissUnknownDeviceSheet()
+            }
         }
     }
 
