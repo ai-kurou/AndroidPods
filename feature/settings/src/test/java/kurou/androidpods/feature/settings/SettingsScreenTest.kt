@@ -46,6 +46,7 @@ import kurou.androidpods.core.domain.ThemeSettingsUseCase
 import kurou.androidpods.core.domain.UnknownDeviceUseCase
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -547,6 +548,31 @@ class SettingsScreenTest {
         composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithText("Report Unknown Device").assertExists()
+    }
+
+    @Test
+    fun `showUnknownDeviceSheetがtrueでunknownModelCodesが空のときシートが自動で閉じる`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        grantRequiredPermissions(context)
+        val viewModel = createViewModel(
+            bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+            unknownModelCodes = emptySet(),
+        )
+
+        composeTestRule.setContent {
+            SettingsScreen(
+                windowSizeClass = windowSizeClassOf(400f),
+                onStartScanService = {},
+                onStopScanService = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                viewModel = viewModel,
+            )
+        }
+        viewModel.showUnknownDeviceSheet()
+        composeTestRule.waitForIdle()
+
+        assertFalse(viewModel.uiState.value.showUnknownDeviceSheet)
     }
 
     @Test
