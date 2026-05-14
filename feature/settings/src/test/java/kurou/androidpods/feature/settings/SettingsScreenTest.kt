@@ -525,6 +525,31 @@ class SettingsScreenTest {
     }
 
     @Test
+    fun `showUnknownDeviceSheetがtrueのときUnknownDeviceBottomSheetが表示される`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        grantRequiredPermissions(context)
+        val viewModel = createViewModel(
+            bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+            unknownModelCodes = setOf("0x1234"),
+        )
+
+        composeTestRule.setContent {
+            SettingsScreen(
+                windowSizeClass = windowSizeClassOf(400f),
+                onStartScanService = {},
+                onStopScanService = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                viewModel = viewModel,
+            )
+        }
+        viewModel.showUnknownDeviceSheet()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Report Unknown Device").assertExists()
+    }
+
+    @Test
     fun `GitHubリポジトリをタップするとACTION_VIEWのインテントが発行される`() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         grantRequiredPermissions(context)
