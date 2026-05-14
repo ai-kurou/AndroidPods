@@ -34,6 +34,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.window.core.layout.WindowSizeClass
 import kurou.androidpods.core.domain.NotificationChannels
 
+@Suppress("CyclomaticComplexMethod")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
@@ -138,6 +139,16 @@ fun SettingsScreen(
         )
     }
 
+    if (uiState.showUnknownDeviceSheet) {
+        uiState.unknownModelCodes.firstOrNull()?.let { modelCode ->
+            UnknownDeviceBottomSheet(
+                modelCode = modelCode,
+                onDismiss = viewModel::dismissUnknownDeviceSheet,
+                onReport = viewModel::reportUnknownDevice,
+            )
+        }
+    }
+
     val columns =
         when {
             windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND) -> 3
@@ -172,7 +183,7 @@ fun SettingsScreen(
             val intent = Intent(Intent.ACTION_VIEW, "https://github.com/ai-kurou/AndroidPods/releases/latest".toUri())
             context.startActivity(intent)
         },
-        onUnknownDevicesClick = {},
+        onUnknownDevicesClick = viewModel::showUnknownDeviceSheet,
         onLicensesClick = onLicensesClick,
         onDevicesClick = onDevicesClick,
         onGithubClick = {

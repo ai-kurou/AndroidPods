@@ -35,7 +35,7 @@ sealed interface ServiceEvent {
 private data class ScanState(
     val bluetoothAdapterState: Int?,
     val appleDevices: Map<String, AppleDevice>,
-    val hasUnknownDevices: Boolean,
+    val unknownModelCodes: Set<String>,
 )
 
 private data class OverlayState(
@@ -56,6 +56,7 @@ private data class UiControlState(
     val showPermissionRequiredDialog: Boolean = false,
     val showThemeModeDialog: Boolean = false,
     val showOverlayPositionDialog: Boolean = false,
+    val showUnknownDeviceSheet: Boolean = false,
 )
 
 data class SettingsUiState(
@@ -68,15 +69,19 @@ data class SettingsUiState(
     val isNotificationsDisabled: Boolean = false,
     val isDeviceScanChannelDisabled: Boolean = false,
     val isBatteryOptimizationExempt: Boolean = false,
-    val hasUnknownDevices: Boolean = false,
+    val unknownModelCodes: Set<String> = emptySet(),
     val permissionStates: Map<String, Boolean> = emptyMap(),
     val isServiceRestarting: Boolean = false,
     val showPermissionRequiredDialog: Boolean = false,
     val showThemeModeDialog: Boolean = false,
     val showOverlayPositionDialog: Boolean = false,
-)
+    val showUnknownDeviceSheet: Boolean = false,
+) {
+    val hasUnknownDevices: Boolean get() = unknownModelCodes.isNotEmpty()
+}
 
 @HiltViewModel
+@Suppress("TooManyFunctions")
 class SettingsViewModel @Inject constructor(
     private val getBluetoothAdapterStateUseCase: GetBluetoothAdapterStateUseCase,
     private val getAppleDevicesUseCase: GetAppleDevicesUseCase,
@@ -102,7 +107,7 @@ class SettingsViewModel @Inject constructor(
                 getAppleDevicesUseCase.observe(),
                 unknownDeviceUseCase.observe(),
             ) { bluetoothAdapterState, appleDevices, unknownModelCodes ->
-                ScanState(bluetoothAdapterState, appleDevices, hasUnknownDevices = unknownModelCodes.isNotEmpty())
+                ScanState(bluetoothAdapterState, appleDevices, unknownModelCodes)
             },
             combine(
                 getOverlaySettingsUseCase.observe(),
@@ -130,7 +135,7 @@ class SettingsViewModel @Inject constructor(
             SettingsUiState(
                 bluetoothAdapterState = scan.bluetoothAdapterState,
                 appleDevices = scan.appleDevices,
-                hasUnknownDevices = scan.hasUnknownDevices,
+                unknownModelCodes = scan.unknownModelCodes,
                 overlayEnabled = overlay.overlayEnabled,
                 overlayPosition = overlay.overlayPosition,
                 themeSettings = themeSettings,
@@ -143,6 +148,7 @@ class SettingsViewModel @Inject constructor(
                 showPermissionRequiredDialog = uiControl.showPermissionRequiredDialog,
                 showThemeModeDialog = uiControl.showThemeModeDialog,
                 showOverlayPositionDialog = uiControl.showOverlayPositionDialog,
+                showUnknownDeviceSheet = uiControl.showUnknownDeviceSheet,
             )
         }.stateIn(
             scope = viewModelScope,
@@ -167,6 +173,20 @@ class SettingsViewModel @Inject constructor(
 
     fun dismissOverlayPositionDialog() =
         _uiControlState.update { it.copy(showOverlayPositionDialog = false) }
+
+    fun showUnknownDeviceSheet() =
+        _uiControlState.update { it.copy(showUnknownDeviceSheet = true) }
+
+    fun dismissUnknownDeviceSheet() =
+        _uiControlState.update { it.copy(showUnknownDeviceSheet = false) }
+
+    fun reportUnknownDevice(modelCode: String, deviceName: String) {
+        viewModelScope.launch {
+            val code = modelCode.removePrefix("0x").toInt(16)
+            unknownDeviceUseCase.report(code, deviceName)
+            dismissUnknownDeviceSheet()
+        }
+    }
 
     fun checkUpdate(currentVersion: String) {
         viewModelScope.launch {

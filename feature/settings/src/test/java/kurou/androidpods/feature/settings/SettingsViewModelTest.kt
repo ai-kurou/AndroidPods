@@ -397,6 +397,21 @@ class SettingsViewModelTest {
         }
 
     @Test
+    fun `シートを表示後に報告するとUseCaseのreportが呼ばれシートが閉じる`() =
+        runTest {
+            fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
+            coEvery { unknownDeviceUseCase.report(0x1234, "AirPods Max") } just Runs
+
+            viewModel.showUnknownDeviceSheet()
+            assertTrue(viewModel.uiState.value.showUnknownDeviceSheet)
+
+            viewModel.reportUnknownDevice("0x1234", "AirPods Max")
+
+            coVerify(exactly = 1) { unknownDeviceUseCase.report(0x1234, "AirPods Max") }
+            assertFalse(viewModel.uiState.value.showUnknownDeviceSheet)
+        }
+
+    @Test
     fun `未知モデルコードが存在するとhasUnknownDevicesがtrueになる`() =
         runTest {
             fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
