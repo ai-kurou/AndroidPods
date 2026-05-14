@@ -170,7 +170,7 @@ try {
 - **Service テスト**: Hilt + Robolectric。`@UninstallModules(DataModule::class)`でFakeモジュールに差し替え、`Robolectric.buildService()`でServiceControllerを取得。ロジックは`internal fun`として抽出しユニットテスト可能にする
 - **Compose UIテスト**: `createAndroidComposeRule<ComponentActivity>()` + Robolectricでユニットテストとして実行。Activityへのアクセス（`activityRule.scenario`、`onBackPressedDispatcher`など）が不要な場合は`createComposeRule()`でも可
 - **スクリーンショットテスト（Roborazzi）**: `@GraphicsMode(GraphicsMode.Mode.NATIVE)` を付けて `captureRoboImage()` でスクリーンショットを取得。クラスに `@Config(qualifiers = "w360dp-h640dp-port-xxhdpi")` でデバイスサイズを固定する。横向きは `@Config(qualifiers = "w640dp-h360dp-land-xxhdpi")` をメソッドに付与。アニメーション・`HorizontalPager`など描画が不安定なComposableは `RoborazziOptions(compareOptions = RoborazziOptions.CompareOptions(changeThreshold = 0.05f))` で差分しきい値を設定する
-- テストケース数は最小限に絞ること。カバレッジを確保しつつ、冗長なケースは省く
+- テストケース数は最小限に絞ること。カバレッジを確保しつつ、冗長なケースは省く。同じコードパスを通る入力パターンは1つのテストにまとめる（例: 空文字と空白のみは「空または空白のみ」として1テストに統合する）。正常系・異常系・境界値の3軸を意識し、各軸に1テストを目安にする
 - テスト名は日本語のバッククォート記法 (`` `初期状態はnullを返す`() ``)
 - 画面の向きは`@Config(qualifiers = "port")`または`@Config(qualifiers = "land")`で指定
 
@@ -179,6 +179,7 @@ try {
 - `HorizontalPager`内のノードは`assertIsDisplayed()`が失敗することがある（boundsチェックの問題）。代わりに`assertExists()`を使う
 - 戻るボタンのシミュレーションは`composeTestRule.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }`で行う
 - `RequestMultiplePermissions`ランチャーはRobolectricで自動的にコールバックを呼ばないため、権限拒否のシミュレーションは複雑になる
+- `ModalBottomSheet` の dismiss は `onBackPressedDispatcher.onBackPressed()` やscrimクリックではRobolectricで動作しない。代わりにシートコンテンツのノードに `performTouchInput { swipeDown() }` を使う
 
 ## カバレッジ
 
