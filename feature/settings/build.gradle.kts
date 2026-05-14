@@ -39,7 +39,6 @@ dependencies {
 
     // AndroidX
     implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
 
     // Unit Test
