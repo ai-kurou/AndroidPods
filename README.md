@@ -8,7 +8,6 @@
 [![Maintainability](https://qlty.sh/gh/ai-kurou/projects/AndroidPods/maintainability.svg)](https://qlty.sh/gh/ai-kurou/projects/AndroidPods)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/a05213d7b70f4578a9fc43cab1b4190c)](https://app.codacy.com/gh/ai-kurou/AndroidPods/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ai-kurou_AndroidPods&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=ai-kurou_AndroidPods)
-[![SonarQube Cloud](https://sonarcloud.io/images/project_badges/sonarcloud-highlight.svg)](https://sonarcloud.io/summary/new_code?id=ai-kurou_AndroidPods)
 [![License](https://img.shields.io/github/license/ai-kurou/AndroidPods)](LICENSE)
 [![GitHub Release](https://img.shields.io/github/v/release/ai-kurou/AndroidPods)](https://github.com/ai-kurou/AndroidPods/releases)
 ![Android](https://img.shields.io/badge/Android-API%2028%2B-green?logo=android)
