@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -29,7 +30,7 @@ internal fun UnknownDeviceBottomSheet(
     onDismiss: () -> Unit,
     onReport: (modelCode: String, deviceName: String) -> Unit,
 ) {
-    var deviceName by remember { mutableStateOf("") }
+    var deviceName by rememberSaveable { mutableStateOf("") }
     var isSubmitting by remember { mutableStateOf(false) }
 
     ModalBottomSheet(
