@@ -9,6 +9,7 @@ import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkStatic
 import io.mockk.verify
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -92,6 +93,21 @@ class UnknownDeviceRepositoryImplTest {
 
             val codes = repository.observeUnknownModelCodes().first()
             assertFalse(codes.contains("0x4444"))
+        }
+
+    @Test
+    fun `reportWithDeviceName - CancellationExceptionが発生したとき再スローされる`() =
+        runTest {
+            justRun { mockCrashlytics.setCustomKey(any(), any<String>()) }
+            every { mockCrashlytics.recordException(any()) } throws CancellationException()
+
+            var caughtCancellation = false
+            try {
+                repository.reportWithDeviceName(0x7777, "Test")
+            } catch (e: CancellationException) {
+                caughtCancellation = true
+            }
+            assertTrue(caughtCancellation)
         }
 
     @Test
