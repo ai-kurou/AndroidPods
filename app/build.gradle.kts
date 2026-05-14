@@ -28,8 +28,8 @@ android {
         applicationId = "kurou.androidpods"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = 36
-        versionCode = 34
-        versionName = "0.19.0"
+        versionCode = 35
+        versionName = "0.20.0"
 
         testInstrumentationRunner = "kurou.androidpods.HiltTestRunner"
     }
