@@ -209,19 +209,19 @@ private fun LazyGridScope.bannerItems(
             )
         }
     }
-    if (state.updateAvailable) {
-        item(key = R.string.update_available, span = { GridItemSpan(maxLineSpan) }) {
-            UpdateAvailableBanner(
-                onClick = onUpdateClick,
-                modifier = Modifier.animateItem(),
-            )
-        }
-    }
     if (state.hasUnknownDevices) {
         item(key = R.string.unknown_device_warning, span = { GridItemSpan(maxLineSpan) }) {
             WarningBanner(
                 text = stringResource(R.string.unknown_device_warning),
                 onClick = onUnknownDevicesClick,
+                modifier = Modifier.animateItem(),
+            )
+        }
+    }
+    if (state.updateAvailable) {
+        item(key = R.string.update_available, span = { GridItemSpan(maxLineSpan) }) {
+            UpdateAvailableBanner(
+                onClick = onUpdateClick,
                 modifier = Modifier.animateItem(),
             )
         }
