@@ -140,12 +140,16 @@ fun SettingsScreen(
     }
 
     if (uiState.showUnknownDeviceSheet) {
-        uiState.unknownModelCodes.firstOrNull()?.let { modelCode ->
+        val modelCode = uiState.unknownModelCodes.firstOrNull()
+        if (modelCode != null) {
             UnknownDeviceBottomSheet(
                 modelCode = modelCode,
                 onDismiss = viewModel::dismissUnknownDeviceSheet,
                 onReport = viewModel::reportUnknownDevice,
             )
+        } else {
+            // Composable内で直接副作用を起こせないためLaunchedEffectでラップする
+            LaunchedEffect(Unit) { viewModel.dismissUnknownDeviceSheet() }
         }
     }
 
