@@ -30,6 +30,7 @@ internal fun UnknownDeviceBottomSheet(
     onReport: (modelCode: String, deviceName: String) -> Unit,
 ) {
     var deviceName by remember { mutableStateOf("") }
+    var isSubmitting by remember { mutableStateOf(false) }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -60,8 +61,11 @@ internal fun UnknownDeviceBottomSheet(
             )
             Spacer(modifier = Modifier.height(16.dp))
             Button(
-                onClick = { onReport(modelCode, deviceName) },
-                enabled = deviceName.isNotBlank(),
+                onClick = {
+                    isSubmitting = true
+                    onReport(modelCode, deviceName)
+                },
+                enabled = deviceName.isNotBlank() && !isSubmitting,
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(stringResource(R.string.unknown_device_report_button))
