@@ -123,6 +123,21 @@ class SettingsContentTest {
     }
 
     @Test
+    fun `hasUnknownDevicesがtrueのとき未知デバイスバナーが表示され、タップするとonUnknownDevicesClickが呼ばれる`() {
+        var clicked = false
+        setSettingsContent(
+            hasUnknownDevices = true,
+            onUnknownDevicesClick = { clicked = true },
+        )
+
+        composeTestRule
+            .onNodeWithText("Unknown Apple device detected. Tap to report.")
+            .performClick()
+
+        assertTrue(clicked)
+    }
+
+    @Test
     fun `通知が無効のとき通知無効警告が表示され、タップするとコールバックが呼ばれる`() {
         var clicked = false
         setSettingsContent(
