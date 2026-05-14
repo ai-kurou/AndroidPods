@@ -34,6 +34,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.window.core.layout.WindowSizeClass
 import kurou.androidpods.core.domain.NotificationChannels
 
+@Suppress("CyclomaticComplexMethod")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
@@ -138,6 +139,20 @@ fun SettingsScreen(
         )
     }
 
+    if (uiState.showUnknownDeviceSheet) {
+        val modelCode = uiState.unknownModelCodes.firstOrNull()
+        if (modelCode != null) {
+            UnknownDeviceBottomSheet(
+                modelCode = modelCode,
+                onDismiss = viewModel::dismissUnknownDeviceSheet,
+                onReport = viewModel::reportUnknownDevice,
+            )
+        } else {
+            // Composable内で直接副作用を起こせないためLaunchedEffectでラップする
+            LaunchedEffect(Unit) { viewModel.dismissUnknownDeviceSheet() }
+        }
+    }
+
     val columns =
         when {
             windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND) -> 3
@@ -172,6 +187,7 @@ fun SettingsScreen(
             val intent = Intent(Intent.ACTION_VIEW, "https://github.com/ai-kurou/AndroidPods/releases/latest".toUri())
             context.startActivity(intent)
         },
+        onUnknownDevicesClick = viewModel::showUnknownDeviceSheet,
         onLicensesClick = onLicensesClick,
         onDevicesClick = onDevicesClick,
         onGithubClick = {
@@ -281,6 +297,7 @@ private fun SettingsScaffold(
     onNotificationWarningClick: () -> Unit,
     onDeviceScanChannelWarningClick: () -> Unit,
     onUpdateClick: () -> Unit,
+    onUnknownDevicesClick: () -> Unit,
     onLicensesClick: () -> Unit,
     onDevicesClick: () -> Unit,
     onGithubClick: () -> Unit,
@@ -312,6 +329,7 @@ private fun SettingsScaffold(
             isDeviceScanChannelDisabled = uiState.isDeviceScanChannelDisabled,
             isServiceRestarting = isServiceRestarting,
             isBatteryOptimizationExempt = uiState.isBatteryOptimizationExempt,
+            hasUnknownDevices = uiState.hasUnknownDevices,
             columns = columns,
             themeSettings = uiState.themeSettings,
             onPermissionWarningClick = onPermissionWarningClick,
@@ -319,6 +337,7 @@ private fun SettingsScaffold(
             onNotificationWarningClick = onNotificationWarningClick,
             onDeviceScanChannelWarningClick = onDeviceScanChannelWarningClick,
             onUpdateClick = onUpdateClick,
+            onUnknownDevicesClick = onUnknownDevicesClick,
             onLicensesClick = onLicensesClick,
             onDevicesClick = onDevicesClick,
             onGithubClick = onGithubClick,

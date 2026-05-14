@@ -19,6 +19,7 @@ import kurou.androidpods.core.domain.FirstLaunchRepository
 import kurou.androidpods.core.domain.OverlayPositionRepository
 import kurou.androidpods.core.domain.OverlaySettingsRepository
 import kurou.androidpods.core.domain.ThemeSettingsRepository
+import kurou.androidpods.core.domain.UnknownDeviceRepository
 import kurou.androidpods.core.domain.UpdateRepository
 import javax.inject.Named
 import javax.inject.Singleton
@@ -73,4 +74,7 @@ abstract class DataModule {
 
     @Binds
     internal abstract fun bindThemeSettingsRepository(impl: ThemeSettingsRepositoryImpl): ThemeSettingsRepository
+
+    @Binds
+    internal abstract fun bindUnknownDeviceRepository(impl: UnknownDeviceRepositoryImpl): UnknownDeviceRepository
 }

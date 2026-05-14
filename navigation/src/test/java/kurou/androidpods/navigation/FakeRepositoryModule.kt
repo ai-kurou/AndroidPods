@@ -17,6 +17,7 @@ import kurou.androidpods.core.domain.OverlayPositionRepository
 import kurou.androidpods.core.domain.OverlaySettingsRepository
 import kurou.androidpods.core.domain.ThemeSettings
 import kurou.androidpods.core.domain.ThemeSettingsRepository
+import kurou.androidpods.core.domain.UnknownDeviceRepository
 import kurou.androidpods.core.domain.UpdateRepository
 import javax.inject.Singleton
 
@@ -82,5 +83,16 @@ object FakeRepositoryModule {
             override fun observe(): Flow<OverlayPosition> = emptyFlow()
 
             override suspend fun update(position: OverlayPosition) {}
+        }
+
+    @Provides
+    @Singleton
+    fun provideUnknownDeviceRepository(): UnknownDeviceRepository =
+        object : UnknownDeviceRepository {
+            override fun observeUnknownModelCodes(): Flow<Set<String>> = flowOf(emptySet())
+
+            override suspend fun saveUnknownModelCode(modelCode: Int) {}
+
+            override suspend fun reportWithDeviceName(modelCode: Int, deviceName: String) {}
         }
 }

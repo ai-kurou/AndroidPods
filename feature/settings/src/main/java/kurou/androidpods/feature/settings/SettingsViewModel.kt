@@ -3,6 +3,7 @@ package kurou.androidpods.feature.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,6 +24,7 @@ import kurou.androidpods.core.domain.OverlayPosition
 import kurou.androidpods.core.domain.OverlayPositionUseCase
 import kurou.androidpods.core.domain.ThemeSettings
 import kurou.androidpods.core.domain.ThemeSettingsUseCase
+import kurou.androidpods.core.domain.UnknownDeviceUseCase
 import javax.inject.Inject
 
 sealed interface ServiceEvent {
@@ -31,25 +33,31 @@ sealed interface ServiceEvent {
     data object ShowRestartSnackbar : ServiceEvent
 }
 
-private data class UseCaseState(
+private data class ScanState(
     val bluetoothAdapterState: Int?,
     val appleDevices: Map<String, AppleDevice>,
-    val themeSettings: ThemeSettings,
-    val overlayPosition: OverlayPosition,
-    val overlayEnabled: Boolean,
+    val unknownModelCodes: Set<String>,
 )
 
-private data class InternalState(
+private data class OverlayState(
+    val overlayEnabled: Boolean,
+    val overlayPosition: OverlayPosition,
+)
+
+private data class WarningState(
     val updateAvailable: Boolean,
     val isNotificationsDisabled: Boolean,
     val isDeviceScanChannelDisabled: Boolean,
     val isBatteryOptimizationExempt: Boolean,
+    val permissionStates: Map<String, Boolean>,
 )
 
-private data class DialogState(
+private data class UiControlState(
+    val isServiceRestarting: Boolean = false,
     val showPermissionRequiredDialog: Boolean = false,
     val showThemeModeDialog: Boolean = false,
     val showOverlayPositionDialog: Boolean = false,
+    val showUnknownDeviceSheet: Boolean = false,
 )
 
 data class SettingsUiState(
@@ -62,14 +70,19 @@ data class SettingsUiState(
     val isNotificationsDisabled: Boolean = false,
     val isDeviceScanChannelDisabled: Boolean = false,
     val isBatteryOptimizationExempt: Boolean = false,
+    val unknownModelCodes: Set<String> = emptySet(),
     val permissionStates: Map<String, Boolean> = emptyMap(),
     val isServiceRestarting: Boolean = false,
     val showPermissionRequiredDialog: Boolean = false,
     val showThemeModeDialog: Boolean = false,
     val showOverlayPositionDialog: Boolean = false,
-)
+    val showUnknownDeviceSheet: Boolean = false,
+) {
+    val hasUnknownDevices: Boolean get() = unknownModelCodes.isNotEmpty()
+}
 
 @HiltViewModel
+@Suppress("TooManyFunctions")
 class SettingsViewModel @Inject constructor(
     private val getBluetoothAdapterStateUseCase: GetBluetoothAdapterStateUseCase,
     private val getAppleDevicesUseCase: GetAppleDevicesUseCase,
@@ -77,14 +90,14 @@ class SettingsViewModel @Inject constructor(
     private val checkUpdateUseCase: CheckUpdateUseCase,
     private val themeSettingsUseCase: ThemeSettingsUseCase,
     private val overlayPositionUseCase: OverlayPositionUseCase,
+    private val unknownDeviceUseCase: UnknownDeviceUseCase,
 ) : ViewModel() {
     private val _updateAvailable = MutableStateFlow(false)
     private val _isNotificationsDisabled = MutableStateFlow(false)
     private val _isDeviceScanChannelDisabled = MutableStateFlow(false)
     private val _isBatteryOptimizationExempt = MutableStateFlow(false)
     private val _permissionStates = MutableStateFlow<Map<String, Boolean>>(emptyMap())
-    private val _isServiceRestarting = MutableStateFlow(false)
-    private val _dialogState = MutableStateFlow(DialogState())
+    private val _uiControlState = MutableStateFlow(UiControlState())
     private val _serviceEvents = MutableSharedFlow<ServiceEvent>()
     val serviceEvents: SharedFlow<ServiceEvent> = _serviceEvents.asSharedFlow()
 
@@ -93,48 +106,50 @@ class SettingsViewModel @Inject constructor(
             combine(
                 getBluetoothAdapterStateUseCase.observe(),
                 getAppleDevicesUseCase.observe(),
-                themeSettingsUseCase.observe(),
-                overlayPositionUseCase.observe(),
+                unknownDeviceUseCase.observe(),
+            ) { bluetoothAdapterState, appleDevices, unknownModelCodes ->
+                ScanState(bluetoothAdapterState, appleDevices, unknownModelCodes)
+            },
+            combine(
                 getOverlaySettingsUseCase.observe(),
-            ) { bluetoothAdapterState, appleDevices, themeSettings, overlayPosition, overlayEnabled ->
-                UseCaseState(bluetoothAdapterState, appleDevices, themeSettings, overlayPosition, overlayEnabled)
+                overlayPositionUseCase.observe(),
+            ) { overlayEnabled, overlayPosition ->
+                OverlayState(overlayEnabled, overlayPosition)
             },
             combine(
                 _updateAvailable,
                 _isNotificationsDisabled,
                 _isDeviceScanChannelDisabled,
                 _isBatteryOptimizationExempt,
-            ) { updateAvailable,
-                isNotificationsDisabled,
-                isDeviceScanChannelDisabled,
-                isBatteryOptimizationExempt,
+                _permissionStates,
+            ) { updateAvailable, isNotificationsDisabled, isDeviceScanChannelDisabled,
+                isBatteryOptimizationExempt, permissionStates,
                 ->
-                InternalState(
-                    updateAvailable,
-                    isNotificationsDisabled,
-                    isDeviceScanChannelDisabled,
-                    isBatteryOptimizationExempt,
+                WarningState(
+                    updateAvailable, isNotificationsDisabled, isDeviceScanChannelDisabled,
+                    isBatteryOptimizationExempt, permissionStates,
                 )
             },
-            _permissionStates,
-            _isServiceRestarting,
-            _dialogState,
-        ) { useCaseState, internalState, permissionStates, isServiceRestarting, dialogState ->
+            themeSettingsUseCase.observe(),
+            _uiControlState,
+        ) { scan, overlay, warning, themeSettings, uiControl ->
             SettingsUiState(
-                bluetoothAdapterState = useCaseState.bluetoothAdapterState,
-                appleDevices = useCaseState.appleDevices,
-                themeSettings = useCaseState.themeSettings,
-                overlayPosition = useCaseState.overlayPosition,
-                overlayEnabled = useCaseState.overlayEnabled,
-                updateAvailable = internalState.updateAvailable,
-                isNotificationsDisabled = internalState.isNotificationsDisabled,
-                isDeviceScanChannelDisabled = internalState.isDeviceScanChannelDisabled,
-                isBatteryOptimizationExempt = internalState.isBatteryOptimizationExempt,
-                permissionStates = permissionStates,
-                isServiceRestarting = isServiceRestarting,
-                showPermissionRequiredDialog = dialogState.showPermissionRequiredDialog,
-                showThemeModeDialog = dialogState.showThemeModeDialog,
-                showOverlayPositionDialog = dialogState.showOverlayPositionDialog,
+                bluetoothAdapterState = scan.bluetoothAdapterState,
+                appleDevices = scan.appleDevices,
+                unknownModelCodes = scan.unknownModelCodes,
+                overlayEnabled = overlay.overlayEnabled,
+                overlayPosition = overlay.overlayPosition,
+                themeSettings = themeSettings,
+                updateAvailable = warning.updateAvailable,
+                isNotificationsDisabled = warning.isNotificationsDisabled,
+                isDeviceScanChannelDisabled = warning.isDeviceScanChannelDisabled,
+                isBatteryOptimizationExempt = warning.isBatteryOptimizationExempt,
+                permissionStates = warning.permissionStates,
+                isServiceRestarting = uiControl.isServiceRestarting,
+                showPermissionRequiredDialog = uiControl.showPermissionRequiredDialog,
+                showThemeModeDialog = uiControl.showThemeModeDialog,
+                showOverlayPositionDialog = uiControl.showOverlayPositionDialog,
+                showUnknownDeviceSheet = uiControl.showUnknownDeviceSheet,
             )
         }.stateIn(
             scope = viewModelScope,
@@ -143,22 +158,42 @@ class SettingsViewModel @Inject constructor(
         )
 
     fun showPermissionRequiredDialog() =
-        _dialogState.update { it.copy(showPermissionRequiredDialog = true) }
+        _uiControlState.update { it.copy(showPermissionRequiredDialog = true) }
 
     fun dismissPermissionRequiredDialog() =
-        _dialogState.update { it.copy(showPermissionRequiredDialog = false) }
+        _uiControlState.update { it.copy(showPermissionRequiredDialog = false) }
 
     fun showThemeModeDialog() =
-        _dialogState.update { it.copy(showThemeModeDialog = true) }
+        _uiControlState.update { it.copy(showThemeModeDialog = true) }
 
     fun dismissThemeModeDialog() =
-        _dialogState.update { it.copy(showThemeModeDialog = false) }
+        _uiControlState.update { it.copy(showThemeModeDialog = false) }
 
     fun showOverlayPositionDialog() =
-        _dialogState.update { it.copy(showOverlayPositionDialog = true) }
+        _uiControlState.update { it.copy(showOverlayPositionDialog = true) }
 
     fun dismissOverlayPositionDialog() =
-        _dialogState.update { it.copy(showOverlayPositionDialog = false) }
+        _uiControlState.update { it.copy(showOverlayPositionDialog = false) }
+
+    fun showUnknownDeviceSheet() =
+        _uiControlState.update { it.copy(showUnknownDeviceSheet = true) }
+
+    fun dismissUnknownDeviceSheet() =
+        _uiControlState.update { it.copy(showUnknownDeviceSheet = false) }
+
+    fun reportUnknownDevice(modelCode: String, deviceName: String) {
+        viewModelScope.launch {
+            try {
+                val code = modelCode.removePrefix("0x").toInt(16)
+                unknownDeviceUseCase.report(code, deviceName)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (_: Exception) {
+            } finally {
+                dismissUnknownDeviceSheet()
+            }
+        }
+    }
 
     fun checkUpdate(currentVersion: String) {
         viewModelScope.launch {
@@ -188,11 +223,11 @@ class SettingsViewModel @Inject constructor(
 
     fun restartService() {
         viewModelScope.launch {
-            _isServiceRestarting.update { true }
+            _uiControlState.update { it.copy(isServiceRestarting = true) }
             _serviceEvents.emit(ServiceEvent.StopScan)
             _serviceEvents.emit(ServiceEvent.StartScan)
             delay(RESTART_DELAY_MS)
-            _isServiceRestarting.update { false }
+            _uiControlState.update { it.copy(isServiceRestarting = false) }
             _serviceEvents.emit(ServiceEvent.ShowRestartSnackbar)
         }
     }

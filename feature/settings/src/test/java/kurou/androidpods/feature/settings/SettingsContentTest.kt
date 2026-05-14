@@ -36,6 +36,7 @@ class SettingsContentTest {
         isDeviceScanChannelDisabled: Boolean = false,
         isServiceRestarting: Boolean = false,
         isBatteryOptimizationExempt: Boolean = false,
+        hasUnknownDevices: Boolean = false,
         columns: Int = 1,
         themeSettings: ThemeSettings = ThemeSettings(),
         onPermissionWarningClick: () -> Unit = {},
@@ -49,6 +50,7 @@ class SettingsContentTest {
         onThemeModeClick: () -> Unit = {},
         onDynamicColorToggle: (Boolean) -> Unit = {},
         onUpdateClick: () -> Unit = {},
+        onUnknownDevicesClick: () -> Unit = {},
         onLicensesClick: () -> Unit = {},
         onDevicesClick: () -> Unit = {},
         onGithubClick: () -> Unit = {},
@@ -64,6 +66,7 @@ class SettingsContentTest {
                 isDeviceScanChannelDisabled = isDeviceScanChannelDisabled,
                 isServiceRestarting = isServiceRestarting,
                 isBatteryOptimizationExempt = isBatteryOptimizationExempt,
+                hasUnknownDevices = hasUnknownDevices,
                 columns = columns,
                 themeSettings = themeSettings,
                 onPermissionWarningClick = onPermissionWarningClick,
@@ -77,6 +80,7 @@ class SettingsContentTest {
                 onThemeModeClick = onThemeModeClick,
                 onDynamicColorToggle = onDynamicColorToggle,
                 onUpdateClick = onUpdateClick,
+                onUnknownDevicesClick = onUnknownDevicesClick,
                 onLicensesClick = onLicensesClick,
                 onDevicesClick = onDevicesClick,
                 onGithubClick = onGithubClick,
@@ -114,6 +118,21 @@ class SettingsContentTest {
             .onNodeWithText(
                 "Some required permissions are not granted. Please grant all permissions.",
             ).performClick()
+
+        assertTrue(clicked)
+    }
+
+    @Test
+    fun `hasUnknownDevicesがtrueのとき未知デバイスバナーが表示され、タップするとonUnknownDevicesClickが呼ばれる`() {
+        var clicked = false
+        setSettingsContent(
+            hasUnknownDevices = true,
+            onUnknownDevicesClick = { clicked = true },
+        )
+
+        composeTestRule
+            .onNodeWithText("Unknown Apple device detected. Tap to report.")
+            .performClick()
 
         assertTrue(clicked)
     }

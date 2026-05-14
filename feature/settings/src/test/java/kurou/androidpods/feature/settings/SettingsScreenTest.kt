@@ -43,8 +43,10 @@ import kurou.androidpods.core.domain.OverlayPosition
 import kurou.androidpods.core.domain.OverlayPositionUseCase
 import kurou.androidpods.core.domain.ThemeSettings
 import kurou.androidpods.core.domain.ThemeSettingsUseCase
+import kurou.androidpods.core.domain.UnknownDeviceUseCase
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -65,6 +67,7 @@ class SettingsScreenTest {
     private val checkUpdateUseCase = mockk<CheckUpdateUseCase>()
     private val themeSettingsUseCase = mockk<ThemeSettingsUseCase>()
     private val overlayPositionUseCase = mockk<OverlayPositionUseCase>(relaxUnitFun = true)
+    private val unknownDeviceUseCase = mockk<UnknownDeviceUseCase>()
 
     @After
     fun tearDown() {
@@ -81,12 +84,16 @@ class SettingsScreenTest {
         )
     }
 
-    private fun createViewModel(bluetoothAdapterState: Int): SettingsViewModel {
+    private fun createViewModel(
+        bluetoothAdapterState: Int,
+        unknownModelCodes: Set<String> = emptySet(),
+    ): SettingsViewModel {
         every { btUseCase.observe() } returns MutableStateFlow(bluetoothAdapterState)
         every { appleDevicesUseCase.observe() } returns MutableStateFlow(emptyMap())
         every { overlayUseCase.observe() } returns MutableStateFlow(false)
         every { themeSettingsUseCase.observe() } returns MutableStateFlow(ThemeSettings())
         every { overlayPositionUseCase.observe() } returns MutableStateFlow(OverlayPosition.BOTTOM)
+        every { unknownDeviceUseCase.observe() } returns MutableStateFlow(unknownModelCodes)
         coEvery { themeSettingsUseCase.update(any()) } just Runs
         return SettingsViewModel(
             btUseCase,
@@ -95,6 +102,7 @@ class SettingsScreenTest {
             checkUpdateUseCase,
             themeSettingsUseCase,
             overlayPositionUseCase,
+            unknownDeviceUseCase,
         )
     }
 
@@ -515,6 +523,56 @@ class SettingsScreenTest {
 
         val started = shadowOf(composeTestRule.activity).nextStartedActivity
         assertEquals(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS, started?.action)
+    }
+
+    @Test
+    fun `showUnknownDeviceSheetがtrueのときUnknownDeviceBottomSheetが表示される`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        grantRequiredPermissions(context)
+        val viewModel = createViewModel(
+            bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+            unknownModelCodes = setOf("0x1234"),
+        )
+
+        composeTestRule.setContent {
+            SettingsScreen(
+                windowSizeClass = windowSizeClassOf(400f),
+                onStartScanService = {},
+                onStopScanService = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                viewModel = viewModel,
+            )
+        }
+        viewModel.showUnknownDeviceSheet()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Report Unknown Device").assertExists()
+    }
+
+    @Test
+    fun `showUnknownDeviceSheetがtrueでunknownModelCodesが空のときシートが自動で閉じる`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        grantRequiredPermissions(context)
+        val viewModel = createViewModel(
+            bluetoothAdapterState = BluetoothAdapter.STATE_ON,
+            unknownModelCodes = emptySet(),
+        )
+
+        composeTestRule.setContent {
+            SettingsScreen(
+                windowSizeClass = windowSizeClassOf(400f),
+                onStartScanService = {},
+                onStopScanService = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                viewModel = viewModel,
+            )
+        }
+        viewModel.showUnknownDeviceSheet()
+        composeTestRule.waitForIdle()
+
+        assertFalse(viewModel.uiState.value.showUnknownDeviceSheet)
     }
 
     @Test

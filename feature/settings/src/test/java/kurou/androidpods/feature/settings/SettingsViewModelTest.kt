@@ -28,6 +28,7 @@ import kurou.androidpods.core.domain.OverlayPositionUseCase
 import kurou.androidpods.core.domain.ThemeMode
 import kurou.androidpods.core.domain.ThemeSettings
 import kurou.androidpods.core.domain.ThemeSettingsUseCase
+import kurou.androidpods.core.domain.UnknownDeviceUseCase
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -45,12 +46,14 @@ class SettingsViewModelTest {
     private val fakeThemeSettingsFlow = MutableStateFlow(ThemeSettings())
     private val fakeOverlayPositionFlow = MutableStateFlow(OverlayPosition.BOTTOM)
     private val fakeOverlayEnabledFlow = MutableStateFlow(false)
+    private val fakeUnknownModelCodesFlow = MutableStateFlow<Set<String>>(emptySet())
     private val getBluetoothAdapterStateUseCase = mockk<GetBluetoothAdapterStateUseCase>()
     private val getAppleDevicesUseCase = mockk<GetAppleDevicesUseCase>(relaxUnitFun = true)
     private val getOverlaySettingsUseCase = mockk<GetOverlaySettingsUseCase>(relaxUnitFun = true)
     private val checkUpdateUseCase = mockk<CheckUpdateUseCase>()
     private val themeSettingsUseCase = mockk<ThemeSettingsUseCase>()
     private val overlayPositionUseCase = mockk<OverlayPositionUseCase>(relaxUnitFun = true)
+    private val unknownDeviceUseCase = mockk<UnknownDeviceUseCase>()
 
     @Before
     fun setUp() {
@@ -60,6 +63,7 @@ class SettingsViewModelTest {
         every { getOverlaySettingsUseCase.observe() } returns fakeOverlayEnabledFlow
         every { themeSettingsUseCase.observe() } returns fakeThemeSettingsFlow
         every { overlayPositionUseCase.observe() } returns fakeOverlayPositionFlow
+        every { unknownDeviceUseCase.observe() } returns fakeUnknownModelCodesFlow
         viewModel =
             SettingsViewModel(
                 getBluetoothAdapterStateUseCase,
@@ -68,6 +72,7 @@ class SettingsViewModelTest {
                 checkUpdateUseCase,
                 themeSettingsUseCase,
                 overlayPositionUseCase,
+                unknownDeviceUseCase,
             )
     }
 
@@ -92,6 +97,7 @@ class SettingsViewModelTest {
             verify(exactly = 1) { getOverlaySettingsUseCase.observe() }
             verify(exactly = 1) { themeSettingsUseCase.observe() }
             verify(exactly = 1) { overlayPositionUseCase.observe() }
+            verify(exactly = 1) { unknownDeviceUseCase.observe() }
             coVerify(exactly = 1) { checkUpdateUseCase(version) }
             confirmVerified(
                 getBluetoothAdapterStateUseCase,
@@ -100,6 +106,7 @@ class SettingsViewModelTest {
                 checkUpdateUseCase,
                 themeSettingsUseCase,
                 overlayPositionUseCase,
+                unknownDeviceUseCase,
             )
         }
 
@@ -118,6 +125,7 @@ class SettingsViewModelTest {
             verify(exactly = 1) { getOverlaySettingsUseCase.observe() }
             verify(exactly = 1) { themeSettingsUseCase.observe() }
             verify(exactly = 1) { overlayPositionUseCase.observe() }
+            verify(exactly = 1) { unknownDeviceUseCase.observe() }
             coVerify(exactly = 1) { checkUpdateUseCase(version) }
             confirmVerified(
                 getBluetoothAdapterStateUseCase,
@@ -126,6 +134,7 @@ class SettingsViewModelTest {
                 checkUpdateUseCase,
                 themeSettingsUseCase,
                 overlayPositionUseCase,
+                unknownDeviceUseCase,
             )
         }
 
@@ -144,6 +153,7 @@ class SettingsViewModelTest {
             verify(exactly = 1) { getOverlaySettingsUseCase.observe() }
             verify(exactly = 1) { themeSettingsUseCase.observe() }
             verify(exactly = 1) { overlayPositionUseCase.observe() }
+            verify(exactly = 1) { unknownDeviceUseCase.observe() }
             coVerify(exactly = 1) { checkUpdateUseCase(version) }
             confirmVerified(
                 getBluetoothAdapterStateUseCase,
@@ -152,6 +162,7 @@ class SettingsViewModelTest {
                 checkUpdateUseCase,
                 themeSettingsUseCase,
                 overlayPositionUseCase,
+                unknownDeviceUseCase,
             )
         }
 
@@ -171,6 +182,7 @@ class SettingsViewModelTest {
             verify(exactly = 1) { getOverlaySettingsUseCase.refresh() }
             verify(exactly = 1) { themeSettingsUseCase.observe() }
             verify(exactly = 1) { overlayPositionUseCase.observe() }
+            verify(exactly = 1) { unknownDeviceUseCase.observe() }
             confirmVerified(
                 getBluetoothAdapterStateUseCase,
                 getAppleDevicesUseCase,
@@ -178,6 +190,7 @@ class SettingsViewModelTest {
                 checkUpdateUseCase,
                 themeSettingsUseCase,
                 overlayPositionUseCase,
+                unknownDeviceUseCase,
             )
         }
 
@@ -195,6 +208,7 @@ class SettingsViewModelTest {
             verify(exactly = 1) { getOverlaySettingsUseCase.observe() }
             verify(exactly = 1) { themeSettingsUseCase.observe() }
             verify(exactly = 1) { overlayPositionUseCase.observe() }
+            verify(exactly = 1) { unknownDeviceUseCase.observe() }
             confirmVerified(
                 getBluetoothAdapterStateUseCase,
                 getAppleDevicesUseCase,
@@ -202,6 +216,7 @@ class SettingsViewModelTest {
                 checkUpdateUseCase,
                 themeSettingsUseCase,
                 overlayPositionUseCase,
+                unknownDeviceUseCase,
             )
         }
 
@@ -219,6 +234,7 @@ class SettingsViewModelTest {
             verify(exactly = 1) { getOverlaySettingsUseCase.observe() }
             verify(exactly = 1) { themeSettingsUseCase.observe() }
             verify(exactly = 1) { overlayPositionUseCase.observe() }
+            verify(exactly = 1) { unknownDeviceUseCase.observe() }
             confirmVerified(
                 getBluetoothAdapterStateUseCase,
                 getAppleDevicesUseCase,
@@ -226,6 +242,7 @@ class SettingsViewModelTest {
                 checkUpdateUseCase,
                 themeSettingsUseCase,
                 overlayPositionUseCase,
+                unknownDeviceUseCase,
             )
         }
 
@@ -243,6 +260,7 @@ class SettingsViewModelTest {
             verify(exactly = 1) { getOverlaySettingsUseCase.observe() }
             verify(exactly = 1) { themeSettingsUseCase.observe() }
             verify(exactly = 1) { overlayPositionUseCase.observe() }
+            verify(exactly = 1) { unknownDeviceUseCase.observe() }
             confirmVerified(
                 getBluetoothAdapterStateUseCase,
                 getAppleDevicesUseCase,
@@ -250,6 +268,7 @@ class SettingsViewModelTest {
                 checkUpdateUseCase,
                 themeSettingsUseCase,
                 overlayPositionUseCase,
+                unknownDeviceUseCase,
             )
         }
 
@@ -266,6 +285,7 @@ class SettingsViewModelTest {
             verify(exactly = 1) { getOverlaySettingsUseCase.observe() }
             verify(exactly = 1) { themeSettingsUseCase.observe() }
             verify(exactly = 1) { overlayPositionUseCase.observe() }
+            verify(exactly = 1) { unknownDeviceUseCase.observe() }
             coVerify(exactly = 1) { themeSettingsUseCase.update(settings) }
             confirmVerified(
                 getBluetoothAdapterStateUseCase,
@@ -274,6 +294,7 @@ class SettingsViewModelTest {
                 checkUpdateUseCase,
                 themeSettingsUseCase,
                 overlayPositionUseCase,
+                unknownDeviceUseCase,
             )
         }
 
@@ -287,6 +308,7 @@ class SettingsViewModelTest {
             verify(exactly = 1) { getOverlaySettingsUseCase.observe() }
             verify(exactly = 1) { themeSettingsUseCase.observe() }
             verify(exactly = 1) { overlayPositionUseCase.observe() }
+            verify(exactly = 1) { unknownDeviceUseCase.observe() }
             coVerify(exactly = 1) { overlayPositionUseCase.update(OverlayPosition.TOP) }
             confirmVerified(
                 getBluetoothAdapterStateUseCase,
@@ -295,6 +317,7 @@ class SettingsViewModelTest {
                 checkUpdateUseCase,
                 themeSettingsUseCase,
                 overlayPositionUseCase,
+                unknownDeviceUseCase,
             )
         }
 
@@ -310,6 +333,7 @@ class SettingsViewModelTest {
         verify(exactly = 1) { getOverlaySettingsUseCase.observe() }
         verify(exactly = 1) { themeSettingsUseCase.observe() }
         verify(exactly = 1) { overlayPositionUseCase.observe() }
+        verify(exactly = 1) { unknownDeviceUseCase.observe() }
         confirmVerified(
             getBluetoothAdapterStateUseCase,
             getAppleDevicesUseCase,
@@ -317,6 +341,7 @@ class SettingsViewModelTest {
             checkUpdateUseCase,
             themeSettingsUseCase,
             overlayPositionUseCase,
+            unknownDeviceUseCase,
         )
     }
 
@@ -369,5 +394,32 @@ class SettingsViewModelTest {
             viewModel.showOverlayPositionDialog()
             viewModel.dismissOverlayPositionDialog()
             assertFalse(viewModel.uiState.value.showOverlayPositionDialog)
+        }
+
+    @Test
+    fun `showUnknownDeviceSheetとdismissUnknownDeviceSheetでシートの表示状態が切り替わる`() =
+        runTest {
+            fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
+
+            viewModel.showUnknownDeviceSheet()
+            assertTrue(viewModel.uiState.value.showUnknownDeviceSheet)
+
+            viewModel.dismissUnknownDeviceSheet()
+            assertFalse(viewModel.uiState.value.showUnknownDeviceSheet)
+        }
+
+    @Test
+    fun `シートを表示後に報告するとUseCaseのreportが呼ばれシートが閉じる`() =
+        runTest {
+            fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
+            coEvery { unknownDeviceUseCase.report(0x1234, "AirPods Max") } just Runs
+
+            viewModel.showUnknownDeviceSheet()
+            assertTrue(viewModel.uiState.value.showUnknownDeviceSheet)
+
+            viewModel.reportUnknownDevice("0x1234", "AirPods Max")
+
+            coVerify(exactly = 1) { unknownDeviceUseCase.report(0x1234, "AirPods Max") }
+            assertFalse(viewModel.uiState.value.showUnknownDeviceSheet)
         }
 }
