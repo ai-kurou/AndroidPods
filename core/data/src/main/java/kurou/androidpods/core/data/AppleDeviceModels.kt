@@ -13,6 +13,7 @@ internal val APPLE_DEVICE_MODELS: Map<Int, String> =
         0x1B20 to "AirPods (4th Gen, ANC)",
         0x0A20 to "AirPods Max",
         0x1F20 to "AirPods Max (USB-C)",
+        0x2D20 to "AirPods Max (2nd Gen)",
         0x0E20 to "AirPods Pro",
         0x1420 to "AirPods Pro (2nd Gen)",
         0x2420 to "AirPods Pro (2nd Gen, USB-C)",
@@ -36,6 +37,7 @@ internal val SINGLE_BATTERY_MODELS: Set<Int> =
     setOf(
         0x0A20, // AirPods Max
         0x1F20, // AirPods Max (USB-C)
+        0x2D20, // AirPods Max (2nd Gen)
         0x0520, // BeatsX
         0x1020, // Beats Flex
         0x0620, // Beats Solo3
@@ -123,6 +125,10 @@ private val APPLE_DEVICE_IMAGES: Map<Int, DeviceImages> =
         0x1F20 to
             DeviceImages.Single(
                 body = R.drawable.airpods_max_1st_gen_usb_c,
+            ),
+        0x2D20 to
+            DeviceImages.Single(
+                body = R.drawable.airpods_max_2nd_gen,
             ),
         0x0E20 to
             DeviceImages.Tws(
