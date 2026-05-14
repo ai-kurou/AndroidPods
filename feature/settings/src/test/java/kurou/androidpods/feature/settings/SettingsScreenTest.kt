@@ -83,13 +83,16 @@ class SettingsScreenTest {
         )
     }
 
-    private fun createViewModel(bluetoothAdapterState: Int): SettingsViewModel {
+    private fun createViewModel(
+        bluetoothAdapterState: Int,
+        unknownModelCodes: Set<String> = emptySet(),
+    ): SettingsViewModel {
         every { btUseCase.observe() } returns MutableStateFlow(bluetoothAdapterState)
         every { appleDevicesUseCase.observe() } returns MutableStateFlow(emptyMap())
         every { overlayUseCase.observe() } returns MutableStateFlow(false)
         every { themeSettingsUseCase.observe() } returns MutableStateFlow(ThemeSettings())
         every { overlayPositionUseCase.observe() } returns MutableStateFlow(OverlayPosition.BOTTOM)
-        every { unknownDeviceUseCase.observe() } returns MutableStateFlow(emptySet())
+        every { unknownDeviceUseCase.observe() } returns MutableStateFlow(unknownModelCodes)
         coEvery { themeSettingsUseCase.update(any()) } just Runs
         return SettingsViewModel(
             btUseCase,

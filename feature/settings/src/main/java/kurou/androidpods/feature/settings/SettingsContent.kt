@@ -61,6 +61,7 @@ internal fun SettingsContent(
     isDeviceScanChannelDisabled: Boolean,
     isServiceRestarting: Boolean,
     isBatteryOptimizationExempt: Boolean,
+    hasUnknownDevices: Boolean,
     columns: Int,
     themeSettings: ThemeSettings,
     onPermissionWarningClick: () -> Unit,
@@ -74,6 +75,7 @@ internal fun SettingsContent(
     onThemeModeClick: () -> Unit,
     onDynamicColorToggle: (Boolean) -> Unit,
     onUpdateClick: () -> Unit,
+    onUnknownDevicesClick: () -> Unit,
     onLicensesClick: () -> Unit,
     onDevicesClick: () -> Unit,
     onGithubClick: () -> Unit,
@@ -90,6 +92,7 @@ internal fun SettingsContent(
         updateAvailable = updateAvailable,
         isNotificationsDisabled = isNotificationsDisabled,
         isDeviceScanChannelDisabled = isDeviceScanChannelDisabled,
+        hasUnknownDevices = hasUnknownDevices,
     )
     val bannerCount = bannerState.count()
     val gridState = rememberLazyGridState()
@@ -114,6 +117,7 @@ internal fun SettingsContent(
             onNotificationWarningClick = onNotificationWarningClick,
             onDeviceScanChannelWarningClick = onDeviceScanChannelWarningClick,
             onUpdateClick = onUpdateClick,
+            onUnknownDevicesClick = onUnknownDevicesClick,
         )
         overlaySectionItems(
             overlayEnabled = overlayEnabled,
@@ -147,6 +151,7 @@ private data class BannerState(
     val updateAvailable: Boolean,
     val isNotificationsDisabled: Boolean,
     val isDeviceScanChannelDisabled: Boolean,
+    val hasUnknownDevices: Boolean,
 ) {
     fun count(): Int = listOf(
         hasNotGranted,
@@ -154,6 +159,7 @@ private data class BannerState(
         updateAvailable,
         isNotificationsDisabled,
         isDeviceScanChannelDisabled,
+        hasUnknownDevices,
     ).count { it }
 }
 
@@ -164,6 +170,7 @@ private fun LazyGridScope.bannerItems(
     onNotificationWarningClick: () -> Unit,
     onDeviceScanChannelWarningClick: () -> Unit,
     onUpdateClick: () -> Unit,
+    onUnknownDevicesClick: () -> Unit,
 ) {
     if (state.hasNotGranted) {
         item(key = R.string.permission_warning, span = { GridItemSpan(maxLineSpan) }) {
@@ -206,6 +213,15 @@ private fun LazyGridScope.bannerItems(
         item(key = R.string.update_available, span = { GridItemSpan(maxLineSpan) }) {
             UpdateAvailableBanner(
                 onClick = onUpdateClick,
+                modifier = Modifier.animateItem(),
+            )
+        }
+    }
+    if (state.hasUnknownDevices) {
+        item(key = R.string.unknown_device_warning, span = { GridItemSpan(maxLineSpan) }) {
+            WarningBanner(
+                text = stringResource(R.string.unknown_device_warning),
+                onClick = onUnknownDevicesClick,
                 modifier = Modifier.animateItem(),
             )
         }
@@ -569,6 +585,7 @@ private fun SettingsContentPreviewNoWarning() {
         isNotificationsDisabled = false,
         isDeviceScanChannelDisabled = false,
         isServiceRestarting = false,
+        hasUnknownDevices = false,
         columns = 1,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
@@ -583,6 +600,7 @@ private fun SettingsContentPreviewNoWarning() {
         onThemeModeClick = {},
         onDynamicColorToggle = {},
         onUpdateClick = {},
+        onUnknownDevicesClick = {},
         onLicensesClick = {},
         onDevicesClick = {},
         onGithubClick = {},
@@ -601,6 +619,7 @@ private fun SettingsContentPreviewBluetoothUnavailable() {
         isNotificationsDisabled = false,
         isDeviceScanChannelDisabled = false,
         isServiceRestarting = false,
+        hasUnknownDevices = false,
         columns = 1,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
@@ -615,6 +634,7 @@ private fun SettingsContentPreviewBluetoothUnavailable() {
         onThemeModeClick = {},
         onDynamicColorToggle = {},
         onUpdateClick = {},
+        onUnknownDevicesClick = {},
         onLicensesClick = {},
         onDevicesClick = {},
         onGithubClick = {},
@@ -637,6 +657,7 @@ private fun SettingsContentPreviewAllWarnings() {
         isNotificationsDisabled = true,
         isDeviceScanChannelDisabled = true,
         isServiceRestarting = false,
+        hasUnknownDevices = true,
         columns = 1,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
@@ -651,6 +672,7 @@ private fun SettingsContentPreviewAllWarnings() {
         onThemeModeClick = {},
         onDynamicColorToggle = {},
         onUpdateClick = {},
+        onUnknownDevicesClick = {},
         onLicensesClick = {},
         onDevicesClick = {},
         onGithubClick = {},
@@ -673,6 +695,7 @@ private fun SettingsContentPreviewServiceRestarting() {
         isNotificationsDisabled = false,
         isDeviceScanChannelDisabled = false,
         isServiceRestarting = true,
+        hasUnknownDevices = false,
         columns = 1,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
@@ -687,6 +710,7 @@ private fun SettingsContentPreviewServiceRestarting() {
         onThemeModeClick = {},
         onDynamicColorToggle = {},
         onUpdateClick = {},
+        onUnknownDevicesClick = {},
         onLicensesClick = {},
         onDevicesClick = {},
         onGithubClick = {},
@@ -709,6 +733,7 @@ private fun SettingsContentPreviewTwoColumns() {
         isNotificationsDisabled = true,
         isDeviceScanChannelDisabled = false,
         isServiceRestarting = false,
+        hasUnknownDevices = false,
         columns = 2,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
@@ -723,6 +748,7 @@ private fun SettingsContentPreviewTwoColumns() {
         onThemeModeClick = {},
         onDynamicColorToggle = {},
         onUpdateClick = {},
+        onUnknownDevicesClick = {},
         onLicensesClick = {},
         onDevicesClick = {},
         onGithubClick = {},
@@ -745,6 +771,7 @@ private fun SettingsContentPreviewThreeColumns() {
         isNotificationsDisabled = true,
         isDeviceScanChannelDisabled = false,
         isServiceRestarting = false,
+        hasUnknownDevices = false,
         columns = 3,
         onPermissionWarningClick = {},
         onBluetoothWarningClick = {},
@@ -759,6 +786,7 @@ private fun SettingsContentPreviewThreeColumns() {
         onThemeModeClick = {},
         onDynamicColorToggle = {},
         onUpdateClick = {},
+        onUnknownDevicesClick = {},
         onLicensesClick = {},
         onDevicesClick = {},
         onGithubClick = {},

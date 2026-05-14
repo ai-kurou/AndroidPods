@@ -172,6 +172,7 @@ fun SettingsScreen(
             val intent = Intent(Intent.ACTION_VIEW, "https://github.com/ai-kurou/AndroidPods/releases/latest".toUri())
             context.startActivity(intent)
         },
+        onUnknownDevicesClick = {},
         onLicensesClick = onLicensesClick,
         onDevicesClick = onDevicesClick,
         onGithubClick = {
@@ -281,6 +282,7 @@ private fun SettingsScaffold(
     onNotificationWarningClick: () -> Unit,
     onDeviceScanChannelWarningClick: () -> Unit,
     onUpdateClick: () -> Unit,
+    onUnknownDevicesClick: () -> Unit,
     onLicensesClick: () -> Unit,
     onDevicesClick: () -> Unit,
     onGithubClick: () -> Unit,
@@ -312,6 +314,7 @@ private fun SettingsScaffold(
             isDeviceScanChannelDisabled = uiState.isDeviceScanChannelDisabled,
             isServiceRestarting = isServiceRestarting,
             isBatteryOptimizationExempt = uiState.isBatteryOptimizationExempt,
+            hasUnknownDevices = uiState.hasUnknownDevices,
             columns = columns,
             themeSettings = uiState.themeSettings,
             onPermissionWarningClick = onPermissionWarningClick,
@@ -319,6 +322,7 @@ private fun SettingsScaffold(
             onNotificationWarningClick = onNotificationWarningClick,
             onDeviceScanChannelWarningClick = onDeviceScanChannelWarningClick,
             onUpdateClick = onUpdateClick,
+            onUnknownDevicesClick = onUnknownDevicesClick,
             onLicensesClick = onLicensesClick,
             onDevicesClick = onDevicesClick,
             onGithubClick = onGithubClick,

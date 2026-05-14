@@ -40,4 +40,5 @@
     <string name="overlay_position_top">Top</string>
     <string name="overlay_position_bottom">Bottom</string>
     <string name="battery_optimization_label">Disable battery optimization</string>
+    <string name="unknown_device_warning">Unknown Apple device detected. Tap to report.</string>
 </resources>
