@@ -66,7 +66,6 @@ dependencies {
     // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.crashlytics)
-    implementation(libs.firebase.analytics)
 
     // プロジェクトモジュール
     implementation(project(":core:domain"))
