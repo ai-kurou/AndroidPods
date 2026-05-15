@@ -59,7 +59,7 @@ internal fun BatteryWidgetContent(context: Context, state: WidgetBatteryState?) 
     val baseModifier = GlanceModifier
         .fillMaxSize()
         .background(ImageProvider(R.drawable.widget_background))
-        .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp)
+        .padding(start = 24.dp, top = 20.dp, end = 24.dp, bottom = 20.dp)
     Column(
         modifier = if (launchComponent != null) {
             baseModifier.clickable(actionStartActivity(launchComponent))
@@ -87,7 +87,7 @@ internal fun BatteryWidgetContent(context: Context, state: WidgetBatteryState?) 
                     textAlign = TextAlign.Center,
                 ),
             )
-            Spacer(modifier = GlanceModifier.height(16.dp))
+            Spacer(modifier = GlanceModifier.height(20.dp))
             val deviceImages = widgetDeviceImages(state.modelCode)
             if (deviceImages != null) {
                 if (state.isSingle) {
@@ -103,7 +103,7 @@ internal fun BatteryWidgetContent(context: Context, state: WidgetBatteryState?) 
                             contentDescription = null,
                             modifier = GlanceModifier.size(60.dp),
                         )
-                        Spacer(modifier = GlanceModifier.height(12.dp))
+                        Spacer(modifier = GlanceModifier.height(16.dp))
                         Row(
                             verticalAlignment = Alignment.Vertical.CenterVertically,
                         ) {
@@ -141,7 +141,7 @@ internal fun BatteryWidgetContent(context: Context, state: WidgetBatteryState?) 
                                 level = state.rightBattery,
                                 imageRes = twsImages.right,
                                 charging = state.rightCharging,
-                                modifier = GlanceModifier.padding(horizontal = 24.dp),
+                                modifier = GlanceModifier.padding(horizontal = 32.dp),
                             )
                             BatteryColumn(
                                 level = state.caseBattery,
@@ -161,7 +161,7 @@ internal fun BatteryWidgetContent(context: Context, state: WidgetBatteryState?) 
                     ),
                 )
             }
-            Spacer(modifier = GlanceModifier.height(12.dp))
+            Spacer(modifier = GlanceModifier.height(16.dp))
             Text(
                 text = recordedAtText(context, state.recordedAt),
                 style = TextStyle(
@@ -191,7 +191,7 @@ private fun BatteryColumn(
                 contentDescription = null,
                 modifier = GlanceModifier.size(40.dp),
             )
-            Spacer(modifier = GlanceModifier.height(10.dp))
+            Spacer(modifier = GlanceModifier.height(14.dp))
         }
         Row(
             verticalAlignment = Alignment.Vertical.CenterVertically,
