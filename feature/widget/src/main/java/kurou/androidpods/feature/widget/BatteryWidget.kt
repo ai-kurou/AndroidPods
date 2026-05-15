@@ -2,6 +2,8 @@ package kurou.androidpods.feature.widget
 
 import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -20,7 +22,6 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import dagger.hilt.android.EntryPointAccessors
-import kotlinx.coroutines.flow.first
 import kurou.androidpods.core.domain.WidgetBatteryState
 
 class BatteryWidget : GlanceAppWidget() {
@@ -29,8 +30,9 @@ class BatteryWidget : GlanceAppWidget() {
             context.applicationContext,
             WidgetEntryPoint::class.java,
         )
-        val state = entryPoint.widgetBatteryUseCase().observe().first()
+        val stateFlow = entryPoint.widgetBatteryUseCase().observe()
         provideContent {
+            val state by stateFlow.collectAsState(initial = null)
             GlanceTheme {
                 BatteryWidgetContent(context, state)
             }

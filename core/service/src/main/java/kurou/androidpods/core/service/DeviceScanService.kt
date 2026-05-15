@@ -5,7 +5,9 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.appwidget.AppWidgetManager
 import android.bluetooth.BluetoothAdapter
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
@@ -99,10 +101,8 @@ class DeviceScanService : Service() {
                     .notify(NOTIFICATION_ID, notification)
 
                 if (deviceList.isNotEmpty()) {
-                    scope.launch {
-                        widgetBatteryRepository.save(deviceList.first())
-                        sendBroadcast(Intent(WidgetActions.WIDGET_UPDATE))
-                    }
+                    widgetBatteryRepository.save(deviceList.last())
+                    notifyWidgetUpdate()
                 }
                 if (overlaySettingsRepository.isEnabled() && deviceList.isNotEmpty()) {
                     overlayManager.show(deviceList)
@@ -168,6 +168,19 @@ class DeviceScanService : Service() {
         }
 
         return builder.build()
+    }
+
+    private fun notifyWidgetUpdate() {
+        val component = ComponentName(packageName, WidgetActions.RECEIVER_CLASS)
+        val widgetIds = AppWidgetManager.getInstance(this).getAppWidgetIds(component)
+        if (widgetIds.isNotEmpty()) {
+            sendBroadcast(
+                Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE).apply {
+                    setComponent(component)
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, widgetIds)
+                },
+            )
+        }
     }
 
     companion object {
