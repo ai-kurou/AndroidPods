@@ -5,4 +5,7 @@
     <string name="widget_recorded_just_now">たった今</string>
     <string name="widget_recorded_minutes_ago">%d分前</string>
     <string name="widget_recorded_hours_ago">%d時間前</string>
+    <string name="widget_label_left">L</string>
+    <string name="widget_label_right">R</string>
+    <string name="widget_label_case">ケース</string>
 </resources>

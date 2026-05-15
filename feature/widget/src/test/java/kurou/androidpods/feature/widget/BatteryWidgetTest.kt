@@ -17,18 +17,26 @@ class BatteryWidgetTest {
 
     private fun twsState(left: Int? = 7, right: Int? = 8, case: Int? = 9) = WidgetBatteryState(
         deviceName = "AirPods Pro",
+        modelCode = 0x2402,
         leftBattery = left,
         rightBattery = right,
         caseBattery = case,
+        leftCharging = false,
+        rightCharging = false,
+        caseCharging = false,
         isSingle = false,
         recordedAt = 0L,
     )
 
     private fun singleState(battery: Int? = 5) = WidgetBatteryState(
         deviceName = "AirPods Max",
+        modelCode = 0x0A20,
         leftBattery = battery,
         rightBattery = null,
         caseBattery = null,
+        leftCharging = false,
+        rightCharging = false,
+        caseCharging = false,
         isSingle = true,
         recordedAt = 0L,
     )

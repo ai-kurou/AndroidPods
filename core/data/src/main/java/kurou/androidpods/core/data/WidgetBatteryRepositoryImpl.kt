@@ -26,9 +26,13 @@ internal class WidgetBatteryRepositoryImpl @Inject constructor(
 ) : WidgetBatteryRepository {
 
     private val keyDeviceName = stringPreferencesKey("device_name")
+    private val keyModelCode = intPreferencesKey("model_code")
     private val keyLeftBattery = intPreferencesKey("left_battery")
     private val keyRightBattery = intPreferencesKey("right_battery")
     private val keyCaseBattery = intPreferencesKey("case_battery")
+    private val keyLeftCharging = booleanPreferencesKey("left_charging")
+    private val keyRightCharging = booleanPreferencesKey("right_charging")
+    private val keyCaseCharging = booleanPreferencesKey("case_charging")
     private val keyIsSingle = booleanPreferencesKey("is_single")
     private val keyRecordedAt = longPreferencesKey("recorded_at")
 
@@ -37,9 +41,13 @@ internal class WidgetBatteryRepositoryImpl @Inject constructor(
             val deviceName = preferences[keyDeviceName] ?: return@map null
             WidgetBatteryState(
                 deviceName = deviceName,
+                modelCode = preferences[keyModelCode] ?: 0,
                 leftBattery = preferences[keyLeftBattery]?.takeIf { it >= 0 },
                 rightBattery = preferences[keyRightBattery]?.takeIf { it >= 0 },
                 caseBattery = preferences[keyCaseBattery]?.takeIf { it >= 0 },
+                leftCharging = preferences[keyLeftCharging] ?: false,
+                rightCharging = preferences[keyRightCharging] ?: false,
+                caseCharging = preferences[keyCaseCharging] ?: false,
                 isSingle = preferences[keyIsSingle] ?: false,
                 recordedAt = preferences[keyRecordedAt] ?: 0L,
             )
@@ -48,9 +56,13 @@ internal class WidgetBatteryRepositoryImpl @Inject constructor(
     override suspend fun save(device: AppleDevice) {
         dataStore.edit { preferences ->
             preferences[keyDeviceName] = device.modelName
+            preferences[keyModelCode] = device.modelCode
             preferences[keyLeftBattery] = device.leftBattery ?: -1
             preferences[keyRightBattery] = device.rightBattery ?: -1
             preferences[keyCaseBattery] = device.caseBattery ?: -1
+            preferences[keyLeftCharging] = device.leftCharging
+            preferences[keyRightCharging] = device.rightCharging
+            preferences[keyCaseCharging] = device.caseCharging
             preferences[keyIsSingle] = device.isSingle
             preferences[keyRecordedAt] = System.currentTimeMillis()
         }

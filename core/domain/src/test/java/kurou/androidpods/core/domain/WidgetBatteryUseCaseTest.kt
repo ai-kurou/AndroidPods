@@ -32,9 +32,13 @@ class WidgetBatteryUseCaseTest {
         runTest {
             val state = WidgetBatteryState(
                 deviceName = "AirPods Pro",
+                modelCode = 0x2002,
                 leftBattery = 7,
                 rightBattery = 8,
                 caseBattery = 9,
+                leftCharging = false,
+                rightCharging = false,
+                caseCharging = false,
                 isSingle = false,
                 recordedAt = 1000L,
             )

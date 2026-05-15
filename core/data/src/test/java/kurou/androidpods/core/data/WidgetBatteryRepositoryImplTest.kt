@@ -57,9 +57,13 @@ class WidgetBatteryRepositoryImplTest {
 
             val result = repository.observe().first()!!
             assertEquals("AirPods Pro", result.deviceName)
+            assertEquals(0x2002, result.modelCode)
             assertEquals(7, result.leftBattery)
             assertEquals(8, result.rightBattery)
             assertEquals(9, result.caseBattery)
+            assertEquals(false, result.leftCharging)
+            assertEquals(false, result.rightCharging)
+            assertEquals(false, result.caseCharging)
             assertEquals(false, result.isSingle)
             assertTrue(result.recordedAt > 0L)
         }
