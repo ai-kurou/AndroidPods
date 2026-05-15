@@ -10,6 +10,8 @@ import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
+import androidx.glance.action.actionStartActivity
+import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
@@ -42,11 +44,18 @@ class BatteryWidget : GlanceAppWidget() {
 
 @Composable
 internal fun BatteryWidgetContent(context: Context, state: WidgetBatteryState?) {
+    val launchComponent = context.packageManager
+        .getLaunchIntentForPackage(context.packageName)?.component
+    val baseModifier = GlanceModifier
+        .fillMaxSize()
+        .background(ColorProvider(Color.White))
+        .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 8.dp)
     Column(
-        modifier = GlanceModifier
-            .fillMaxSize()
-            .background(ColorProvider(Color.White))
-            .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 8.dp),
+        modifier = if (launchComponent != null) {
+            baseModifier.clickable(actionStartActivity(launchComponent))
+        } else {
+            baseModifier
+        },
         verticalAlignment = Alignment.Vertical.CenterVertically,
     ) {
         if (state == null) {
