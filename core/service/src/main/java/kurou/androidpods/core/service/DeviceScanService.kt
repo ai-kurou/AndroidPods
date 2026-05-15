@@ -26,6 +26,7 @@ import kurou.androidpods.core.domain.DeviceImages
 import kurou.androidpods.core.domain.NotificationChannels
 import kurou.androidpods.core.domain.OverlayPositionRepository
 import kurou.androidpods.core.domain.OverlaySettingsRepository
+import kurou.androidpods.core.domain.WidgetBatteryRepository
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -41,6 +42,9 @@ class DeviceScanService : Service() {
 
     @Inject
     lateinit var overlayPositionRepository: OverlayPositionRepository
+
+    @Inject
+    lateinit var widgetBatteryRepository: WidgetBatteryRepository
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private var isForeground = false
@@ -93,6 +97,9 @@ class DeviceScanService : Service() {
                 getSystemService(NotificationManager::class.java)
                     .notify(NOTIFICATION_ID, notification)
 
+                if (deviceList.isNotEmpty()) {
+                    scope.launch { widgetBatteryRepository.save(deviceList.first()) }
+                }
                 if (overlaySettingsRepository.isEnabled() && deviceList.isNotEmpty()) {
                     overlayManager.show(deviceList)
                 } else {

@@ -19,6 +19,8 @@ import kurou.androidpods.core.domain.ThemeSettings
 import kurou.androidpods.core.domain.ThemeSettingsRepository
 import kurou.androidpods.core.domain.UnknownDeviceRepository
 import kurou.androidpods.core.domain.UpdateRepository
+import kurou.androidpods.core.domain.WidgetBatteryRepository
+import kurou.androidpods.core.domain.WidgetBatteryState
 import javax.inject.Singleton
 
 @Module
@@ -94,5 +96,14 @@ object FakeRepositoryModule {
             override suspend fun saveUnknownModelCode(modelCode: Int) {}
 
             override suspend fun reportWithDeviceName(modelCode: Int, deviceName: String) {}
+        }
+
+    @Provides
+    @Singleton
+    fun provideWidgetBatteryRepository(): WidgetBatteryRepository =
+        object : WidgetBatteryRepository {
+            override fun observe(): Flow<WidgetBatteryState?> = flowOf(null)
+
+            override suspend fun save(device: kurou.androidpods.core.domain.AppleDevice) {}
         }
 }
