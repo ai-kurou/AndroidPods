@@ -26,6 +26,7 @@ import kurou.androidpods.core.domain.DeviceImages
 import kurou.androidpods.core.domain.NotificationChannels
 import kurou.androidpods.core.domain.OverlayPositionRepository
 import kurou.androidpods.core.domain.OverlaySettingsRepository
+import kurou.androidpods.core.domain.WidgetActions
 import kurou.androidpods.core.domain.WidgetBatteryRepository
 import javax.inject.Inject
 
@@ -98,7 +99,10 @@ class DeviceScanService : Service() {
                     .notify(NOTIFICATION_ID, notification)
 
                 if (deviceList.isNotEmpty()) {
-                    scope.launch { widgetBatteryRepository.save(deviceList.first()) }
+                    scope.launch {
+                        widgetBatteryRepository.save(deviceList.first())
+                        sendBroadcast(Intent(WidgetActions.WIDGET_UPDATE))
+                    }
                 }
                 if (overlaySettingsRepository.isEnabled() && deviceList.isNotEmpty()) {
                     overlayManager.show(deviceList)
