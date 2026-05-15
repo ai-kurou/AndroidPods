@@ -3,10 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:targetApi="31"
     android:description="@string/widget_description"
-    android:minWidth="110dp"
+    android:minWidth="250dp"
     android:minHeight="110dp"
     android:resizeMode="horizontal|vertical"
     android:targetCellHeight="2"
-    android:targetCellWidth="2"
+    android:targetCellWidth="3"
     android:updatePeriodMillis="0"
     android:widgetCategory="home_screen" />

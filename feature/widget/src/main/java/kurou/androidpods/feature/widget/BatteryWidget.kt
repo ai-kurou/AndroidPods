@@ -1,7 +1,6 @@
 package kurou.androidpods.feature.widget
 
 import android.content.Context
-import androidx.annotation.DrawableRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -26,6 +25,7 @@ import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
+import androidx.glance.layout.width
 import androidx.glance.layout.wrapContentHeight
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
@@ -59,7 +59,7 @@ internal fun BatteryWidgetContent(context: Context, state: WidgetBatteryState?) 
     val baseModifier = GlanceModifier
         .fillMaxSize()
         .background(ImageProvider(R.drawable.widget_background))
-        .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 8.dp)
+        .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp)
     Column(
         modifier = if (launchComponent != null) {
             baseModifier.clickable(actionStartActivity(launchComponent))
@@ -87,7 +87,7 @@ internal fun BatteryWidgetContent(context: Context, state: WidgetBatteryState?) 
                     textAlign = TextAlign.Center,
                 ),
             )
-            Spacer(modifier = GlanceModifier.height(4.dp))
+            Spacer(modifier = GlanceModifier.height(16.dp))
             val deviceImages = widgetDeviceImages(state.modelCode)
             if (deviceImages != null) {
                 if (state.isSingle) {
@@ -103,7 +103,7 @@ internal fun BatteryWidgetContent(context: Context, state: WidgetBatteryState?) 
                             contentDescription = null,
                             modifier = GlanceModifier.size(60.dp),
                         )
-                        Spacer(modifier = GlanceModifier.height(2.dp))
+                        Spacer(modifier = GlanceModifier.height(12.dp))
                         Row(
                             verticalAlignment = Alignment.Vertical.CenterVertically,
                         ) {
@@ -114,6 +114,7 @@ internal fun BatteryWidgetContent(context: Context, state: WidgetBatteryState?) 
                                 contentDescription = null,
                                 modifier = GlanceModifier.size(20.dp),
                             )
+                            Spacer(modifier = GlanceModifier.width(4.dp))
                             Text(
                                 text = levelToText(state.leftBattery),
                                 style = TextStyle(
@@ -132,20 +133,17 @@ internal fun BatteryWidgetContent(context: Context, state: WidgetBatteryState?) 
                     ) {
                         if (twsImages != null) {
                             BatteryColumn(
-                                label = context.getString(R.string.widget_label_left),
                                 level = state.leftBattery,
                                 imageRes = twsImages.left,
                                 charging = state.leftCharging,
                             )
                             BatteryColumn(
-                                label = context.getString(R.string.widget_label_right),
                                 level = state.rightBattery,
                                 imageRes = twsImages.right,
                                 charging = state.rightCharging,
                                 modifier = GlanceModifier.padding(horizontal = 24.dp),
                             )
                             BatteryColumn(
-                                label = context.getString(R.string.widget_label_case),
                                 level = state.caseBattery,
                                 imageRes = twsImages.case,
                                 charging = state.caseCharging,
@@ -163,7 +161,7 @@ internal fun BatteryWidgetContent(context: Context, state: WidgetBatteryState?) 
                     ),
                 )
             }
-            Spacer(modifier = GlanceModifier.height(4.dp))
+            Spacer(modifier = GlanceModifier.height(12.dp))
             Text(
                 text = recordedAtText(context, state.recordedAt),
                 style = TextStyle(
@@ -178,9 +176,8 @@ internal fun BatteryWidgetContent(context: Context, state: WidgetBatteryState?) 
 
 @Composable
 private fun BatteryColumn(
-    label: String,
     level: Int?,
-    @DrawableRes imageRes: Int?,
+    imageRes: Int?,
     charging: Boolean,
     modifier: GlanceModifier = GlanceModifier,
 ) {
@@ -188,21 +185,13 @@ private fun BatteryColumn(
         modifier = modifier,
         horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
     ) {
-        Text(
-            text = label,
-            style = TextStyle(
-                color = GlanceTheme.colors.onSurfaceVariant,
-                fontSize = 11.sp,
-                textAlign = TextAlign.Center,
-            ),
-        )
         if (imageRes != null) {
             Image(
                 provider = ImageProvider(imageRes),
                 contentDescription = null,
                 modifier = GlanceModifier.size(40.dp),
             )
-            Spacer(modifier = GlanceModifier.height(2.dp))
+            Spacer(modifier = GlanceModifier.height(10.dp))
         }
         Row(
             verticalAlignment = Alignment.Vertical.CenterVertically,
@@ -212,6 +201,7 @@ private fun BatteryColumn(
                 contentDescription = null,
                 modifier = GlanceModifier.size(20.dp),
             )
+            Spacer(modifier = GlanceModifier.width(4.dp))
             Text(
                 text = levelToText(level),
                 style = TextStyle(

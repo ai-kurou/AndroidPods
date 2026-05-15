@@ -5,7 +5,4 @@
     <string name="widget_recorded_just_now">Just now</string>
     <string name="widget_recorded_minutes_ago">%d min ago</string>
     <string name="widget_recorded_hours_ago">%dh ago</string>
-    <string name="widget_label_left">L</string>
-    <string name="widget_label_right">R</string>
-    <string name="widget_label_case">Case</string>
 </resources>
