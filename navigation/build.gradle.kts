@@ -26,6 +26,7 @@ dependencies {
     implementation(project(":feature:onboarding"))
     implementation(project(":feature:licenses"))
     implementation(project(":feature:devices"))
+    implementation(project(":feature:widget"))
 
     // AndroidX
     implementation(libs.androidx.activity.compose)

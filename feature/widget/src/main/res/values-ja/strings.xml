@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_description">AirPodsのバッテリー残量を表示します</string>
+    <string name="widget_not_detected">AirPods未検出</string>
+    <string name="widget_recorded_just_now">たった今</string>
+    <string name="widget_recorded_minutes_ago">%d分前</string>
+    <string name="widget_recorded_hours_ago">%d時間前</string>
+</resources>

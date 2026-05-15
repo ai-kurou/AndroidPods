@@ -239,4 +239,5 @@ dependencies {
     kover(project(":feature:onboarding"))
     kover(project(":feature:licenses"))
     kover(project(":navigation"))
+    kover(project(":feature:widget"))
 }
