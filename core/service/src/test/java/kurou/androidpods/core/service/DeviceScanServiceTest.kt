@@ -153,6 +153,29 @@ class DeviceScanServiceTest {
         assertTrue(text?.contains("AirPods Pro") == true)
     }
 
+    @Test
+    fun `デバイス更新時にwidgetBatteryRepositoryのsaveが呼ばれる`() {
+        controller.create().startCommand(0, 0)
+
+        fakeDevicesFlow.tryEmit(mapOf(baseDevice.address to baseDevice))
+
+        assertTrue(widgetSaveCount > 0)
+    }
+
+    @Test
+    fun `widgetBatteryRepository_save失敗後も次のデバイス更新が処理される`() {
+        widgetSaveShouldThrow = true
+        controller.create().startCommand(0, 0)
+
+        fakeDevicesFlow.tryEmit(mapOf(baseDevice.address to baseDevice))
+        widgetSaveShouldThrow = false
+        widgetSaveCount = 0
+
+        fakeDevicesFlow.tryEmit(mapOf(baseDevice.address to baseDevice.copy(leftBattery = 9)))
+
+        assertTrue(widgetSaveCount > 0)
+    }
+
     // --- createLaunchPendingIntent ---
 
     @Test

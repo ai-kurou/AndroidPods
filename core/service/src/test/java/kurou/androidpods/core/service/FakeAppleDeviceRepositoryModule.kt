@@ -23,11 +23,15 @@ val fakeBluetoothStateFlow = MutableSharedFlow<Int?>(extraBufferCapacity = 1)
 var startScanCalled = false
 var stopScanCalled = false
 var startScanCount = 0
+var widgetSaveShouldThrow = false
+var widgetSaveCount = 0
 
 fun resetFakeRepository() {
     startScanCalled = false
     stopScanCalled = false
     startScanCount = 0
+    widgetSaveShouldThrow = false
+    widgetSaveCount = 0
 }
 
 @Module
@@ -92,6 +96,9 @@ object FakeRepositoryModule {
         object : WidgetBatteryRepository {
             override fun observe(): Flow<WidgetBatteryState?> = emptyFlow()
 
-            override suspend fun save(device: AppleDevice) {}
+            override suspend fun save(device: AppleDevice) {
+                widgetSaveCount++
+                if (widgetSaveShouldThrow) throw RuntimeException("fake save error")
+            }
         }
 }

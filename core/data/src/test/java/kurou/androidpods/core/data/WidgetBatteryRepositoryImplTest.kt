@@ -92,6 +92,31 @@ class WidgetBatteryRepositoryImplTest {
         }
 
     @Test
+    fun `充電中フラグがtrueのデバイスを保存するとobserveで充電状態が取得できる`() =
+        runTest {
+            val device = AppleDevice(
+                address = "AA:BB:CC:DD:EE:FF",
+                modelName = "AirPods Pro",
+                modelCode = 0x2002,
+                rssi = -60,
+                leftBattery = 7,
+                rightBattery = 8,
+                caseBattery = 9,
+                leftCharging = true,
+                rightCharging = true,
+                caseCharging = true,
+                isSingle = false,
+            )
+
+            repository.save(device)
+
+            val result = repository.observe().first()!!
+            assertEquals(true, result.leftCharging)
+            assertEquals(true, result.rightCharging)
+            assertEquals(true, result.caseCharging)
+        }
+
+    @Test
     fun `saveを2回呼ぶと最新のデバイス情報で上書きされる`() =
         runTest {
             val first = AppleDevice(
