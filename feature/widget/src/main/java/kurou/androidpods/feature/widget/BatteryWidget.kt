@@ -32,7 +32,8 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import dagger.hilt.android.EntryPointAccessors
-import kurou.androidpods.core.domain.DeviceImages
+import kurou.androidpods.core.designsystem.DeviceImages
+import kurou.androidpods.core.designsystem.deviceImages
 import kurou.androidpods.core.domain.WidgetBatteryState
 import kurou.androidpods.core.designsystem.R as DesignSystemR
 
@@ -88,7 +89,7 @@ internal fun BatteryWidgetContent(context: Context, state: WidgetBatteryState?) 
                 ),
             )
             Spacer(modifier = GlanceModifier.height(20.dp))
-            val deviceImages = widgetDeviceImages(state.modelCode)
+            val deviceImages = deviceImages(state.modelCode)
             if (deviceImages != null) {
                 if (state.isSingle) {
                     val bodyRes = when (deviceImages) {
@@ -213,134 +214,6 @@ private fun BatteryColumn(
         }
     }
 }
-
-internal fun widgetDeviceImages(modelCode: Int): DeviceImages? = WIDGET_DEVICE_IMAGES[modelCode]
-
-private val WIDGET_DEVICE_IMAGES: Map<Int, DeviceImages> =
-    mapOf(
-        0x0220 to
-            DeviceImages.Tws(
-                left = DesignSystemR.drawable.airpods_1st_gen_left,
-                right = DesignSystemR.drawable.airpods_1st_gen_right,
-                case = DesignSystemR.drawable.airpods_1st_gen_case,
-            ),
-        0x0F20 to
-            DeviceImages.Tws(
-                left = DesignSystemR.drawable.airpods_2nd_gen_left,
-                right = DesignSystemR.drawable.airpods_2nd_gen_right,
-                case = DesignSystemR.drawable.airpods_2nd_gen_case,
-            ),
-        0x1320 to
-            DeviceImages.Tws(
-                left = DesignSystemR.drawable.airpods_3rd_gen_left,
-                right = DesignSystemR.drawable.airpods_3rd_gen_right,
-                case = DesignSystemR.drawable.airpods_3rd_gen_case,
-            ),
-        0x1920 to
-            DeviceImages.Tws(
-                left = DesignSystemR.drawable.airpods_4th_gen_left,
-                right = DesignSystemR.drawable.airpods_4th_gen_right,
-                case = DesignSystemR.drawable.airpods_4th_gen_case,
-            ),
-        0x1B20 to
-            DeviceImages.Tws(
-                left = DesignSystemR.drawable.airpods_4th_gen_anc_left,
-                right = DesignSystemR.drawable.airpods_4th_gen_anc_right,
-                case = DesignSystemR.drawable.airpods_4th_gen_anc_case,
-            ),
-        0x0A20 to
-            DeviceImages.Single(
-                body = DesignSystemR.drawable.airpods_max_1st_gen,
-            ),
-        0x1F20 to
-            DeviceImages.Single(
-                body = DesignSystemR.drawable.airpods_max_1st_gen_usb_c,
-            ),
-        0x2D20 to
-            DeviceImages.Single(
-                body = DesignSystemR.drawable.airpods_max_2nd_gen,
-            ),
-        0x0E20 to
-            DeviceImages.Tws(
-                left = DesignSystemR.drawable.airpods_pro_1st_gen_left,
-                right = DesignSystemR.drawable.airpods_pro_1st_gen_right,
-                case = DesignSystemR.drawable.airpods_pro_1st_gen_case,
-            ),
-        0x1420 to
-            DeviceImages.Tws(
-                left = DesignSystemR.drawable.airpods_pro_2nd_gen_left,
-                right = DesignSystemR.drawable.airpods_pro_2nd_gen_right,
-                case = DesignSystemR.drawable.airpods_pro_2nd_gen_case,
-            ),
-        0x2420 to
-            DeviceImages.Tws(
-                left = DesignSystemR.drawable.airpods_pro_2nd_gen_usb_c_left,
-                right = DesignSystemR.drawable.airpods_pro_2nd_gen_usb_c_right,
-                case = DesignSystemR.drawable.airpods_pro_2nd_gen_usb_c_case,
-            ),
-        0x2720 to
-            DeviceImages.Tws(
-                left = DesignSystemR.drawable.airpods_pro_3rd_gen_left,
-                right = DesignSystemR.drawable.airpods_pro_3rd_gen_right,
-                case = DesignSystemR.drawable.airpods_pro_3rd_gen_case,
-            ),
-        0x0520 to
-            DeviceImages.Single(
-                body = DesignSystemR.drawable.beats_x,
-            ),
-        0x0620 to
-            DeviceImages.Single(
-                body = DesignSystemR.drawable.beats_solo_3,
-            ),
-        0x0920 to
-            DeviceImages.Single(
-                body = DesignSystemR.drawable.beats_studio_3,
-            ),
-        0x1720 to
-            DeviceImages.Single(
-                body = DesignSystemR.drawable.beats_studio_pro,
-            ),
-        0x0320 to
-            DeviceImages.Single(
-                body = DesignSystemR.drawable.power_beats_3,
-            ),
-        0x0D20 to
-            DeviceImages.Single(
-                body = DesignSystemR.drawable.power_beats_4,
-            ),
-        0x0C20 to
-            DeviceImages.Single(
-                body = DesignSystemR.drawable.beats_solo_pro,
-            ),
-        0x1020 to
-            DeviceImages.Single(
-                body = DesignSystemR.drawable.beats_flex,
-            ),
-        0x1120 to
-            DeviceImages.Tws(
-                left = DesignSystemR.drawable.beats_studio_buds_left,
-                right = DesignSystemR.drawable.beats_studio_buds_right,
-                case = DesignSystemR.drawable.beats_studio_buds_case,
-            ),
-        0x1620 to
-            DeviceImages.Tws(
-                left = DesignSystemR.drawable.beats_studio_buds_plus_left,
-                right = DesignSystemR.drawable.beats_studio_buds_plus_right,
-                case = DesignSystemR.drawable.beats_studio_buds_plus_case,
-            ),
-        0x1220 to
-            DeviceImages.Tws(
-                left = DesignSystemR.drawable.beats_fit_pro_left,
-                right = DesignSystemR.drawable.beats_fit_pro_right,
-                case = DesignSystemR.drawable.beats_fit_pro_case,
-            ),
-        0x0B20 to
-            DeviceImages.Tws(
-                left = DesignSystemR.drawable.power_beats_pro_left,
-                right = DesignSystemR.drawable.power_beats_pro_right,
-                case = DesignSystemR.drawable.power_beats_pro_case,
-            ),
-    )
 
 internal fun widgetBatteryIconRes(level: Int?, charging: Boolean): Int {
     if (level == null) return DesignSystemR.drawable.icon_battery_null

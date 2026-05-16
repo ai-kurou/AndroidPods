@@ -14,9 +14,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import kurou.androidpods.core.data.DataModule
-import kurou.androidpods.core.designsystem.R as DesignSystemR
 import kurou.androidpods.core.domain.AppleDevice
-import kurou.androidpods.core.domain.DeviceImages
 import kurou.androidpods.core.domain.NotificationChannels
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -30,6 +28,7 @@ import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.android.controller.ServiceController
 import org.robolectric.annotation.Config
+import kurou.androidpods.core.designsystem.R as DesignSystemR
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltAndroidTest
@@ -284,29 +283,14 @@ class DeviceScanServiceTest {
 
     @Test
     fun `TWSデバイスのRemoteViewsが正しいレイアウトを使用する`() {
-        val tws =
-            baseDevice.copy(
-                images =
-                    DeviceImages.Tws(
-                        left = android.R.drawable.ic_menu_gallery,
-                        right = android.R.drawable.ic_menu_gallery,
-                        case = android.R.drawable.ic_menu_gallery,
-                    ),
-            )
+        val tws = baseDevice.copy(modelCode = 0x1420)
         val remoteViews = buildDeviceRemoteViews(testPackageName, tws)
         assertEquals(R.layout.notification_device_tws, remoteViews.layoutId)
     }
 
     @Test
     fun `SingleデバイスのRemoteViewsが正しいレイアウトを使用する`() {
-        val single =
-            baseDevice.copy(
-                isSingle = true,
-                images =
-                    DeviceImages.Single(
-                        body = android.R.drawable.ic_menu_gallery,
-                    ),
-            )
+        val single = baseDevice.copy(modelCode = 0x0A20, isSingle = true)
         val remoteViews = buildDeviceRemoteViews(testPackageName, single)
         assertEquals(R.layout.notification_device_single, remoteViews.layoutId)
     }
@@ -361,15 +345,10 @@ class DeviceScanServiceTest {
         val tws =
             baseDevice.copy(
                 address = "AA:BB:CC:DD:EE:FF",
+                modelCode = 0x1420,
                 leftBattery = 8,
                 rightBattery = 7,
                 caseBattery = 5,
-                images =
-                    DeviceImages.Tws(
-                        left = android.R.drawable.ic_menu_gallery,
-                        right = android.R.drawable.ic_menu_gallery,
-                        case = android.R.drawable.ic_menu_gallery,
-                    ),
             )
         fakeDevicesFlow.tryEmit(mapOf(tws.address to tws))
 

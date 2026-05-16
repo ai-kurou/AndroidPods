@@ -19,7 +19,6 @@ android {
 
 dependencies {
     // プロジェクトモジュール
-    implementation(project(":core:designsystem"))
     implementation(project(":core:domain"))
 
     // Hilt (DI)

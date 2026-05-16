@@ -92,7 +92,6 @@ moduleGraphAssert {
         ":core:service -> :core:domain",
         ":core:service -> :core:designsystem",
         ":core:data -> :core:domain",
-        ":core:data -> :core:designsystem",
         ":feature:.* -> :core:domain",
     )
     restricted = arrayOf(
@@ -105,6 +104,7 @@ moduleGraphAssert {
         ":core:domain -X> :core:designsystem",
         ":core:domain -X> :core:service",
         ":core:domain -X> :feature:.*",
+        ":core:data -X> :core:designsystem",
         ":core:data -X> :core:service",
         ":core:data -X> :feature:.*",
         ":core:designsystem -X> :core:domain",

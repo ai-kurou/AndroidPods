@@ -18,8 +18,9 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
+import kurou.androidpods.core.designsystem.DeviceImages
+import kurou.androidpods.core.designsystem.deviceImages
 import kurou.androidpods.core.domain.AppleDevice
-import kurou.androidpods.core.domain.DeviceImages
 import kurou.androidpods.core.domain.OverlayPosition
 
 internal class BatteryOverlayViewDelegate(
@@ -328,7 +329,7 @@ internal class BatteryOverlayViewDelegate(
         parent: LinearLayout,
         device: AppleDevice,
     ): View =
-        when (val images = device.images) {
+        when (val images = deviceImages(device.modelCode)) {
             is DeviceImages.Tws -> {
                 inflater.inflate(R.layout.overlay_device_tws, parent, false).apply {
                     findViewById<TextView>(R.id.device_model_name).text = device.modelName

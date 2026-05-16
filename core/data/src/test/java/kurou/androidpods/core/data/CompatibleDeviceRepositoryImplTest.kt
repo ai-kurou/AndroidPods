@@ -13,10 +13,9 @@ class CompatibleDeviceRepositoryImplTest {
     fun `getCompatibleDevicesはAPPLE_DEVICE_MODELSを返す`() = runTest {
         val result = repository.getCompatibleDevices().first()
         val resultNames = result.map { it.name }.toSet()
-        val missingImages = result.filter { it.images == null }.map { it.name }
 
         assertEquals(APPLE_DEVICE_MODELS.size, result.size)
         assertTrue(APPLE_DEVICE_MODELS.values.all { it in resultNames })
-        assertTrue("画像未定義のモデル: $missingImages", missingImages.isEmpty())
+        assertTrue(result.all { it.modelCode != 0 })
     }
 }

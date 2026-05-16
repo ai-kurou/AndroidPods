@@ -1,4 +1,4 @@
-package kurou.androidpods.core.domain
+package kurou.androidpods.core.designsystem
 
 import androidx.annotation.DrawableRes
 

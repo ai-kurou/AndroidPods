@@ -21,10 +21,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kurou.androidpods.core.designsystem.DeviceImages
+import kurou.androidpods.core.designsystem.deviceImages
 import kurou.androidpods.core.domain.AppleDevice
 import kurou.androidpods.core.domain.AppleDeviceRepository
 import kurou.androidpods.core.domain.BluetoothAdapterRepository
-import kurou.androidpods.core.domain.DeviceImages
 import kurou.androidpods.core.domain.NotificationChannels
 import kurou.androidpods.core.domain.OverlayPositionRepository
 import kurou.androidpods.core.domain.OverlaySettingsRepository
@@ -239,7 +240,7 @@ internal fun buildDeviceRemoteViews(
     packageName: String,
     device: AppleDevice,
 ): RemoteViews =
-    when (val images = device.images) {
+    when (val images = deviceImages(device.modelCode)) {
         is DeviceImages.Tws -> {
             RemoteViews(packageName, R.layout.notification_device_tws).apply {
                 setTextViewText(R.id.device_model_name, device.modelName)

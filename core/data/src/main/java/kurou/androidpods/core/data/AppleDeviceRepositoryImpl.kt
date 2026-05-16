@@ -317,6 +317,5 @@ internal fun parseProximityPairingData(
         lidOpenCounter = lidOpenCounter,
         deviceColor = deviceColor,
         colorName = appleDeviceColorName(deviceColor),
-        images = appleDeviceImages(modelCode),
     )
 }

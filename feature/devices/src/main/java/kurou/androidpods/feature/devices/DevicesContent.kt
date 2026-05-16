@@ -26,8 +26,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kurou.androidpods.core.designsystem.DeviceImages
+import kurou.androidpods.core.designsystem.deviceImages
 import kurou.androidpods.core.domain.CompatibleDevice
-import kurou.androidpods.core.domain.DeviceImages
 
 @Composable
 internal fun DevicesContent(
@@ -50,12 +51,12 @@ internal fun DevicesContent(
 
 private val previewDevices =
     listOf(
-        CompatibleDevice(name = "AirPods Pro (2nd Gen)", images = null),
-        CompatibleDevice(name = "AirPods (4th Gen)", images = null),
-        CompatibleDevice(name = "AirPods Max", images = null),
-        CompatibleDevice(name = "Beats Studio Buds+", images = null),
-        CompatibleDevice(name = "Powerbeats Pro", images = null),
-        CompatibleDevice(name = "Beats Solo3", images = null),
+        CompatibleDevice(name = "AirPods Pro (2nd Gen)", modelCode = 0x1420),
+        CompatibleDevice(name = "AirPods (4th Gen)", modelCode = 0x1920),
+        CompatibleDevice(name = "AirPods Max", modelCode = 0x0A20),
+        CompatibleDevice(name = "Beats Studio Buds+", modelCode = 0x1620),
+        CompatibleDevice(name = "Powerbeats Pro", modelCode = 0x0B20),
+        CompatibleDevice(name = "Beats Solo3", modelCode = 0x0620),
     )
 
 @Preview(showBackground = true, widthDp = 400, heightDp = 700)
@@ -91,7 +92,7 @@ private fun DeviceItem(
             Box(
                 modifier = Modifier.fillMaxWidth().weight(1f).padding(8.dp),
             ) {
-                when (val img = device.images) {
+                when (val img = deviceImages(device.modelCode)) {
                     is DeviceImages.Tws -> {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
