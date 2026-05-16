@@ -51,7 +51,9 @@ object FakeRepositoryModule {
     fun provideOverlaySettingsRepository(): OverlaySettingsRepository =
         object : OverlaySettingsRepository {
             override fun isEnabled(): Boolean = false
+            override fun hasPermission(): Boolean = false
             override fun observe(): Flow<Boolean> = flowOf(false)
+            override suspend fun setEnabled(enabled: Boolean) {}
             override fun refresh() {}
         }
 

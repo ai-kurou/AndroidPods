@@ -37,11 +37,11 @@ class OverlayPositionRepositoryImplTest {
     }
 
     @Test
-    fun `デフォルト値はBOTTOM`() =
+    fun `デフォルト値はTOP`() =
         runTest {
             val result = repository.observe().first()
 
-            assertEquals(OverlayPosition.BOTTOM, result)
+            assertEquals(OverlayPosition.TOP, result)
         }
 
     @Test
@@ -58,7 +58,7 @@ class OverlayPositionRepositoryImplTest {
 
             val result = repositoryWithError.observe().first()
 
-            assertEquals(OverlayPosition.BOTTOM, result)
+            assertEquals(OverlayPosition.TOP, result)
         }
 
     @Test

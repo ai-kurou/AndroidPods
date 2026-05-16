@@ -31,6 +31,7 @@ sealed interface ServiceEvent {
     data object StopScan : ServiceEvent
     data object StartScan : ServiceEvent
     data object ShowRestartSnackbar : ServiceEvent
+    data object OpenOverlayPermissionSettings : ServiceEvent
 }
 
 private data class ScanState(
@@ -66,7 +67,7 @@ data class SettingsUiState(
     val overlayEnabled: Boolean = false,
     val updateAvailable: Boolean = false,
     val themeSettings: ThemeSettings = ThemeSettings(),
-    val overlayPosition: OverlayPosition = OverlayPosition.BOTTOM,
+    val overlayPosition: OverlayPosition = OverlayPosition.TOP,
     val isNotificationsDisabled: Boolean = false,
     val isDeviceScanChannelDisabled: Boolean = false,
     val isBatteryOptimizationExempt: Boolean = false,
@@ -203,6 +204,17 @@ class SettingsViewModel @Inject constructor(
 
     fun refreshOverlayState() {
         getOverlaySettingsUseCase.refresh()
+    }
+
+    fun setOverlayEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            if (enabled && !getOverlaySettingsUseCase.hasPermission()) {
+                getOverlaySettingsUseCase.setEnabled(true)
+                _serviceEvents.emit(ServiceEvent.OpenOverlayPermissionSettings)
+            } else {
+                getOverlaySettingsUseCase.setEnabled(enabled)
+            }
+        }
     }
 
     fun refreshNotificationState(isDisabled: Boolean) {

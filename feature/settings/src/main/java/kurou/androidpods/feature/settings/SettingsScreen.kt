@@ -55,22 +55,30 @@ fun SettingsScreen(
 
     val restartServiceMessage = stringResource(R.string.restart_service_completed)
 
-    LaunchedEffect(viewModel) {
-        viewModel.serviceEvents.collect { event ->
-            when (event) {
-                ServiceEvent.StopScan -> onStopScanService()
-                ServiceEvent.StartScan -> onStartScanService()
-                ServiceEvent.ShowRestartSnackbar -> snackbarHostState.showSnackbar(restartServiceMessage)
-            }
-        }
-    }
-
     val overlaySettingsLauncher =
         rememberLauncherForActivityResult(
             ActivityResultContracts.StartActivityForResult(),
         ) {
             viewModel.refreshOverlayState()
         }
+
+    LaunchedEffect(viewModel) {
+        viewModel.serviceEvents.collect { event ->
+            when (event) {
+                ServiceEvent.StopScan -> onStopScanService()
+                ServiceEvent.StartScan -> onStartScanService()
+                ServiceEvent.ShowRestartSnackbar -> snackbarHostState.showSnackbar(restartServiceMessage)
+                ServiceEvent.OpenOverlayPermissionSettings -> {
+                    val intent =
+                        Intent(
+                            Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                            "package:${context.packageName}".toUri(),
+                        )
+                    overlaySettingsLauncher.launch(intent)
+                }
+            }
+        }
+    }
 
     val batteryOptimizationLauncher =
         rememberLauncherForActivityResult(
@@ -194,14 +202,7 @@ fun SettingsScreen(
             val intent = Intent(Intent.ACTION_VIEW, "https://github.com/ai-kurou/AndroidPods".toUri())
             context.startActivity(intent)
         },
-        onOverlayToggle = {
-            val intent =
-                Intent(
-                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                    "package:${context.packageName}".toUri(),
-                )
-            overlaySettingsLauncher.launch(intent)
-        },
+        onOverlayToggle = { enabled -> viewModel.setOverlayEnabled(enabled) },
         onRestartServiceClick = viewModel::restartService,
         onBatteryOptimizationClick = {
             val pm = context.getSystemService(PowerManager::class.java)

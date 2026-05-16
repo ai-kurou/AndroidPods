@@ -31,7 +31,7 @@ internal class OverlayPositionRepositoryImpl @Inject constructor(
             .map { preferences ->
                 preferences[positionKey]
                     ?.let { try { OverlayPosition.valueOf(it) } catch (_: IllegalArgumentException) { null } }
-                    ?: OverlayPosition.BOTTOM
+                    ?: OverlayPosition.TOP
             }
 
     override suspend fun update(position: OverlayPosition) {
