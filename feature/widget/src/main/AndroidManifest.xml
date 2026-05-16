@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
     <application
-        android:usesCleartextTraffic="false"
-        tools:ignore="AllowBackup">
+        android:allowBackup="false"
+        android:usesCleartextTraffic="false">
         <receiver
             android:name=".BatteryWidgetReceiver"
             android:exported="true"
