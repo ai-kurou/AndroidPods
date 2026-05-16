@@ -5,6 +5,13 @@
         android:allowBackup="false"
         android:usesCleartextTraffic="false">
         <receiver
+            android:name=".PackageReplacedReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+        <receiver
             android:name=".BatteryWidgetReceiver"
             android:exported="true"
             tools:ignore="ExportedReceiver">
