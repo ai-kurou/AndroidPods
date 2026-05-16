@@ -16,6 +16,7 @@ import android.os.IBinder
 import android.widget.RemoteViews
 import androidx.core.app.ServiceCompat
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -102,8 +103,14 @@ class DeviceScanService : Service() {
                     .notify(NOTIFICATION_ID, notification)
 
                 if (deviceList.isNotEmpty()) {
-                    widgetBatteryRepository.save(deviceList.last())
-                    notifyWidgetUpdate()
+                    try {
+                        widgetBatteryRepository.save(deviceList.last())
+                        notifyWidgetUpdate()
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        android.util.Log.e("DeviceScanService", "Failed to save widget battery state", e)
+                    }
                 }
                 if (overlaySettingsRepository.isEnabled() && deviceList.isNotEmpty()) {
                     overlayManager.show(deviceList)
