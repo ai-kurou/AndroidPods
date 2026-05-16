@@ -14,6 +14,8 @@ import kurou.androidpods.core.domain.FirstLaunchRepository
 import kurou.androidpods.core.domain.OverlayPosition
 import kurou.androidpods.core.domain.OverlayPositionRepository
 import kurou.androidpods.core.domain.OverlaySettingsRepository
+import kurou.androidpods.core.domain.WidgetBatteryRepository
+import kurou.androidpods.core.domain.WidgetBatteryState
 import javax.inject.Singleton
 
 val fakeDevicesFlow = MutableSharedFlow<Map<String, AppleDevice>>(extraBufferCapacity = 1)
@@ -21,11 +23,15 @@ val fakeBluetoothStateFlow = MutableSharedFlow<Int?>(extraBufferCapacity = 1)
 var startScanCalled = false
 var stopScanCalled = false
 var startScanCount = 0
+var widgetSaveShouldThrow = false
+var widgetSaveCount = 0
 
 fun resetFakeRepository() {
     startScanCalled = false
     stopScanCalled = false
     startScanCount = 0
+    widgetSaveShouldThrow = false
+    widgetSaveCount = 0
 }
 
 @Module
@@ -82,5 +88,17 @@ object FakeRepositoryModule {
                 kotlinx.coroutines.flow.emptyFlow()
 
             override suspend fun update(position: OverlayPosition) {}
+        }
+
+    @Provides
+    @Singleton
+    fun provideWidgetBatteryRepository(): WidgetBatteryRepository =
+        object : WidgetBatteryRepository {
+            override fun observe(): Flow<WidgetBatteryState?> = emptyFlow()
+
+            override suspend fun save(device: AppleDevice) {
+                widgetSaveCount++
+                if (widgetSaveShouldThrow) throw RuntimeException("fake save error")
+            }
         }
 }

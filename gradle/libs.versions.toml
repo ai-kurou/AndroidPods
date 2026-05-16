@@ -27,6 +27,7 @@ roborazzi = "1.60.0"
 composable-preview-scanner = "0.9.0"
 modulesGraphAssert = "2.9.1"
 detekt = "1.23.8"
+glance = "1.1.1"
 firebaseBom = "34.13.0"
 google-services = "4.4.4"
 firebase-crashlytics-plugin = "3.0.7"
@@ -75,6 +76,7 @@ composable-preview-scanner = { group = "io.github.sergio-sastre.ComposablePrevie
 detekt-formatting = { group = "io.gitlab.arturbosch.detekt", name = "detekt-formatting", version.ref = "detekt" }
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
+androidx-glance-appwidget = { group = "androidx.glance", name = "glance-appwidget", version.ref = "glance" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

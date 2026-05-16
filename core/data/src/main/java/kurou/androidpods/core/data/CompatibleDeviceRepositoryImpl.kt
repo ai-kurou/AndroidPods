@@ -12,7 +12,7 @@ internal class CompatibleDeviceRepositoryImpl @Inject constructor() : Compatible
     override fun getCompatibleDevices(): Flow<List<CompatibleDevice>> =
         flowOf(
             APPLE_DEVICE_MODELS.map { (code, name) ->
-                CompatibleDevice(name = name, images = appleDeviceImages(code))
+                CompatibleDevice(name = name, modelCode = code)
             },
         )
 }

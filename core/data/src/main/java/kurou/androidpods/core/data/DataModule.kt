@@ -21,6 +21,7 @@ import kurou.androidpods.core.domain.OverlaySettingsRepository
 import kurou.androidpods.core.domain.ThemeSettingsRepository
 import kurou.androidpods.core.domain.UnknownDeviceRepository
 import kurou.androidpods.core.domain.UpdateRepository
+import kurou.androidpods.core.domain.WidgetBatteryRepository
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -45,6 +46,13 @@ abstract class DataModule {
         fun provideOverlayPositionDataStore(
             @ApplicationContext context: Context,
         ): DataStore<Preferences> = context.overlayPositionDataStore
+
+        @Provides
+        @Singleton
+        @Named("widget_battery")
+        fun provideWidgetBatteryDataStore(
+            @ApplicationContext context: Context,
+        ): DataStore<Preferences> = context.widgetBatteryDataStore
     }
 
     @Binds
@@ -77,4 +85,7 @@ abstract class DataModule {
 
     @Binds
     internal abstract fun bindUnknownDeviceRepository(impl: UnknownDeviceRepositoryImpl): UnknownDeviceRepository
+
+    @Binds
+    internal abstract fun bindWidgetBatteryRepository(impl: WidgetBatteryRepositoryImpl): WidgetBatteryRepository
 }

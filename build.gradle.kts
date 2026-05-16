@@ -90,6 +90,7 @@ moduleGraphAssert {
         ":navigation -> :feature:.*",
         ":feature:.* -> :core:designsystem",
         ":core:service -> :core:domain",
+        ":core:service -> :core:designsystem",
         ":core:data -> :core:domain",
         ":feature:.* -> :core:domain",
     )
@@ -111,7 +112,6 @@ moduleGraphAssert {
         ":core:designsystem -X> :core:service",
         ":core:designsystem -X> :feature:.*",
         ":core:service -X> :app",
-        ":core:service -X> :core:designsystem",
         ":core:service -X> :navigation",
         ":core:service -X> :feature:.*",
     )
@@ -239,4 +239,5 @@ dependencies {
     kover(project(":feature:onboarding"))
     kover(project(":feature:licenses"))
     kover(project(":navigation"))
+    kover(project(":feature:widget"))
 }

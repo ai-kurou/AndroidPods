@@ -7,7 +7,6 @@ import android.view.WindowManager
 import android.widget.TextView
 import androidx.test.core.app.ApplicationProvider
 import kurou.androidpods.core.domain.AppleDevice
-import kurou.androidpods.core.domain.DeviceImages
 import kurou.androidpods.core.domain.OverlayPosition
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -283,15 +282,10 @@ class BatteryOverlayViewDelegateTest {
         val twsDevice =
             baseDevice.copy(
                 modelName = "AirPods Pro 2",
+                modelCode = 0x1420,
                 leftBattery = 8,
                 rightBattery = 6,
                 caseBattery = 3,
-                images =
-                    DeviceImages.Tws(
-                        left = android.R.drawable.ic_menu_info_details,
-                        right = android.R.drawable.ic_menu_info_details,
-                        case = android.R.drawable.ic_menu_info_details,
-                    ),
             )
         delegate.addOverlayView()
         delegate.updateContent(listOf(twsDevice))
@@ -308,12 +302,9 @@ class BatteryOverlayViewDelegateTest {
         val singleDevice =
             baseDevice.copy(
                 modelName = "AirPods Max",
+                modelCode = 0x0A20,
                 isSingle = true,
                 leftBattery = 9,
-                images =
-                    DeviceImages.Single(
-                        body = android.R.drawable.ic_menu_info_details,
-                    ),
             )
         delegate.addOverlayView()
         delegate.updateContent(listOf(singleDevice))

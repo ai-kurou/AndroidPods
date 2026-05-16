@@ -15,7 +15,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import kurou.androidpods.core.data.DataModule
 import kurou.androidpods.core.domain.AppleDevice
-import kurou.androidpods.core.domain.DeviceImages
 import kurou.androidpods.core.domain.NotificationChannels
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -29,6 +28,7 @@ import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.android.controller.ServiceController
 import org.robolectric.annotation.Config
+import kurou.androidpods.core.designsystem.R as DesignSystemR
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltAndroidTest
@@ -153,6 +153,29 @@ class DeviceScanServiceTest {
         assertTrue(text?.contains("AirPods Pro") == true)
     }
 
+    @Test
+    fun `デバイス更新時にwidgetBatteryRepositoryのsaveが呼ばれる`() {
+        controller.create().startCommand(0, 0)
+
+        fakeDevicesFlow.tryEmit(mapOf(baseDevice.address to baseDevice))
+
+        assertTrue(widgetSaveCount > 0)
+    }
+
+    @Test
+    fun `widgetBatteryRepository_save失敗後も次のデバイス更新が処理される`() {
+        widgetSaveShouldThrow = true
+        controller.create().startCommand(0, 0)
+
+        fakeDevicesFlow.tryEmit(mapOf(baseDevice.address to baseDevice))
+        widgetSaveShouldThrow = false
+        widgetSaveCount = 0
+
+        fakeDevicesFlow.tryEmit(mapOf(baseDevice.address to baseDevice.copy(leftBattery = 9)))
+
+        assertTrue(widgetSaveCount > 0)
+    }
+
     // --- createLaunchPendingIntent ---
 
     @Test
@@ -237,44 +260,44 @@ class DeviceScanServiceTest {
 
     @Test
     fun `バッテリーがnullの場合はnullアイコンを返す`() {
-        assertEquals(R.drawable.icon_battery_null, batteryIconRes(null, false))
-        assertEquals(R.drawable.icon_battery_null, batteryIconRes(null, true))
+        assertEquals(DesignSystemR.drawable.icon_battery_null, batteryIconRes(null, false))
+        assertEquals(DesignSystemR.drawable.icon_battery_null, batteryIconRes(null, true))
     }
 
     @Test
     fun `非充電時の各レベルで正しいアイコンを返す`() {
-        assertEquals(R.drawable.icon_battery_5_19, batteryIconRes(0, false)) // 5%
-        assertEquals(R.drawable.icon_battery_5_19, batteryIconRes(1, false)) // 15%
-        assertEquals(R.drawable.icon_battery_20_39, batteryIconRes(2, false)) // 25%
-        assertEquals(R.drawable.icon_battery_20_39, batteryIconRes(3, false)) // 35%
-        assertEquals(R.drawable.icon_battery_40_59, batteryIconRes(4, false)) // 45%
-        assertEquals(R.drawable.icon_battery_40_59, batteryIconRes(5, false)) // 55%
-        assertEquals(R.drawable.icon_battery_60_79, batteryIconRes(6, false)) // 65%
-        assertEquals(R.drawable.icon_battery_60_79, batteryIconRes(7, false)) // 75%
-        assertEquals(R.drawable.icon_battery_80_94, batteryIconRes(8, false)) // 85%
-        assertEquals(R.drawable.icon_battery_95_100, batteryIconRes(9, false)) // 95%
+        assertEquals(DesignSystemR.drawable.icon_battery_5_19, batteryIconRes(0, false)) // 5%
+        assertEquals(DesignSystemR.drawable.icon_battery_5_19, batteryIconRes(1, false)) // 15%
+        assertEquals(DesignSystemR.drawable.icon_battery_20_39, batteryIconRes(2, false)) // 25%
+        assertEquals(DesignSystemR.drawable.icon_battery_20_39, batteryIconRes(3, false)) // 35%
+        assertEquals(DesignSystemR.drawable.icon_battery_40_59, batteryIconRes(4, false)) // 45%
+        assertEquals(DesignSystemR.drawable.icon_battery_40_59, batteryIconRes(5, false)) // 55%
+        assertEquals(DesignSystemR.drawable.icon_battery_60_79, batteryIconRes(6, false)) // 65%
+        assertEquals(DesignSystemR.drawable.icon_battery_60_79, batteryIconRes(7, false)) // 75%
+        assertEquals(DesignSystemR.drawable.icon_battery_80_94, batteryIconRes(8, false)) // 85%
+        assertEquals(DesignSystemR.drawable.icon_battery_95_100, batteryIconRes(9, false)) // 95%
     }
 
     @Test
     fun `充電中の各レベルで正しいアイコンを返す`() {
-        assertEquals(R.drawable.icon_battery_charging_0_19, batteryIconRes(0, true)) // 5%
-        assertEquals(R.drawable.icon_battery_charging_0_19, batteryIconRes(1, true)) // 15%
-        assertEquals(R.drawable.icon_battery_charging_20_39, batteryIconRes(2, true)) // 25%
-        assertEquals(R.drawable.icon_battery_charging_20_39, batteryIconRes(3, true)) // 35%
-        assertEquals(R.drawable.icon_battery_charging_40_59, batteryIconRes(4, true)) // 45%
-        assertEquals(R.drawable.icon_battery_charging_40_59, batteryIconRes(5, true)) // 55%
-        assertEquals(R.drawable.icon_battery_charging_60_79, batteryIconRes(6, true)) // 65%
-        assertEquals(R.drawable.icon_battery_charging_60_79, batteryIconRes(7, true)) // 75%
-        assertEquals(R.drawable.icon_battery_charging_80_94, batteryIconRes(8, true)) // 85%
-        assertEquals(R.drawable.icon_battery_charging_95_99, batteryIconRes(9, true)) // 95%
+        assertEquals(DesignSystemR.drawable.icon_battery_charging_0_19, batteryIconRes(0, true)) // 5%
+        assertEquals(DesignSystemR.drawable.icon_battery_charging_0_19, batteryIconRes(1, true)) // 15%
+        assertEquals(DesignSystemR.drawable.icon_battery_charging_20_39, batteryIconRes(2, true)) // 25%
+        assertEquals(DesignSystemR.drawable.icon_battery_charging_20_39, batteryIconRes(3, true)) // 35%
+        assertEquals(DesignSystemR.drawable.icon_battery_charging_40_59, batteryIconRes(4, true)) // 45%
+        assertEquals(DesignSystemR.drawable.icon_battery_charging_40_59, batteryIconRes(5, true)) // 55%
+        assertEquals(DesignSystemR.drawable.icon_battery_charging_60_79, batteryIconRes(6, true)) // 65%
+        assertEquals(DesignSystemR.drawable.icon_battery_charging_60_79, batteryIconRes(7, true)) // 75%
+        assertEquals(DesignSystemR.drawable.icon_battery_charging_80_94, batteryIconRes(8, true)) // 85%
+        assertEquals(DesignSystemR.drawable.icon_battery_charging_95_99, batteryIconRes(9, true)) // 95%
     }
 
     @Test
     fun `レベル10以上は満充電アイコンを返す`() {
-        assertEquals(R.drawable.icon_battery_95_100, batteryIconRes(10, false))
-        assertEquals(R.drawable.icon_battery_95_100, batteryIconRes(15, false))
-        assertEquals(R.drawable.icon_battery_charging_100, batteryIconRes(10, true))
-        assertEquals(R.drawable.icon_battery_charging_100, batteryIconRes(15, true))
+        assertEquals(DesignSystemR.drawable.icon_battery_95_100, batteryIconRes(10, false))
+        assertEquals(DesignSystemR.drawable.icon_battery_95_100, batteryIconRes(15, false))
+        assertEquals(DesignSystemR.drawable.icon_battery_charging_100, batteryIconRes(10, true))
+        assertEquals(DesignSystemR.drawable.icon_battery_charging_100, batteryIconRes(15, true))
     }
 
     // --- buildDeviceRemoteViews / buildExpandedRemoteViews ---
@@ -283,29 +306,14 @@ class DeviceScanServiceTest {
 
     @Test
     fun `TWSデバイスのRemoteViewsが正しいレイアウトを使用する`() {
-        val tws =
-            baseDevice.copy(
-                images =
-                    DeviceImages.Tws(
-                        left = android.R.drawable.ic_menu_gallery,
-                        right = android.R.drawable.ic_menu_gallery,
-                        case = android.R.drawable.ic_menu_gallery,
-                    ),
-            )
+        val tws = baseDevice.copy(modelCode = 0x1420)
         val remoteViews = buildDeviceRemoteViews(testPackageName, tws)
         assertEquals(R.layout.notification_device_tws, remoteViews.layoutId)
     }
 
     @Test
     fun `SingleデバイスのRemoteViewsが正しいレイアウトを使用する`() {
-        val single =
-            baseDevice.copy(
-                isSingle = true,
-                images =
-                    DeviceImages.Single(
-                        body = android.R.drawable.ic_menu_gallery,
-                    ),
-            )
+        val single = baseDevice.copy(modelCode = 0x0A20, isSingle = true)
         val remoteViews = buildDeviceRemoteViews(testPackageName, single)
         assertEquals(R.layout.notification_device_single, remoteViews.layoutId)
     }
@@ -360,15 +368,10 @@ class DeviceScanServiceTest {
         val tws =
             baseDevice.copy(
                 address = "AA:BB:CC:DD:EE:FF",
+                modelCode = 0x1420,
                 leftBattery = 8,
                 rightBattery = 7,
                 caseBattery = 5,
-                images =
-                    DeviceImages.Tws(
-                        left = android.R.drawable.ic_menu_gallery,
-                        right = android.R.drawable.ic_menu_gallery,
-                        case = android.R.drawable.ic_menu_gallery,
-                    ),
             )
         fakeDevicesFlow.tryEmit(mapOf(tws.address to tws))
 

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_description">Displays AirPods battery level</string>
+    <string name="widget_not_detected">No AirPods detected</string>
+    <string name="widget_recorded_just_now">Just now</string>
+    <string name="widget_recorded_minutes_ago">%d min ago</string>
+    <string name="widget_recorded_hours_ago">%dh ago</string>
+</resources>

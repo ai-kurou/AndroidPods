@@ -5,7 +5,9 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.appwidget.AppWidgetManager
 import android.bluetooth.BluetoothAdapter
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
@@ -14,19 +16,23 @@ import android.os.IBinder
 import android.widget.RemoteViews
 import androidx.core.app.ServiceCompat
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kurou.androidpods.core.designsystem.DeviceImages
+import kurou.androidpods.core.designsystem.deviceImages
 import kurou.androidpods.core.domain.AppleDevice
 import kurou.androidpods.core.domain.AppleDeviceRepository
 import kurou.androidpods.core.domain.BluetoothAdapterRepository
-import kurou.androidpods.core.domain.DeviceImages
 import kurou.androidpods.core.domain.NotificationChannels
 import kurou.androidpods.core.domain.OverlayPositionRepository
 import kurou.androidpods.core.domain.OverlaySettingsRepository
+import kurou.androidpods.core.domain.WidgetBatteryRepository
 import javax.inject.Inject
+import kurou.androidpods.core.designsystem.R as DesignSystemR
 
 @AndroidEntryPoint
 class DeviceScanService : Service() {
@@ -41,6 +47,9 @@ class DeviceScanService : Service() {
 
     @Inject
     lateinit var overlayPositionRepository: OverlayPositionRepository
+
+    @Inject
+    lateinit var widgetBatteryRepository: WidgetBatteryRepository
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private var isForeground = false
@@ -93,6 +102,16 @@ class DeviceScanService : Service() {
                 getSystemService(NotificationManager::class.java)
                     .notify(NOTIFICATION_ID, notification)
 
+                if (deviceList.isNotEmpty()) {
+                    try {
+                        widgetBatteryRepository.save(deviceList.last())
+                        notifyWidgetUpdate()
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        android.util.Log.e("DeviceScanService", "Failed to save widget battery state", e)
+                    }
+                }
                 if (overlaySettingsRepository.isEnabled() && deviceList.isNotEmpty()) {
                     overlayManager.show(deviceList)
                 } else {
@@ -159,9 +178,23 @@ class DeviceScanService : Service() {
         return builder.build()
     }
 
+    private fun notifyWidgetUpdate() {
+        val component = ComponentName(packageName, WIDGET_RECEIVER_CLASS)
+        val widgetIds = AppWidgetManager.getInstance(this).getAppWidgetIds(component)
+        if (widgetIds.isNotEmpty()) {
+            sendBroadcast(
+                Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE).apply {
+                    setComponent(component)
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, widgetIds)
+                },
+            )
+        }
+    }
+
     companion object {
         private val CHANNEL_ID = NotificationChannels.DEVICE_SCAN
         private const val NOTIFICATION_ID = 1
+        private const val WIDGET_RECEIVER_CLASS = "kurou.androidpods.feature.widget.BatteryWidgetReceiver"
 
         fun start(context: Context) {
             context.startForegroundService(Intent(context, DeviceScanService::class.java))
@@ -214,7 +247,7 @@ internal fun buildDeviceRemoteViews(
     packageName: String,
     device: AppleDevice,
 ): RemoteViews =
-    when (val images = device.images) {
+    when (val images = deviceImages(device.modelCode)) {
         is DeviceImages.Tws -> {
             RemoteViews(packageName, R.layout.notification_device_tws).apply {
                 setTextViewText(R.id.device_model_name, device.modelName)
@@ -301,29 +334,33 @@ internal fun batteryIconRes(
     level: Int?,
     charging: Boolean,
 ): Int {
-    if (level == null) return R.drawable.icon_battery_null
-    if (level >= 10) return if (charging) R.drawable.icon_battery_charging_100 else R.drawable.icon_battery_95_100
+    if (level == null) return DesignSystemR.drawable.icon_battery_null
+    if (level >= 10) return if (charging) {
+        DesignSystemR.drawable.icon_battery_charging_100
+    } else {
+        DesignSystemR.drawable.icon_battery_95_100
+    }
     val pct = level * 10 + 5
     return if (charging) chargingBatteryIconRes(pct) else dischargingBatteryIconRes(pct)
 }
 
 private fun chargingBatteryIconRes(pct: Int): Int = when {
-    pct < 20 -> R.drawable.icon_battery_charging_0_19
-    pct < 40 -> R.drawable.icon_battery_charging_20_39
-    pct < 60 -> R.drawable.icon_battery_charging_40_59
-    pct < 80 -> R.drawable.icon_battery_charging_60_79
-    pct < 95 -> R.drawable.icon_battery_charging_80_94
-    else -> R.drawable.icon_battery_charging_95_99
+    pct < 20 -> DesignSystemR.drawable.icon_battery_charging_0_19
+    pct < 40 -> DesignSystemR.drawable.icon_battery_charging_20_39
+    pct < 60 -> DesignSystemR.drawable.icon_battery_charging_40_59
+    pct < 80 -> DesignSystemR.drawable.icon_battery_charging_60_79
+    pct < 95 -> DesignSystemR.drawable.icon_battery_charging_80_94
+    else -> DesignSystemR.drawable.icon_battery_charging_95_99
 }
 
 private fun dischargingBatteryIconRes(pct: Int): Int = when {
-    pct < 5 -> R.drawable.icon_battery_0_4
-    pct < 20 -> R.drawable.icon_battery_5_19
-    pct < 40 -> R.drawable.icon_battery_20_39
-    pct < 60 -> R.drawable.icon_battery_40_59
-    pct < 80 -> R.drawable.icon_battery_60_79
-    pct < 95 -> R.drawable.icon_battery_80_94
-    else -> R.drawable.icon_battery_95_100
+    pct < 5 -> DesignSystemR.drawable.icon_battery_0_4
+    pct < 20 -> DesignSystemR.drawable.icon_battery_5_19
+    pct < 40 -> DesignSystemR.drawable.icon_battery_20_39
+    pct < 60 -> DesignSystemR.drawable.icon_battery_40_59
+    pct < 80 -> DesignSystemR.drawable.icon_battery_60_79
+    pct < 95 -> DesignSystemR.drawable.icon_battery_80_94
+    else -> DesignSystemR.drawable.icon_battery_95_100
 }
 
 internal fun batteryText(

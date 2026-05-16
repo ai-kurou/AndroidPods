@@ -14,7 +14,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kurou.androidpods.core.domain.CompatibleDevice
-import kurou.androidpods.core.domain.DeviceImages
 import kurou.androidpods.core.domain.GetCompatibleDevicesUseCase
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -30,8 +29,8 @@ class DevicesViewModelTest {
 
     private val devices =
         listOf(
-            CompatibleDevice(name = "AirPods Pro (2nd Gen)", images = null),
-            CompatibleDevice(name = "AirPods Max", images = DeviceImages.Single(body = 0)),
+            CompatibleDevice(name = "AirPods Pro (2nd Gen)", modelCode = 0x1420),
+            CompatibleDevice(name = "AirPods Max", modelCode = 0x0A20),
         )
 
     @Before

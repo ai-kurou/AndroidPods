@@ -29,8 +29,8 @@ class DevicesScreenTest {
 
     private val devices =
         listOf(
-            CompatibleDevice(name = "AirPods Pro (2nd Gen)", images = null),
-            CompatibleDevice(name = "AirPods Max", images = null),
+            CompatibleDevice(name = "AirPods Pro (2nd Gen)", modelCode = 0x1420),
+            CompatibleDevice(name = "AirPods Max", modelCode = 0x0A20),
         )
     private val onBack = mockk<() -> Unit>(relaxed = true)
 
