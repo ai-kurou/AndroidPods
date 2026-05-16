@@ -29,7 +29,6 @@ import kurou.androidpods.core.domain.BluetoothAdapterRepository
 import kurou.androidpods.core.domain.NotificationChannels
 import kurou.androidpods.core.domain.OverlayPositionRepository
 import kurou.androidpods.core.domain.OverlaySettingsRepository
-import kurou.androidpods.core.domain.WidgetActions
 import kurou.androidpods.core.domain.WidgetBatteryRepository
 import javax.inject.Inject
 import kurou.androidpods.core.designsystem.R as DesignSystemR
@@ -173,7 +172,7 @@ class DeviceScanService : Service() {
     }
 
     private fun notifyWidgetUpdate() {
-        val component = ComponentName(packageName, WidgetActions.RECEIVER_CLASS)
+        val component = ComponentName(packageName, WIDGET_RECEIVER_CLASS)
         val widgetIds = AppWidgetManager.getInstance(this).getAppWidgetIds(component)
         if (widgetIds.isNotEmpty()) {
             sendBroadcast(
@@ -188,6 +187,7 @@ class DeviceScanService : Service() {
     companion object {
         private val CHANNEL_ID = NotificationChannels.DEVICE_SCAN
         private const val NOTIFICATION_ID = 1
+        private const val WIDGET_RECEIVER_CLASS = "kurou.androidpods.feature.widget.BatteryWidgetReceiver"
 
         fun start(context: Context) {
             context.startForegroundService(Intent(context, DeviceScanService::class.java))
