@@ -8,6 +8,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import kurou.androidpods.core.designsystem.R as DesignSystemR
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [35])
@@ -83,5 +84,55 @@ class BatteryWidgetTest {
         val now = 10_000_000L
         val result = recordedAtText(context, recordedAt = now - 2 * 3_600_000L, now = now)
         assertEquals(context.getString(R.string.widget_recorded_hours_ago, 2L), result)
+    }
+
+    @Test
+    fun `levelToText_nullはダッシュを返す`() {
+        assertEquals("--", levelToText(null))
+    }
+
+    @Test
+    fun `levelToText_10以上は100パーセントを返す`() {
+        assertEquals("100%", levelToText(10))
+        assertEquals("100%", levelToText(15))
+    }
+
+    @Test
+    fun `levelToText_0から9はレベルを変換したパーセントを返す`() {
+        assertEquals("5%", levelToText(0))
+        assertEquals("55%", levelToText(5))
+        assertEquals("95%", levelToText(9))
+    }
+
+    @Test
+    fun `widgetBatteryIconRes_nullはnullアイコンを返す`() {
+        assertEquals(DesignSystemR.drawable.icon_battery_null, widgetBatteryIconRes(null, false))
+        assertEquals(DesignSystemR.drawable.icon_battery_null, widgetBatteryIconRes(null, true))
+    }
+
+    @Test
+    fun `widgetBatteryIconRes_レベル10以上は充電状態に応じた100パーセントアイコンを返す`() {
+        assertEquals(DesignSystemR.drawable.icon_battery_charging_100, widgetBatteryIconRes(10, true))
+        assertEquals(DesignSystemR.drawable.icon_battery_95_100, widgetBatteryIconRes(10, false))
+    }
+
+    @Test
+    fun `widgetBatteryIconRes_充電中は各レベルに対応するアイコンを返す`() {
+        assertEquals(DesignSystemR.drawable.icon_battery_charging_0_19, widgetBatteryIconRes(0, true))
+        assertEquals(DesignSystemR.drawable.icon_battery_charging_20_39, widgetBatteryIconRes(2, true))
+        assertEquals(DesignSystemR.drawable.icon_battery_charging_40_59, widgetBatteryIconRes(4, true))
+        assertEquals(DesignSystemR.drawable.icon_battery_charging_60_79, widgetBatteryIconRes(6, true))
+        assertEquals(DesignSystemR.drawable.icon_battery_charging_80_94, widgetBatteryIconRes(8, true))
+        assertEquals(DesignSystemR.drawable.icon_battery_charging_95_99, widgetBatteryIconRes(9, true))
+    }
+
+    @Test
+    fun `widgetBatteryIconRes_非充電中は各レベルに対応するアイコンを返す`() {
+        assertEquals(DesignSystemR.drawable.icon_battery_5_19, widgetBatteryIconRes(0, false))
+        assertEquals(DesignSystemR.drawable.icon_battery_20_39, widgetBatteryIconRes(2, false))
+        assertEquals(DesignSystemR.drawable.icon_battery_40_59, widgetBatteryIconRes(4, false))
+        assertEquals(DesignSystemR.drawable.icon_battery_60_79, widgetBatteryIconRes(6, false))
+        assertEquals(DesignSystemR.drawable.icon_battery_80_94, widgetBatteryIconRes(8, false))
+        assertEquals(DesignSystemR.drawable.icon_battery_95_100, widgetBatteryIconRes(9, false))
     }
 }
