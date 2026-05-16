@@ -79,99 +79,116 @@ internal fun BatteryWidgetContent(context: Context, state: WidgetBatteryState?) 
                 ),
             )
         } else {
+            BatteryWidgetStateContent(context, state)
+        }
+    }
+}
+
+@Composable
+private fun BatteryWidgetStateContent(context: Context, state: WidgetBatteryState) {
+    Text(
+        text = state.deviceName,
+        style = TextStyle(
+            color = GlanceTheme.colors.onSurface,
+            fontWeight = FontWeight.Medium,
+            fontSize = 14.sp,
+            textAlign = TextAlign.Center,
+        ),
+    )
+    Spacer(modifier = GlanceModifier.height(20.dp))
+    val deviceImages = deviceImages(state.modelCode)
+    if (deviceImages != null) {
+        DeviceContent(state, deviceImages)
+    } else {
+        Text(
+            text = batteryLevelText(state),
+            style = TextStyle(
+                color = GlanceTheme.colors.onSurface,
+                fontSize = 13.sp,
+                textAlign = TextAlign.Center,
+            ),
+        )
+    }
+    Spacer(modifier = GlanceModifier.height(16.dp))
+    Text(
+        text = recordedAtText(context, state.recordedAt),
+        style = TextStyle(
+            color = GlanceTheme.colors.onSurfaceVariant,
+            fontSize = 11.sp,
+            textAlign = TextAlign.Center,
+        ),
+    )
+}
+
+@Composable
+private fun DeviceContent(state: WidgetBatteryState, deviceImages: DeviceImages) {
+    if (state.isSingle) {
+        SingleDeviceContent(state, deviceImages)
+    } else if (deviceImages is DeviceImages.Tws) {
+        TwsDeviceContent(state, deviceImages)
+    }
+}
+
+@Composable
+private fun SingleDeviceContent(state: WidgetBatteryState, deviceImages: DeviceImages) {
+    val bodyRes = when (deviceImages) {
+        is DeviceImages.Single -> deviceImages.body
+        is DeviceImages.Tws -> deviceImages.left
+    }
+    Column(
+        horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
+    ) {
+        Image(
+            provider = ImageProvider(bodyRes),
+            contentDescription = null,
+            modifier = GlanceModifier.size(60.dp),
+        )
+        Spacer(modifier = GlanceModifier.height(16.dp))
+        Row(
+            verticalAlignment = Alignment.Vertical.CenterVertically,
+        ) {
+            Image(
+                provider = ImageProvider(
+                    widgetBatteryIconRes(state.leftBattery, state.leftCharging),
+                ),
+                contentDescription = null,
+                modifier = GlanceModifier.size(20.dp),
+            )
+            Spacer(modifier = GlanceModifier.width(4.dp))
             Text(
-                text = state.deviceName,
+                text = levelToText(state.leftBattery),
                 style = TextStyle(
                     color = GlanceTheme.colors.onSurface,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 14.sp,
-                    textAlign = TextAlign.Center,
-                ),
-            )
-            Spacer(modifier = GlanceModifier.height(20.dp))
-            val deviceImages = deviceImages(state.modelCode)
-            if (deviceImages != null) {
-                if (state.isSingle) {
-                    val bodyRes = when (deviceImages) {
-                        is DeviceImages.Single -> deviceImages.body
-                        is DeviceImages.Tws -> deviceImages.left
-                    }
-                    Column(
-                        horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
-                    ) {
-                        Image(
-                            provider = ImageProvider(bodyRes),
-                            contentDescription = null,
-                            modifier = GlanceModifier.size(60.dp),
-                        )
-                        Spacer(modifier = GlanceModifier.height(16.dp))
-                        Row(
-                            verticalAlignment = Alignment.Vertical.CenterVertically,
-                        ) {
-                            Image(
-                                provider = ImageProvider(
-                                    widgetBatteryIconRes(state.leftBattery, state.leftCharging),
-                                ),
-                                contentDescription = null,
-                                modifier = GlanceModifier.size(20.dp),
-                            )
-                            Spacer(modifier = GlanceModifier.width(4.dp))
-                            Text(
-                                text = levelToText(state.leftBattery),
-                                style = TextStyle(
-                                    color = GlanceTheme.colors.onSurface,
-                                    fontSize = 11.sp,
-                                    textAlign = TextAlign.Center,
-                                ),
-                            )
-                        }
-                    }
-                } else {
-                    val twsImages = deviceImages as? DeviceImages.Tws
-                    Row(
-                        modifier = GlanceModifier.fillMaxWidth().wrapContentHeight(),
-                        horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
-                    ) {
-                        if (twsImages != null) {
-                            BatteryColumn(
-                                level = state.leftBattery,
-                                imageRes = twsImages.left,
-                                charging = state.leftCharging,
-                            )
-                            BatteryColumn(
-                                level = state.rightBattery,
-                                imageRes = twsImages.right,
-                                charging = state.rightCharging,
-                                modifier = GlanceModifier.padding(horizontal = 32.dp),
-                            )
-                            BatteryColumn(
-                                level = state.caseBattery,
-                                imageRes = twsImages.case,
-                                charging = state.caseCharging,
-                            )
-                        }
-                    }
-                }
-            } else {
-                Text(
-                    text = batteryLevelText(state),
-                    style = TextStyle(
-                        color = GlanceTheme.colors.onSurface,
-                        fontSize = 13.sp,
-                        textAlign = TextAlign.Center,
-                    ),
-                )
-            }
-            Spacer(modifier = GlanceModifier.height(16.dp))
-            Text(
-                text = recordedAtText(context, state.recordedAt),
-                style = TextStyle(
-                    color = GlanceTheme.colors.onSurfaceVariant,
                     fontSize = 11.sp,
                     textAlign = TextAlign.Center,
                 ),
             )
         }
+    }
+}
+
+@Composable
+private fun TwsDeviceContent(state: WidgetBatteryState, twsImages: DeviceImages.Tws) {
+    Row(
+        modifier = GlanceModifier.fillMaxWidth().wrapContentHeight(),
+        horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
+    ) {
+        BatteryColumn(
+            level = state.leftBattery,
+            imageRes = twsImages.left,
+            charging = state.leftCharging,
+        )
+        BatteryColumn(
+            level = state.rightBattery,
+            imageRes = twsImages.right,
+            charging = state.rightCharging,
+            modifier = GlanceModifier.padding(horizontal = 32.dp),
+        )
+        BatteryColumn(
+            level = state.caseBattery,
+            imageRes = twsImages.case,
+            charging = state.caseCharging,
+        )
     }
 }
 
