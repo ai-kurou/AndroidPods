@@ -92,6 +92,6 @@ object FakeRepositoryModule {
         object : WidgetBatteryRepository {
             override fun observe(): Flow<WidgetBatteryState?> = emptyFlow()
 
-            override suspend fun save(device: kurou.androidpods.core.domain.AppleDevice) {}
+            override suspend fun save(device: AppleDevice) {}
         }
 }
