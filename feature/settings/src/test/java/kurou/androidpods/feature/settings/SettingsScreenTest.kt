@@ -53,6 +53,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
+import org.robolectric.shadows.ShadowLooper
 import java.util.concurrent.TimeUnit
 
 @RunWith(RobolectricTestRunner::class)
@@ -91,6 +92,8 @@ class SettingsScreenTest {
         every { btUseCase.observe() } returns MutableStateFlow(bluetoothAdapterState)
         every { appleDevicesUseCase.observe() } returns MutableStateFlow(emptyMap())
         every { overlayUseCase.observe() } returns MutableStateFlow(false)
+        every { overlayUseCase.hasPermission() } returns false
+        coEvery { overlayUseCase.setEnabled(any()) } just Runs
         every { themeSettingsUseCase.observe() } returns MutableStateFlow(ThemeSettings())
         every { overlayPositionUseCase.observe() } returns MutableStateFlow(OverlayPosition.BOTTOM)
         every { unknownDeviceUseCase.observe() } returns MutableStateFlow(unknownModelCodes)
@@ -305,6 +308,8 @@ class SettingsScreenTest {
         composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithText("Show battery overlay").performClick()
+        composeTestRule.waitForIdle()
+        ShadowLooper.idleMainLooper()
         composeTestRule.waitForIdle()
 
         val started = shadowOf(composeTestRule.activity).nextStartedActivityForResult

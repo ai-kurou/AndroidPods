@@ -7,5 +7,7 @@ class GetOverlaySettingsUseCase @Inject constructor(
     private val repository: OverlaySettingsRepository,
 ) {
     fun observe(): Flow<Boolean> = repository.observe()
+    fun hasPermission(): Boolean = repository.hasPermission()
+    suspend fun setEnabled(enabled: Boolean) = repository.setEnabled(enabled)
     fun refresh() = repository.refresh()
 }

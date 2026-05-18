@@ -14,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -421,5 +422,75 @@ class SettingsViewModelTest {
 
             coVerify(exactly = 1) { unknownDeviceUseCase.report(0x1234, "AirPods Max") }
             assertFalse(viewModel.uiState.value.showUnknownDeviceSheet)
+        }
+
+    @Test
+    fun `権限なしでsetOverlayEnabled_trueを呼ぶとsetEnabled_trueが呼ばれる`() =
+        runTest {
+            every { getOverlaySettingsUseCase.hasPermission() } returns false
+            coEvery { getOverlaySettingsUseCase.setEnabled(any()) } just Runs
+
+            viewModel.setOverlayEnabled(true)
+
+            verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
+            verify(exactly = 1) { getAppleDevicesUseCase.observe() }
+            verify(exactly = 1) { getOverlaySettingsUseCase.observe() }
+            verify(exactly = 1) { getOverlaySettingsUseCase.hasPermission() }
+            coVerify(exactly = 1) { getOverlaySettingsUseCase.setEnabled(true) }
+            verify(exactly = 1) { themeSettingsUseCase.observe() }
+            verify(exactly = 1) { overlayPositionUseCase.observe() }
+            verify(exactly = 1) { unknownDeviceUseCase.observe() }
+            confirmVerified(
+                getBluetoothAdapterStateUseCase,
+                getAppleDevicesUseCase,
+                getOverlaySettingsUseCase,
+                checkUpdateUseCase,
+                themeSettingsUseCase,
+                overlayPositionUseCase,
+                unknownDeviceUseCase,
+            )
+        }
+
+    @Test
+    fun `権限ありでsetOverlayEnabledを呼ぶとUseCaseのsetEnabledが呼ばれる`() =
+        runTest {
+            every { getOverlaySettingsUseCase.hasPermission() } returns true
+            coEvery { getOverlaySettingsUseCase.setEnabled(any()) } just Runs
+
+            viewModel.setOverlayEnabled(true)
+            viewModel.setOverlayEnabled(false)
+
+            verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
+            verify(exactly = 1) { getAppleDevicesUseCase.observe() }
+            verify(exactly = 1) { getOverlaySettingsUseCase.observe() }
+            verify(exactly = 1) { getOverlaySettingsUseCase.hasPermission() }
+            coVerify(exactly = 1) { getOverlaySettingsUseCase.setEnabled(true) }
+            coVerify(exactly = 1) { getOverlaySettingsUseCase.setEnabled(false) }
+            verify(exactly = 1) { themeSettingsUseCase.observe() }
+            verify(exactly = 1) { overlayPositionUseCase.observe() }
+            verify(exactly = 1) { unknownDeviceUseCase.observe() }
+            confirmVerified(
+                getBluetoothAdapterStateUseCase,
+                getAppleDevicesUseCase,
+                getOverlaySettingsUseCase,
+                checkUpdateUseCase,
+                themeSettingsUseCase,
+                overlayPositionUseCase,
+                unknownDeviceUseCase,
+            )
+        }
+
+    @Test
+    fun `権限なしでsetOverlayEnabled_trueを呼ぶとOpenOverlayPermissionSettingsイベントが発行される`() =
+        runTest {
+            every { getOverlaySettingsUseCase.hasPermission() } returns false
+            coEvery { getOverlaySettingsUseCase.setEnabled(any()) } just Runs
+            val events = mutableListOf<ServiceEvent>()
+            val job = launch(testDispatcher) { viewModel.serviceEvents.collect { events.add(it) } }
+
+            viewModel.setOverlayEnabled(true)
+
+            assertEquals(ServiceEvent.OpenOverlayPermissionSettings, events.first())
+            job.cancel()
         }
 }
