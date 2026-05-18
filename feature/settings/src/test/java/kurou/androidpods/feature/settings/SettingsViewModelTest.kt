@@ -14,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -477,5 +478,19 @@ class SettingsViewModelTest {
                 overlayPositionUseCase,
                 unknownDeviceUseCase,
             )
+        }
+
+    @Test
+    fun `権限なしでsetOverlayEnabled_trueを呼ぶとOpenOverlayPermissionSettingsイベントが発行される`() =
+        runTest {
+            every { getOverlaySettingsUseCase.hasPermission() } returns false
+            coEvery { getOverlaySettingsUseCase.setEnabled(any()) } just Runs
+            val events = mutableListOf<ServiceEvent>()
+            val job = launch(testDispatcher) { viewModel.serviceEvents.collect { events.add(it) } }
+
+            viewModel.setOverlayEnabled(true)
+
+            assertEquals(ServiceEvent.OpenOverlayPermissionSettings, events.first())
+            job.cancel()
         }
 }
