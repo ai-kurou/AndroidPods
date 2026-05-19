@@ -17,6 +17,7 @@ An Android app that displays real-time battery levels of Apple Bluetooth earphon
 
 ## Screenshots
 
+<img width="400" src="https://github.com/user-attachments/assets/f3771fc9-1e4a-42a7-bc4d-5b1fc887360e" />
 <img width="400" src="https://github.com/user-attachments/assets/a3cb83ea-e09f-43f0-80c5-ee907df0dab0" />
 
 ## Features
