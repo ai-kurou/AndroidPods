@@ -41,6 +41,8 @@ import kurou.androidpods.core.domain.GetOverlaySettingsUseCase
 import kurou.androidpods.core.domain.NotificationChannels
 import kurou.androidpods.core.domain.OverlayPosition
 import kurou.androidpods.core.domain.OverlayPositionUseCase
+import kurou.androidpods.core.domain.RssiThreshold
+import kurou.androidpods.core.domain.RssiThresholdUseCase
 import kurou.androidpods.core.domain.ThemeSettings
 import kurou.androidpods.core.domain.ThemeSettingsUseCase
 import kurou.androidpods.core.domain.UnknownDeviceUseCase
@@ -69,6 +71,7 @@ class SettingsScreenTest {
     private val themeSettingsUseCase = mockk<ThemeSettingsUseCase>()
     private val overlayPositionUseCase = mockk<OverlayPositionUseCase>(relaxUnitFun = true)
     private val unknownDeviceUseCase = mockk<UnknownDeviceUseCase>()
+    private val rssiThresholdUseCase = mockk<RssiThresholdUseCase>()
 
     @After
     fun tearDown() {
@@ -97,6 +100,8 @@ class SettingsScreenTest {
         every { themeSettingsUseCase.observe() } returns MutableStateFlow(ThemeSettings())
         every { overlayPositionUseCase.observe() } returns MutableStateFlow(OverlayPosition.BOTTOM)
         every { unknownDeviceUseCase.observe() } returns MutableStateFlow(unknownModelCodes)
+        every { rssiThresholdUseCase.observe() } returns MutableStateFlow(RssiThreshold.VERY_NEAR)
+        coEvery { rssiThresholdUseCase.update(any()) } just Runs
         coEvery { themeSettingsUseCase.update(any()) } just Runs
         return SettingsViewModel(
             btUseCase,
@@ -106,6 +111,7 @@ class SettingsScreenTest {
             themeSettingsUseCase,
             overlayPositionUseCase,
             unknownDeviceUseCase,
+            rssiThresholdUseCase,
         )
     }
 
@@ -578,6 +584,36 @@ class SettingsScreenTest {
         composeTestRule.waitForIdle()
 
         assertFalse(viewModel.uiState.value.showUnknownDeviceSheet)
+    }
+
+    @Test
+    fun `RSSI閾値アイテムをタップするとRssiThresholdDialogが表示される`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        grantRequiredPermissions(context)
+
+        composeTestRule.setContent {
+            SettingsScreen(
+                windowSizeClass = windowSizeClassOf(400f),
+                onStartScanService = {},
+                onStopScanService = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                viewModel = createViewModel(BluetoothAdapter.STATE_ON),
+            )
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst()
+            .performScrollToNode(hasText("Signal Strength Filter"))
+        composeTestRule.onNodeWithText("Signal Strength Filter").performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("All devices").assertExists()
+
+        composeTestRule.onNodeWithText("All devices").performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("All devices").assertDoesNotExist()
     }
 
     @Test

@@ -22,6 +22,8 @@ import kurou.androidpods.core.domain.GetBluetoothAdapterStateUseCase
 import kurou.androidpods.core.domain.GetOverlaySettingsUseCase
 import kurou.androidpods.core.domain.OverlayPosition
 import kurou.androidpods.core.domain.OverlayPositionUseCase
+import kurou.androidpods.core.domain.RssiThreshold
+import kurou.androidpods.core.domain.RssiThresholdUseCase
 import kurou.androidpods.core.domain.ThemeSettings
 import kurou.androidpods.core.domain.ThemeSettingsUseCase
 import kurou.androidpods.core.domain.UnknownDeviceUseCase
@@ -53,12 +55,18 @@ private data class WarningState(
     val permissionStates: Map<String, Boolean>,
 )
 
+private data class AppSettingsState(
+    val themeSettings: ThemeSettings,
+    val rssiThreshold: RssiThreshold,
+)
+
 private data class UiControlState(
     val isServiceRestarting: Boolean = false,
     val showPermissionRequiredDialog: Boolean = false,
     val showThemeModeDialog: Boolean = false,
     val showOverlayPositionDialog: Boolean = false,
     val showUnknownDeviceSheet: Boolean = false,
+    val showRssiThresholdDialog: Boolean = false,
 )
 
 data class SettingsUiState(
@@ -73,17 +81,19 @@ data class SettingsUiState(
     val isBatteryOptimizationExempt: Boolean = false,
     val unknownModelCodes: Set<String> = emptySet(),
     val permissionStates: Map<String, Boolean> = emptyMap(),
+    val rssiThreshold: RssiThreshold = RssiThreshold.VERY_NEAR,
     val isServiceRestarting: Boolean = false,
     val showPermissionRequiredDialog: Boolean = false,
     val showThemeModeDialog: Boolean = false,
     val showOverlayPositionDialog: Boolean = false,
     val showUnknownDeviceSheet: Boolean = false,
+    val showRssiThresholdDialog: Boolean = false,
 ) {
     val hasUnknownDevices: Boolean get() = unknownModelCodes.isNotEmpty()
 }
 
 @HiltViewModel
-@Suppress("TooManyFunctions")
+@Suppress("TooManyFunctions", "LongParameterList")
 class SettingsViewModel @Inject constructor(
     private val getBluetoothAdapterStateUseCase: GetBluetoothAdapterStateUseCase,
     private val getAppleDevicesUseCase: GetAppleDevicesUseCase,
@@ -92,6 +102,7 @@ class SettingsViewModel @Inject constructor(
     private val themeSettingsUseCase: ThemeSettingsUseCase,
     private val overlayPositionUseCase: OverlayPositionUseCase,
     private val unknownDeviceUseCase: UnknownDeviceUseCase,
+    private val rssiThresholdUseCase: RssiThresholdUseCase,
 ) : ViewModel() {
     private val _updateAvailable = MutableStateFlow(false)
     private val _isNotificationsDisabled = MutableStateFlow(false)
@@ -131,16 +142,22 @@ class SettingsViewModel @Inject constructor(
                     isBatteryOptimizationExempt, permissionStates,
                 )
             },
-            themeSettingsUseCase.observe(),
+            combine(
+                themeSettingsUseCase.observe(),
+                rssiThresholdUseCase.observe(),
+            ) { themeSettings, rssiThreshold ->
+                AppSettingsState(themeSettings, rssiThreshold)
+            },
             _uiControlState,
-        ) { scan, overlay, warning, themeSettings, uiControl ->
+        ) { scan, overlay, warning, appSettings, uiControl ->
             SettingsUiState(
                 bluetoothAdapterState = scan.bluetoothAdapterState,
                 appleDevices = scan.appleDevices,
                 unknownModelCodes = scan.unknownModelCodes,
                 overlayEnabled = overlay.overlayEnabled,
                 overlayPosition = overlay.overlayPosition,
-                themeSettings = themeSettings,
+                themeSettings = appSettings.themeSettings,
+                rssiThreshold = appSettings.rssiThreshold,
                 updateAvailable = warning.updateAvailable,
                 isNotificationsDisabled = warning.isNotificationsDisabled,
                 isDeviceScanChannelDisabled = warning.isDeviceScanChannelDisabled,
@@ -151,6 +168,7 @@ class SettingsViewModel @Inject constructor(
                 showThemeModeDialog = uiControl.showThemeModeDialog,
                 showOverlayPositionDialog = uiControl.showOverlayPositionDialog,
                 showUnknownDeviceSheet = uiControl.showUnknownDeviceSheet,
+                showRssiThresholdDialog = uiControl.showRssiThresholdDialog,
             )
         }.stateIn(
             scope = viewModelScope,
@@ -241,6 +259,18 @@ class SettingsViewModel @Inject constructor(
             delay(RESTART_DELAY_MS)
             _uiControlState.update { it.copy(isServiceRestarting = false) }
             _serviceEvents.emit(ServiceEvent.ShowRestartSnackbar)
+        }
+    }
+
+    fun showRssiThresholdDialog() =
+        _uiControlState.update { it.copy(showRssiThresholdDialog = true) }
+
+    fun dismissRssiThresholdDialog() =
+        _uiControlState.update { it.copy(showRssiThresholdDialog = false) }
+
+    fun updateRssiThreshold(threshold: RssiThreshold) {
+        viewModelScope.launch {
+            rssiThresholdUseCase.update(threshold)
         }
     }
 

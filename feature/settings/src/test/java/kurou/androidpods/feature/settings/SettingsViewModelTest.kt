@@ -26,6 +26,8 @@ import kurou.androidpods.core.domain.GetBluetoothAdapterStateUseCase
 import kurou.androidpods.core.domain.GetOverlaySettingsUseCase
 import kurou.androidpods.core.domain.OverlayPosition
 import kurou.androidpods.core.domain.OverlayPositionUseCase
+import kurou.androidpods.core.domain.RssiThreshold
+import kurou.androidpods.core.domain.RssiThresholdUseCase
 import kurou.androidpods.core.domain.ThemeMode
 import kurou.androidpods.core.domain.ThemeSettings
 import kurou.androidpods.core.domain.ThemeSettingsUseCase
@@ -48,6 +50,7 @@ class SettingsViewModelTest {
     private val fakeOverlayPositionFlow = MutableStateFlow(OverlayPosition.BOTTOM)
     private val fakeOverlayEnabledFlow = MutableStateFlow(false)
     private val fakeUnknownModelCodesFlow = MutableStateFlow<Set<String>>(emptySet())
+    private val fakeRssiThresholdFlow = MutableStateFlow(RssiThreshold.VERY_NEAR)
     private val getBluetoothAdapterStateUseCase = mockk<GetBluetoothAdapterStateUseCase>()
     private val getAppleDevicesUseCase = mockk<GetAppleDevicesUseCase>(relaxUnitFun = true)
     private val getOverlaySettingsUseCase = mockk<GetOverlaySettingsUseCase>(relaxUnitFun = true)
@@ -55,6 +58,7 @@ class SettingsViewModelTest {
     private val themeSettingsUseCase = mockk<ThemeSettingsUseCase>()
     private val overlayPositionUseCase = mockk<OverlayPositionUseCase>(relaxUnitFun = true)
     private val unknownDeviceUseCase = mockk<UnknownDeviceUseCase>()
+    private val rssiThresholdUseCase = mockk<RssiThresholdUseCase>()
 
     @Before
     fun setUp() {
@@ -65,6 +69,7 @@ class SettingsViewModelTest {
         every { themeSettingsUseCase.observe() } returns fakeThemeSettingsFlow
         every { overlayPositionUseCase.observe() } returns fakeOverlayPositionFlow
         every { unknownDeviceUseCase.observe() } returns fakeUnknownModelCodesFlow
+        every { rssiThresholdUseCase.observe() } returns fakeRssiThresholdFlow
         viewModel =
             SettingsViewModel(
                 getBluetoothAdapterStateUseCase,
@@ -74,6 +79,7 @@ class SettingsViewModelTest {
                 themeSettingsUseCase,
                 overlayPositionUseCase,
                 unknownDeviceUseCase,
+                rssiThresholdUseCase,
             )
     }
 
@@ -99,6 +105,7 @@ class SettingsViewModelTest {
             verify(exactly = 1) { themeSettingsUseCase.observe() }
             verify(exactly = 1) { overlayPositionUseCase.observe() }
             verify(exactly = 1) { unknownDeviceUseCase.observe() }
+            verify(exactly = 1) { rssiThresholdUseCase.observe() }
             coVerify(exactly = 1) { checkUpdateUseCase(version) }
             confirmVerified(
                 getBluetoothAdapterStateUseCase,
@@ -108,6 +115,7 @@ class SettingsViewModelTest {
                 themeSettingsUseCase,
                 overlayPositionUseCase,
                 unknownDeviceUseCase,
+                rssiThresholdUseCase,
             )
         }
 
@@ -127,6 +135,7 @@ class SettingsViewModelTest {
             verify(exactly = 1) { themeSettingsUseCase.observe() }
             verify(exactly = 1) { overlayPositionUseCase.observe() }
             verify(exactly = 1) { unknownDeviceUseCase.observe() }
+            verify(exactly = 1) { rssiThresholdUseCase.observe() }
             coVerify(exactly = 1) { checkUpdateUseCase(version) }
             confirmVerified(
                 getBluetoothAdapterStateUseCase,
@@ -136,6 +145,7 @@ class SettingsViewModelTest {
                 themeSettingsUseCase,
                 overlayPositionUseCase,
                 unknownDeviceUseCase,
+                rssiThresholdUseCase,
             )
         }
 
@@ -155,6 +165,7 @@ class SettingsViewModelTest {
             verify(exactly = 1) { themeSettingsUseCase.observe() }
             verify(exactly = 1) { overlayPositionUseCase.observe() }
             verify(exactly = 1) { unknownDeviceUseCase.observe() }
+            verify(exactly = 1) { rssiThresholdUseCase.observe() }
             coVerify(exactly = 1) { checkUpdateUseCase(version) }
             confirmVerified(
                 getBluetoothAdapterStateUseCase,
@@ -164,6 +175,7 @@ class SettingsViewModelTest {
                 themeSettingsUseCase,
                 overlayPositionUseCase,
                 unknownDeviceUseCase,
+                rssiThresholdUseCase,
             )
         }
 
@@ -184,6 +196,7 @@ class SettingsViewModelTest {
             verify(exactly = 1) { themeSettingsUseCase.observe() }
             verify(exactly = 1) { overlayPositionUseCase.observe() }
             verify(exactly = 1) { unknownDeviceUseCase.observe() }
+            verify(exactly = 1) { rssiThresholdUseCase.observe() }
             confirmVerified(
                 getBluetoothAdapterStateUseCase,
                 getAppleDevicesUseCase,
@@ -192,6 +205,7 @@ class SettingsViewModelTest {
                 themeSettingsUseCase,
                 overlayPositionUseCase,
                 unknownDeviceUseCase,
+                rssiThresholdUseCase,
             )
         }
 
@@ -210,6 +224,7 @@ class SettingsViewModelTest {
             verify(exactly = 1) { themeSettingsUseCase.observe() }
             verify(exactly = 1) { overlayPositionUseCase.observe() }
             verify(exactly = 1) { unknownDeviceUseCase.observe() }
+            verify(exactly = 1) { rssiThresholdUseCase.observe() }
             confirmVerified(
                 getBluetoothAdapterStateUseCase,
                 getAppleDevicesUseCase,
@@ -218,6 +233,7 @@ class SettingsViewModelTest {
                 themeSettingsUseCase,
                 overlayPositionUseCase,
                 unknownDeviceUseCase,
+                rssiThresholdUseCase,
             )
         }
 
@@ -236,6 +252,7 @@ class SettingsViewModelTest {
             verify(exactly = 1) { themeSettingsUseCase.observe() }
             verify(exactly = 1) { overlayPositionUseCase.observe() }
             verify(exactly = 1) { unknownDeviceUseCase.observe() }
+            verify(exactly = 1) { rssiThresholdUseCase.observe() }
             confirmVerified(
                 getBluetoothAdapterStateUseCase,
                 getAppleDevicesUseCase,
@@ -244,6 +261,7 @@ class SettingsViewModelTest {
                 themeSettingsUseCase,
                 overlayPositionUseCase,
                 unknownDeviceUseCase,
+                rssiThresholdUseCase,
             )
         }
 
@@ -262,6 +280,7 @@ class SettingsViewModelTest {
             verify(exactly = 1) { themeSettingsUseCase.observe() }
             verify(exactly = 1) { overlayPositionUseCase.observe() }
             verify(exactly = 1) { unknownDeviceUseCase.observe() }
+            verify(exactly = 1) { rssiThresholdUseCase.observe() }
             confirmVerified(
                 getBluetoothAdapterStateUseCase,
                 getAppleDevicesUseCase,
@@ -270,6 +289,7 @@ class SettingsViewModelTest {
                 themeSettingsUseCase,
                 overlayPositionUseCase,
                 unknownDeviceUseCase,
+                rssiThresholdUseCase,
             )
         }
 
@@ -287,6 +307,7 @@ class SettingsViewModelTest {
             verify(exactly = 1) { themeSettingsUseCase.observe() }
             verify(exactly = 1) { overlayPositionUseCase.observe() }
             verify(exactly = 1) { unknownDeviceUseCase.observe() }
+            verify(exactly = 1) { rssiThresholdUseCase.observe() }
             coVerify(exactly = 1) { themeSettingsUseCase.update(settings) }
             confirmVerified(
                 getBluetoothAdapterStateUseCase,
@@ -296,6 +317,7 @@ class SettingsViewModelTest {
                 themeSettingsUseCase,
                 overlayPositionUseCase,
                 unknownDeviceUseCase,
+                rssiThresholdUseCase,
             )
         }
 
@@ -310,6 +332,7 @@ class SettingsViewModelTest {
             verify(exactly = 1) { themeSettingsUseCase.observe() }
             verify(exactly = 1) { overlayPositionUseCase.observe() }
             verify(exactly = 1) { unknownDeviceUseCase.observe() }
+            verify(exactly = 1) { rssiThresholdUseCase.observe() }
             coVerify(exactly = 1) { overlayPositionUseCase.update(OverlayPosition.TOP) }
             confirmVerified(
                 getBluetoothAdapterStateUseCase,
@@ -319,6 +342,7 @@ class SettingsViewModelTest {
                 themeSettingsUseCase,
                 overlayPositionUseCase,
                 unknownDeviceUseCase,
+                rssiThresholdUseCase,
             )
         }
 
@@ -335,6 +359,7 @@ class SettingsViewModelTest {
         verify(exactly = 1) { themeSettingsUseCase.observe() }
         verify(exactly = 1) { overlayPositionUseCase.observe() }
         verify(exactly = 1) { unknownDeviceUseCase.observe() }
+        verify(exactly = 1) { rssiThresholdUseCase.observe() }
         confirmVerified(
             getBluetoothAdapterStateUseCase,
             getAppleDevicesUseCase,
@@ -343,6 +368,7 @@ class SettingsViewModelTest {
             themeSettingsUseCase,
             overlayPositionUseCase,
             unknownDeviceUseCase,
+            rssiThresholdUseCase,
         )
     }
 
@@ -440,6 +466,7 @@ class SettingsViewModelTest {
             verify(exactly = 1) { themeSettingsUseCase.observe() }
             verify(exactly = 1) { overlayPositionUseCase.observe() }
             verify(exactly = 1) { unknownDeviceUseCase.observe() }
+            verify(exactly = 1) { rssiThresholdUseCase.observe() }
             confirmVerified(
                 getBluetoothAdapterStateUseCase,
                 getAppleDevicesUseCase,
@@ -448,6 +475,7 @@ class SettingsViewModelTest {
                 themeSettingsUseCase,
                 overlayPositionUseCase,
                 unknownDeviceUseCase,
+                rssiThresholdUseCase,
             )
         }
 
@@ -469,6 +497,7 @@ class SettingsViewModelTest {
             verify(exactly = 1) { themeSettingsUseCase.observe() }
             verify(exactly = 1) { overlayPositionUseCase.observe() }
             verify(exactly = 1) { unknownDeviceUseCase.observe() }
+            verify(exactly = 1) { rssiThresholdUseCase.observe() }
             confirmVerified(
                 getBluetoothAdapterStateUseCase,
                 getAppleDevicesUseCase,
@@ -477,6 +506,35 @@ class SettingsViewModelTest {
                 themeSettingsUseCase,
                 overlayPositionUseCase,
                 unknownDeviceUseCase,
+                rssiThresholdUseCase,
+            )
+        }
+
+    @Test
+    fun `updateRssiThresholdを呼び出すとUseCaseのupdateが呼ばれる`() =
+        runTest {
+            fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
+            coEvery { rssiThresholdUseCase.update(RssiThreshold.NEAR) } just Runs
+
+            viewModel.updateRssiThreshold(RssiThreshold.NEAR)
+
+            verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
+            verify(exactly = 1) { getAppleDevicesUseCase.observe() }
+            verify(exactly = 1) { getOverlaySettingsUseCase.observe() }
+            verify(exactly = 1) { themeSettingsUseCase.observe() }
+            verify(exactly = 1) { overlayPositionUseCase.observe() }
+            verify(exactly = 1) { unknownDeviceUseCase.observe() }
+            verify(exactly = 1) { rssiThresholdUseCase.observe() }
+            coVerify(exactly = 1) { rssiThresholdUseCase.update(RssiThreshold.NEAR) }
+            confirmVerified(
+                getBluetoothAdapterStateUseCase,
+                getAppleDevicesUseCase,
+                getOverlaySettingsUseCase,
+                checkUpdateUseCase,
+                themeSettingsUseCase,
+                overlayPositionUseCase,
+                unknownDeviceUseCase,
+                rssiThresholdUseCase,
             )
         }
 

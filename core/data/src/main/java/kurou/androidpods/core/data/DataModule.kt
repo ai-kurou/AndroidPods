@@ -18,6 +18,7 @@ import kurou.androidpods.core.domain.CompatibleDeviceRepository
 import kurou.androidpods.core.domain.FirstLaunchRepository
 import kurou.androidpods.core.domain.OverlayPositionRepository
 import kurou.androidpods.core.domain.OverlaySettingsRepository
+import kurou.androidpods.core.domain.RssiThresholdRepository
 import kurou.androidpods.core.domain.ThemeSettingsRepository
 import kurou.androidpods.core.domain.UnknownDeviceRepository
 import kurou.androidpods.core.domain.UpdateRepository
@@ -53,6 +54,13 @@ abstract class DataModule {
         fun provideWidgetBatteryDataStore(
             @ApplicationContext context: Context,
         ): DataStore<Preferences> = context.widgetBatteryDataStore
+
+        @Provides
+        @Singleton
+        @Named("rssi_threshold")
+        fun provideRssiThresholdDataStore(
+            @ApplicationContext context: Context,
+        ): DataStore<Preferences> = context.rssiThresholdDataStore
     }
 
     @Binds
@@ -88,4 +96,7 @@ abstract class DataModule {
 
     @Binds
     internal abstract fun bindWidgetBatteryRepository(impl: WidgetBatteryRepositoryImpl): WidgetBatteryRepository
+
+    @Binds
+    internal abstract fun bindRssiThresholdRepository(impl: RssiThresholdRepositoryImpl): RssiThresholdRepository
 }

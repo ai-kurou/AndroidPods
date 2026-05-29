@@ -17,38 +17,38 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kurou.androidpods.core.domain.OverlayPosition
+import kurou.androidpods.core.domain.RssiThreshold
 
 @Composable
-internal fun OverlayPositionDialog(
-    currentPosition: OverlayPosition,
+internal fun RssiThresholdDialog(
+    currentThreshold: RssiThreshold,
     onDismiss: () -> Unit,
-    onPositionSelected: (OverlayPosition) -> Unit,
+    onThresholdSelected: (RssiThreshold) -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.overlay_position_label)) },
+        title = { Text(stringResource(R.string.rssi_threshold_label)) },
         text = {
             Column {
-                OverlayPosition.entries.forEach { position ->
+                RssiThreshold.entries.forEach { threshold ->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier =
                             Modifier
                                 .fillMaxWidth()
                                 .selectable(
-                                    selected = position == currentPosition,
-                                    onClick = { onPositionSelected(position) },
+                                    selected = threshold == currentThreshold,
+                                    onClick = { onThresholdSelected(threshold) },
                                     role = Role.RadioButton,
                                 )
                                 .padding(vertical = 4.dp),
                     ) {
                         RadioButton(
-                            selected = position == currentPosition,
+                            selected = threshold == currentThreshold,
                             onClick = null,
                             modifier = Modifier.minimumInteractiveComponentSize(),
                         )
-                        Text(stringResource(position.toStringRes()))
+                        Text(stringResource(threshold.toStringRes()))
                     }
                 }
             }
@@ -64,10 +64,10 @@ internal fun OverlayPositionDialog(
 
 @Preview(showBackground = true, widthDp = 400, heightDp = 700)
 @Composable
-private fun OverlayPositionDialogPreview() {
-    OverlayPositionDialog(
-        currentPosition = OverlayPosition.TOP,
+private fun RssiThresholdDialogPreview() {
+    RssiThresholdDialog(
+        currentThreshold = RssiThreshold.VERY_NEAR,
         onDismiss = {},
-        onPositionSelected = {},
+        onThresholdSelected = {},
     )
 }

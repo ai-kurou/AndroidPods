@@ -15,6 +15,8 @@ import kurou.androidpods.core.domain.CompatibleDeviceRepository
 import kurou.androidpods.core.domain.OverlayPosition
 import kurou.androidpods.core.domain.OverlayPositionRepository
 import kurou.androidpods.core.domain.OverlaySettingsRepository
+import kurou.androidpods.core.domain.RssiThreshold
+import kurou.androidpods.core.domain.RssiThresholdRepository
 import kurou.androidpods.core.domain.ThemeSettings
 import kurou.androidpods.core.domain.ThemeSettingsRepository
 import kurou.androidpods.core.domain.UnknownDeviceRepository
@@ -107,5 +109,14 @@ object FakeRepositoryModule {
             override fun observe(): Flow<WidgetBatteryState?> = emptyFlow()
 
             override suspend fun save(device: AppleDevice) {}
+        }
+
+    @Provides
+    @Singleton
+    fun provideRssiThresholdRepository(): RssiThresholdRepository =
+        object : RssiThresholdRepository {
+            override fun observe(): Flow<RssiThreshold> = flowOf(RssiThreshold.VERY_NEAR)
+
+            override suspend fun update(threshold: RssiThreshold) {}
         }
 }

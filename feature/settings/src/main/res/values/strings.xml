@@ -45,4 +45,9 @@
     <string name="unknown_device_sheet_description">Model code %1$s was detected. What device were you trying to connect?</string>
     <string name="unknown_device_name_label">Device name</string>
     <string name="unknown_device_report_button">Report</string>
+    <string name="rssi_threshold_label">Signal Strength Filter</string>
+    <string name="rssi_threshold_all">All devices</string>
+    <string name="rssi_threshold_medium">Medium range (~5m)</string>
+    <string name="rssi_threshold_near">Near range (~2m)</string>
+    <string name="rssi_threshold_very_near">Very near (~1m)</string>
 </resources>

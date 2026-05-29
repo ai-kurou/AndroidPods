@@ -47,6 +47,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kurou.androidpods.core.domain.OverlayPosition
+import kurou.androidpods.core.domain.RssiThreshold
 import kurou.androidpods.core.domain.ThemeMode
 import kurou.androidpods.core.domain.ThemeSettings
 
@@ -64,6 +65,7 @@ internal fun SettingsContent(
     hasUnknownDevices: Boolean,
     columns: Int,
     themeSettings: ThemeSettings,
+    rssiThreshold: RssiThreshold,
     onPermissionWarningClick: () -> Unit,
     onBluetoothWarningClick: () -> Unit,
     onNotificationWarningClick: () -> Unit,
@@ -72,6 +74,7 @@ internal fun SettingsContent(
     onOverlayPositionClick: () -> Unit,
     onRestartServiceClick: () -> Unit,
     onBatteryOptimizationClick: () -> Unit,
+    onRssiThresholdClick: () -> Unit,
     onThemeModeClick: () -> Unit,
     onDynamicColorToggle: (Boolean) -> Unit,
     onUpdateClick: () -> Unit,
@@ -128,8 +131,10 @@ internal fun SettingsContent(
         scanServiceSectionItems(
             isServiceRestarting = isServiceRestarting,
             isBatteryOptimizationExempt = isBatteryOptimizationExempt,
+            rssiThreshold = rssiThreshold,
             onRestartServiceClick = onRestartServiceClick,
             onBatteryOptimizationClick = onBatteryOptimizationClick,
+            onRssiThresholdClick = onRssiThresholdClick,
         )
         appearanceSectionItems(
             themeSettings = themeSettings,
@@ -267,8 +272,10 @@ private fun LazyGridScope.overlaySectionItems(
 private fun LazyGridScope.scanServiceSectionItems(
     isServiceRestarting: Boolean,
     isBatteryOptimizationExempt: Boolean,
+    rssiThreshold: RssiThreshold,
     onRestartServiceClick: () -> Unit,
     onBatteryOptimizationClick: () -> Unit,
+    onRssiThresholdClick: () -> Unit,
 ) {
     sectionLabel(R.string.scan_service_section_label)
     item(key = R.string.restart_service, span = { GridItemSpan(1) }) {
@@ -299,6 +306,20 @@ private fun LazyGridScope.scanServiceSectionItems(
             Switch(
                 checked = isBatteryOptimizationExempt,
                 onCheckedChange = null,
+            )
+        }
+    }
+    item(key = R.string.rssi_threshold_label, span = { GridItemSpan(1) }) {
+        SettingsItem(
+            label = stringResource(R.string.rssi_threshold_label),
+            icon = painterResource(R.drawable.ic_rssi_threshold),
+            onClick = onRssiThresholdClick,
+            modifier = Modifier.animateItem(),
+        ) {
+            Text(
+                text = stringResource(rssiThreshold.toStringRes()),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }
@@ -569,6 +590,14 @@ internal fun OverlayPosition.toStringRes(): Int =
         OverlayPosition.BOTTOM -> R.string.overlay_position_bottom
     }
 
+internal fun RssiThreshold.toStringRes(): Int =
+    when (this) {
+        RssiThreshold.ALL -> R.string.rssi_threshold_all
+        RssiThreshold.MEDIUM -> R.string.rssi_threshold_medium
+        RssiThreshold.NEAR -> R.string.rssi_threshold_near
+        RssiThreshold.VERY_NEAR -> R.string.rssi_threshold_very_near
+    }
+
 @Preview(showBackground = true, widthDp = 400, heightDp = 700)
 @Composable
 private fun SettingsContentPreviewNoWarning() {
@@ -595,8 +624,10 @@ private fun SettingsContentPreviewNoWarning() {
         onOverlayPositionClick = {},
         onRestartServiceClick = {},
         onBatteryOptimizationClick = {},
+        onRssiThresholdClick = {},
         isBatteryOptimizationExempt = false,
         themeSettings = ThemeSettings(),
+        rssiThreshold = RssiThreshold.VERY_NEAR,
         onThemeModeClick = {},
         onDynamicColorToggle = {},
         onUpdateClick = {},
@@ -629,8 +660,10 @@ private fun SettingsContentPreviewBluetoothUnavailable() {
         onOverlayPositionClick = {},
         onRestartServiceClick = {},
         onBatteryOptimizationClick = {},
+        onRssiThresholdClick = {},
         isBatteryOptimizationExempt = false,
         themeSettings = ThemeSettings(),
+        rssiThreshold = RssiThreshold.VERY_NEAR,
         onThemeModeClick = {},
         onDynamicColorToggle = {},
         onUpdateClick = {},
@@ -667,8 +700,10 @@ private fun SettingsContentPreviewAllWarnings() {
         onOverlayPositionClick = {},
         onRestartServiceClick = {},
         onBatteryOptimizationClick = {},
+        onRssiThresholdClick = {},
         isBatteryOptimizationExempt = false,
         themeSettings = ThemeSettings(),
+        rssiThreshold = RssiThreshold.VERY_NEAR,
         onThemeModeClick = {},
         onDynamicColorToggle = {},
         onUpdateClick = {},
@@ -705,8 +740,10 @@ private fun SettingsContentPreviewServiceRestarting() {
         onOverlayPositionClick = {},
         onRestartServiceClick = {},
         onBatteryOptimizationClick = {},
+        onRssiThresholdClick = {},
         isBatteryOptimizationExempt = false,
         themeSettings = ThemeSettings(),
+        rssiThreshold = RssiThreshold.VERY_NEAR,
         onThemeModeClick = {},
         onDynamicColorToggle = {},
         onUpdateClick = {},
@@ -743,8 +780,10 @@ private fun SettingsContentPreviewTwoColumns() {
         onOverlayPositionClick = {},
         onRestartServiceClick = {},
         onBatteryOptimizationClick = {},
+        onRssiThresholdClick = {},
         isBatteryOptimizationExempt = false,
         themeSettings = ThemeSettings(),
+        rssiThreshold = RssiThreshold.VERY_NEAR,
         onThemeModeClick = {},
         onDynamicColorToggle = {},
         onUpdateClick = {},
@@ -781,8 +820,10 @@ private fun SettingsContentPreviewThreeColumns() {
         onOverlayPositionClick = {},
         onRestartServiceClick = {},
         onBatteryOptimizationClick = {},
+        onRssiThresholdClick = {},
         isBatteryOptimizationExempt = false,
         themeSettings = ThemeSettings(),
+        rssiThreshold = RssiThreshold.VERY_NEAR,
         onThemeModeClick = {},
         onDynamicColorToggle = {},
         onUpdateClick = {},
