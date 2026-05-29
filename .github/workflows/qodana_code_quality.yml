@@ -1,3 +1,8 @@
+# Qodana は pull-request.yml / on-main-merge.yml とは別ファイルで管理する。
+# 理由: Qodana は Docker コンテナ (jetbrains/qodana-jvm-android) を pull して
+# JetBrains IDE エンジンを丸ごと起動するため、Gradle タスクを直接実行する
+# 他のジョブとは性質が異なる（実行時間・専用シークレット・Cloud へのアップロードなど）。
+# 別ファイルにするのが JetBrains 公式の推奨パターン。
 name: Qodana
 on:
   workflow_dispatch:
@@ -20,6 +25,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}  # to check out the actual pull request commit, not the merge commit
           fetch-depth: 0  # a full history is required for pull request analysis
       - name: 'Qodana Scan'
+        continue-on-error: true  # AGP 9.2.1 は Qodana 側の対応待ち（最大対応 AGP 9.0.0-alpha06）のため一時的に無視
         uses: JetBrains/qodana-action@v2026.1
         with:
           pr-mode: false
