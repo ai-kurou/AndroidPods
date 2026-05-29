@@ -192,7 +192,7 @@ Koverでカバレッジを計測し、CIでCodecovにアップロードする。
 
 ## CI
 
-PR時に `.github/workflows/pull-request.yml` が実行される:
+PR時に `.github/workflows/on-pull-request.yml` が実行される:
 - **module-graph-assert ジョブ**: `assertModuleGraph` でモジュール間の依存ルールを検証
 - **unit-test ジョブ**: `koverXmlReport` → Codecov へアップロード
 - **screenshot-test ジョブ**: `verifyRoborazziDebug` でスクリーンショットを比較。差分が出た場合は `**/build/outputs/roborazzi/*.png` をアーティファクトとしてアップロード
