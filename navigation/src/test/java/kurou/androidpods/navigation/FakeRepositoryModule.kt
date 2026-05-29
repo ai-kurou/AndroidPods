@@ -15,10 +15,10 @@ import kurou.androidpods.core.domain.CompatibleDeviceRepository
 import kurou.androidpods.core.domain.OverlayPosition
 import kurou.androidpods.core.domain.OverlayPositionRepository
 import kurou.androidpods.core.domain.OverlaySettingsRepository
-import kurou.androidpods.core.domain.ThemeSettings
-import kurou.androidpods.core.domain.ThemeSettingsRepository
 import kurou.androidpods.core.domain.RssiThreshold
 import kurou.androidpods.core.domain.RssiThresholdRepository
+import kurou.androidpods.core.domain.ThemeSettings
+import kurou.androidpods.core.domain.ThemeSettingsRepository
 import kurou.androidpods.core.domain.UnknownDeviceRepository
 import kurou.androidpods.core.domain.UpdateRepository
 import kurou.androidpods.core.domain.WidgetBatteryRepository
