@@ -101,6 +101,7 @@ class SettingsScreenTest {
         every { overlayPositionUseCase.observe() } returns MutableStateFlow(OverlayPosition.BOTTOM)
         every { unknownDeviceUseCase.observe() } returns MutableStateFlow(unknownModelCodes)
         every { rssiThresholdUseCase.observe() } returns MutableStateFlow(RssiThreshold.VERY_NEAR)
+        coEvery { rssiThresholdUseCase.update(any()) } just Runs
         coEvery { themeSettingsUseCase.update(any()) } just Runs
         return SettingsViewModel(
             btUseCase,
@@ -583,6 +584,36 @@ class SettingsScreenTest {
         composeTestRule.waitForIdle()
 
         assertFalse(viewModel.uiState.value.showUnknownDeviceSheet)
+    }
+
+    @Test
+    fun `RSSI閾値アイテムをタップするとRssiThresholdDialogが表示される`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        grantRequiredPermissions(context)
+
+        composeTestRule.setContent {
+            SettingsScreen(
+                windowSizeClass = windowSizeClassOf(400f),
+                onStartScanService = {},
+                onStopScanService = {},
+                onLicensesClick = {},
+                onDevicesClick = {},
+                viewModel = createViewModel(BluetoothAdapter.STATE_ON),
+            )
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst()
+            .performScrollToNode(hasText("Signal Strength Filter"))
+        composeTestRule.onNodeWithText("Signal Strength Filter").performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("All devices").assertExists()
+
+        composeTestRule.onNodeWithText("All devices").performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("All devices").assertDoesNotExist()
     }
 
     @Test

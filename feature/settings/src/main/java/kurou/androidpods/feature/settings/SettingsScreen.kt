@@ -147,6 +147,14 @@ fun SettingsScreen(
         )
     }
 
+    if (uiState.showRssiThresholdDialog) {
+        RssiThresholdDialog(
+            currentThreshold = uiState.rssiThreshold,
+            onDismiss = viewModel::dismissRssiThresholdDialog,
+            onThresholdSelected = viewModel::updateRssiThreshold,
+        )
+    }
+
     if (uiState.showUnknownDeviceSheet) {
         val modelCode = uiState.unknownModelCodes.firstOrNull()
         if (modelCode != null) {
@@ -221,6 +229,7 @@ fun SettingsScreen(
             viewModel.updateThemeSettings(uiState.themeSettings.copy(useDynamicColor = enabled))
         },
         onOverlayPositionClick = viewModel::showOverlayPositionDialog,
+        onRssiThresholdClick = viewModel::showRssiThresholdDialog,
     )
 }
 
@@ -306,6 +315,7 @@ private fun SettingsScaffold(
     onOverlayPositionClick: () -> Unit,
     onRestartServiceClick: () -> Unit,
     onBatteryOptimizationClick: () -> Unit,
+    onRssiThresholdClick: () -> Unit,
     onThemeModeClick: () -> Unit,
     onDynamicColorToggle: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
@@ -333,6 +343,7 @@ private fun SettingsScaffold(
             hasUnknownDevices = uiState.hasUnknownDevices,
             columns = columns,
             themeSettings = uiState.themeSettings,
+            rssiThreshold = uiState.rssiThreshold,
             onPermissionWarningClick = onPermissionWarningClick,
             onBluetoothWarningClick = onBluetoothWarningClick,
             onNotificationWarningClick = onNotificationWarningClick,
@@ -346,6 +357,7 @@ private fun SettingsScaffold(
             onOverlayPositionClick = onOverlayPositionClick,
             onRestartServiceClick = onRestartServiceClick,
             onBatteryOptimizationClick = onBatteryOptimizationClick,
+            onRssiThresholdClick = onRssiThresholdClick,
             onThemeModeClick = onThemeModeClick,
             onDynamicColorToggle = onDynamicColorToggle,
             modifier = Modifier.padding(innerPadding),

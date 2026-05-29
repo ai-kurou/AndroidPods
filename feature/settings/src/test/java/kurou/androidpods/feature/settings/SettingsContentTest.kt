@@ -10,6 +10,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import kurou.androidpods.core.domain.OverlayPosition
+import kurou.androidpods.core.domain.RssiThreshold
 import kurou.androidpods.core.domain.ThemeSettings
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -39,6 +40,7 @@ class SettingsContentTest {
         hasUnknownDevices: Boolean = false,
         columns: Int = 1,
         themeSettings: ThemeSettings = ThemeSettings(),
+        rssiThreshold: RssiThreshold = RssiThreshold.VERY_NEAR,
         onPermissionWarningClick: () -> Unit = {},
         onBluetoothWarningClick: () -> Unit = {},
         onNotificationWarningClick: () -> Unit = {},
@@ -47,6 +49,7 @@ class SettingsContentTest {
         onOverlayPositionClick: () -> Unit = {},
         onRestartServiceClick: () -> Unit = {},
         onBatteryOptimizationClick: () -> Unit = {},
+        onRssiThresholdClick: () -> Unit = {},
         onThemeModeClick: () -> Unit = {},
         onDynamicColorToggle: (Boolean) -> Unit = {},
         onUpdateClick: () -> Unit = {},
@@ -69,6 +72,7 @@ class SettingsContentTest {
                 hasUnknownDevices = hasUnknownDevices,
                 columns = columns,
                 themeSettings = themeSettings,
+                rssiThreshold = rssiThreshold,
                 onPermissionWarningClick = onPermissionWarningClick,
                 onBluetoothWarningClick = onBluetoothWarningClick,
                 onNotificationWarningClick = onNotificationWarningClick,
@@ -77,6 +81,7 @@ class SettingsContentTest {
                 onOverlayPositionClick = onOverlayPositionClick,
                 onRestartServiceClick = onRestartServiceClick,
                 onBatteryOptimizationClick = onBatteryOptimizationClick,
+                onRssiThresholdClick = onRssiThresholdClick,
                 onThemeModeClick = onThemeModeClick,
                 onDynamicColorToggle = onDynamicColorToggle,
                 onUpdateClick = onUpdateClick,
@@ -255,6 +260,18 @@ class SettingsContentTest {
         composeTestRule.onAllNodes(hasScrollAction()).onFirst()
             .performScrollToNode(hasText("Disable battery optimization"))
         composeTestRule.onNodeWithText("Disable battery optimization").performClick()
+
+        assertTrue(clicked)
+    }
+
+    @Test
+    fun `RSSI閾値アイテムをタップするとonRssiThresholdClickが呼ばれる`() {
+        var clicked = false
+        setSettingsContent(onRssiThresholdClick = { clicked = true })
+
+        composeTestRule.onAllNodes(hasScrollAction()).onFirst()
+            .performScrollToNode(hasText("Signal Strength Filter"))
+        composeTestRule.onNodeWithText("Signal Strength Filter").performClick()
 
         assertTrue(clicked)
     }
