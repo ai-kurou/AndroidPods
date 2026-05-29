@@ -18,9 +18,10 @@ class BluetoothUnavailableDialogTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun `タイトルとメッセージが表示される`() {
+    fun `ダイアログが表示されて必要な文字列が全て表示されてOKを押す`() {
+        var dismissed = false
         composeTestRule.setContent {
-            BluetoothUnavailableDialog(onDismiss = {})
+            BluetoothUnavailableDialog(onDismiss = { dismissed = true })
         }
 
         composeTestRule.onNodeWithText("Bluetooth Unavailable").assertIsDisplayed()
@@ -28,14 +29,6 @@ class BluetoothUnavailableDialogTest {
             .onNodeWithText(
                 "This device does not have Bluetooth, so this app cannot be used.",
             ).assertIsDisplayed()
-    }
-
-    @Test
-    fun `OKボタンをタップするとonDismissが呼ばれる`() {
-        var dismissed = false
-        composeTestRule.setContent {
-            BluetoothUnavailableDialog(onDismiss = { dismissed = true })
-        }
 
         composeTestRule.onNodeWithText("OK").performClick()
         assertTrue(dismissed)

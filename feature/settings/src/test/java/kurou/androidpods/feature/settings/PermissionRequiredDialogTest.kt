@@ -18,9 +18,10 @@ class PermissionRequiredDialogTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun `タイトルとメッセージが表示される`() {
+    fun `ダイアログが表示されて必要な文字列が全て表示されてOpen Settingsを押す`() {
+        var confirmed = false
         composeTestRule.setContent {
-            PermissionRequiredDialog(onDismiss = {}, onConfirm = {})
+            PermissionRequiredDialog(onDismiss = {}, onConfirm = { confirmed = true })
         }
 
         composeTestRule.onNodeWithText("Bluetooth Permission Required").assertIsDisplayed()
@@ -28,21 +29,13 @@ class PermissionRequiredDialogTest {
             .onNodeWithText(
                 "This app requires Bluetooth permissions to connect to devices. Please grant permissions in Settings.",
             ).assertIsDisplayed()
-    }
-
-    @Test
-    fun `Open SettingsボタンをタップするとonConfirmが呼ばれる`() {
-        var confirmed = false
-        composeTestRule.setContent {
-            PermissionRequiredDialog(onDismiss = {}, onConfirm = { confirmed = true })
-        }
 
         composeTestRule.onNodeWithText("Open Settings").performClick()
         assertTrue(confirmed)
     }
 
     @Test
-    fun `CancelボタンをタップするとonDismissが呼ばれる`() {
+    fun `ダイアログが表示されてキャンセルを押す`() {
         var dismissed = false
         composeTestRule.setContent {
             PermissionRequiredDialog(onDismiss = { dismissed = true }, onConfirm = {})
