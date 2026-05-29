@@ -271,7 +271,6 @@ class SettingsViewModel @Inject constructor(
     fun updateRssiThreshold(threshold: RssiThreshold) {
         viewModelScope.launch {
             rssiThresholdUseCase.update(threshold)
-            dismissRssiThresholdDialog()
         }
     }
 

@@ -151,7 +151,10 @@ fun SettingsScreen(
         RssiThresholdDialog(
             currentThreshold = uiState.rssiThreshold,
             onDismiss = viewModel::dismissRssiThresholdDialog,
-            onThresholdSelected = viewModel::updateRssiThreshold,
+            onThresholdSelected = { threshold ->
+                viewModel.updateRssiThreshold(threshold)
+                viewModel.dismissRssiThresholdDialog()
+            },
         )
     }
 

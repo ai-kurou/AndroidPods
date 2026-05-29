@@ -511,16 +511,13 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun `showRssiThresholdDialogを呼び出してupdateRssiThresholdを呼び出すとUseCaseのupdateが呼ばれダイアログが閉じる`() =
+    fun `updateRssiThresholdを呼び出すとUseCaseのupdateが呼ばれる`() =
         runTest {
             fakeBluetoothFlow.emit(BluetoothAdapter.STATE_ON)
             coEvery { rssiThresholdUseCase.update(RssiThreshold.NEAR) } just Runs
 
-            viewModel.showRssiThresholdDialog()
-            assertTrue(viewModel.uiState.value.showRssiThresholdDialog)
             viewModel.updateRssiThreshold(RssiThreshold.NEAR)
 
-            assertFalse(viewModel.uiState.value.showRssiThresholdDialog)
             verify(exactly = 1) { getBluetoothAdapterStateUseCase.observe() }
             verify(exactly = 1) { getAppleDevicesUseCase.observe() }
             verify(exactly = 1) { getOverlaySettingsUseCase.observe() }
