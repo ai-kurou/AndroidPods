@@ -1,5 +1,6 @@
 package kurou.androidpods.core.data
 
+import android.app.Application
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
@@ -28,7 +29,7 @@ class RssiThresholdRepositoryImplTest {
 
     @Before
     fun setUp() {
-        val context = ApplicationProvider.getApplicationContext<android.app.Application>()
+        val context = ApplicationProvider.getApplicationContext<Application>()
         val dataStore = PreferenceDataStoreFactory.create {
             File(context.filesDir, "datastore/test_rssi_${UUID.randomUUID()}.preferences_pb")
         }
