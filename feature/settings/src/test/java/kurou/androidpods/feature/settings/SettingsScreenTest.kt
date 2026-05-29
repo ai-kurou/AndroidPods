@@ -41,6 +41,8 @@ import kurou.androidpods.core.domain.GetOverlaySettingsUseCase
 import kurou.androidpods.core.domain.NotificationChannels
 import kurou.androidpods.core.domain.OverlayPosition
 import kurou.androidpods.core.domain.OverlayPositionUseCase
+import kurou.androidpods.core.domain.RssiThreshold
+import kurou.androidpods.core.domain.RssiThresholdUseCase
 import kurou.androidpods.core.domain.ThemeSettings
 import kurou.androidpods.core.domain.ThemeSettingsUseCase
 import kurou.androidpods.core.domain.UnknownDeviceUseCase
@@ -69,6 +71,7 @@ class SettingsScreenTest {
     private val themeSettingsUseCase = mockk<ThemeSettingsUseCase>()
     private val overlayPositionUseCase = mockk<OverlayPositionUseCase>(relaxUnitFun = true)
     private val unknownDeviceUseCase = mockk<UnknownDeviceUseCase>()
+    private val rssiThresholdUseCase = mockk<RssiThresholdUseCase>()
 
     @After
     fun tearDown() {
@@ -97,6 +100,7 @@ class SettingsScreenTest {
         every { themeSettingsUseCase.observe() } returns MutableStateFlow(ThemeSettings())
         every { overlayPositionUseCase.observe() } returns MutableStateFlow(OverlayPosition.BOTTOM)
         every { unknownDeviceUseCase.observe() } returns MutableStateFlow(unknownModelCodes)
+        every { rssiThresholdUseCase.observe() } returns MutableStateFlow(RssiThreshold.VERY_NEAR)
         coEvery { themeSettingsUseCase.update(any()) } just Runs
         return SettingsViewModel(
             btUseCase,
@@ -106,6 +110,7 @@ class SettingsScreenTest {
             themeSettingsUseCase,
             overlayPositionUseCase,
             unknownDeviceUseCase,
+            rssiThresholdUseCase,
         )
     }
 
