@@ -47,6 +47,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kurou.androidpods.core.domain.OverlayPosition
+import kurou.androidpods.core.domain.RssiThreshold
 import kurou.androidpods.core.domain.ThemeMode
 import kurou.androidpods.core.domain.ThemeSettings
 
@@ -567,6 +568,14 @@ internal fun OverlayPosition.toStringRes(): Int =
     when (this) {
         OverlayPosition.TOP -> R.string.overlay_position_top
         OverlayPosition.BOTTOM -> R.string.overlay_position_bottom
+    }
+
+internal fun RssiThreshold.toStringRes(): Int =
+    when (this) {
+        RssiThreshold.ALL -> R.string.rssi_threshold_all
+        RssiThreshold.MEDIUM -> R.string.rssi_threshold_medium
+        RssiThreshold.NEAR -> R.string.rssi_threshold_near
+        RssiThreshold.VERY_NEAR -> R.string.rssi_threshold_very_near
     }
 
 @Preview(showBackground = true, widthDp = 400, heightDp = 700)

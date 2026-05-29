@@ -45,4 +45,9 @@
     <string name="unknown_device_sheet_description">モデルコード %1$s のデバイスを検出しました。何のデバイスを接続しようとしていましたか？</string>
     <string name="unknown_device_name_label">デバイス名</string>
     <string name="unknown_device_report_button">報告する</string>
+    <string name="rssi_threshold_label">電波強度フィルター</string>
+    <string name="rssi_threshold_all">すべて検出</string>
+    <string name="rssi_threshold_medium">中距離まで（〜5m）</string>
+    <string name="rssi_threshold_near">近い距離のみ（〜2m）</string>
+    <string name="rssi_threshold_very_near">手元のみ（〜1m）</string>
 </resources>
