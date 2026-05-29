@@ -115,7 +115,7 @@ object FakeRepositoryModule {
     @Singleton
     fun provideRssiThresholdRepository(): RssiThresholdRepository =
         object : RssiThresholdRepository {
-            override fun observe(): Flow<RssiThreshold> = flowOf(RssiThreshold.ALL)
+            override fun observe(): Flow<RssiThreshold> = flowOf(RssiThreshold.VERY_NEAR)
 
             override suspend fun update(threshold: RssiThreshold) {}
         }
