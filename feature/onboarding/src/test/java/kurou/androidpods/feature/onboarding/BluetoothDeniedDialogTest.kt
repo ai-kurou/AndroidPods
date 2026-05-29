@@ -18,28 +18,21 @@ class BluetoothDeniedDialogTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun `タイトルとメッセージが表示される`() {
-        composeTestRule.setContent {
-            BluetoothDeniedDialog(onDismiss = {}, onConfirm = {})
-        }
-
-        composeTestRule.onNodeWithText("Bluetooth is Off").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Bluetooth was not enabled. Please enable it in Settings.").assertIsDisplayed()
-    }
-
-    @Test
-    fun `Open SettingsボタンをタップするとonConfirmが呼ばれる`() {
+    fun `ダイアログが表示されて必要な文字列が全て表示されてOpen Settingsを押す`() {
         var confirmed = false
         composeTestRule.setContent {
             BluetoothDeniedDialog(onDismiss = {}, onConfirm = { confirmed = true })
         }
+
+        composeTestRule.onNodeWithText("Bluetooth is Off").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Bluetooth was not enabled. Please enable it in Settings.").assertIsDisplayed()
 
         composeTestRule.onNodeWithText("Open Settings").performClick()
         assertTrue(confirmed)
     }
 
     @Test
-    fun `CancelボタンをタップするとonDismissが呼ばれる`() {
+    fun `ダイアログが表示されてキャンセルを押す`() {
         var dismissed = false
         composeTestRule.setContent {
             BluetoothDeniedDialog(onDismiss = { dismissed = true }, onConfirm = {})

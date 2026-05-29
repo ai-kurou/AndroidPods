@@ -6,6 +6,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import kurou.androidpods.core.domain.ThemeMode
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -19,19 +20,7 @@ class ThemeModeDialogTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun `タイトルと選択肢が表示される`() {
-        composeTestRule.setContent {
-            ThemeModeDialog(currentMode = ThemeMode.SYSTEM, onDismiss = {}, onModeSelected = {})
-        }
-
-        composeTestRule.onNodeWithText("Theme").assertIsDisplayed()
-        composeTestRule.onNodeWithText("System").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Light").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Dark").assertIsDisplayed()
-    }
-
-    @Test
-    fun `選択肢をタップするとonModeSelectedが呼ばれる`() {
+    fun `ダイアログが表示されて必要な文字列が全て表示されていずれかを選択する`() {
         var selected: ThemeMode? = null
         composeTestRule.setContent {
             ThemeModeDialog(
@@ -41,7 +30,27 @@ class ThemeModeDialogTest {
             )
         }
 
+        composeTestRule.onNodeWithText("Theme").assertIsDisplayed()
+        composeTestRule.onNodeWithText("System").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Light").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Dark").assertIsDisplayed()
+
         composeTestRule.onNodeWithText("Dark").performClick()
         assertEquals(ThemeMode.DARK, selected)
+    }
+
+    @Test
+    fun `ダイアログが表示されてキャンセルを押す`() {
+        var dismissed = false
+        composeTestRule.setContent {
+            ThemeModeDialog(
+                currentMode = ThemeMode.SYSTEM,
+                onDismiss = { dismissed = true },
+                onModeSelected = {},
+            )
+        }
+
+        composeTestRule.onNodeWithText("Cancel").performClick()
+        assertTrue(dismissed)
     }
 }

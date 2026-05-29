@@ -20,22 +20,7 @@ class OverlayPositionDialogTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun `タイトルと選択肢が表示される`() {
-        composeTestRule.setContent {
-            OverlayPositionDialog(
-                currentPosition = OverlayPosition.TOP,
-                onDismiss = {},
-                onPositionSelected = {},
-            )
-        }
-
-        composeTestRule.onNodeWithText("Overlay position").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Top").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Bottom").assertIsDisplayed()
-    }
-
-    @Test
-    fun `選択肢をタップするとonPositionSelectedが呼ばれる`() {
+    fun `ダイアログが表示されて必要な文字列が全て表示されていずれかを選択する`() {
         var selected: OverlayPosition? = null
         composeTestRule.setContent {
             OverlayPositionDialog(
@@ -45,12 +30,16 @@ class OverlayPositionDialogTest {
             )
         }
 
+        composeTestRule.onNodeWithText("Overlay position").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Top").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Bottom").assertIsDisplayed()
+
         composeTestRule.onNodeWithText("Bottom").performClick()
         assertEquals(OverlayPosition.BOTTOM, selected)
     }
 
     @Test
-    fun `CancelボタンをタップするとonDismissが呼ばれる`() {
+    fun `ダイアログが表示されてキャンセルを押す`() {
         var dismissed = false
         composeTestRule.setContent {
             OverlayPositionDialog(
