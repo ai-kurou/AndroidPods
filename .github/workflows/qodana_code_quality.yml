@@ -1,4 +1,4 @@
-# Qodana は pull-request.yml / on-main-merge.yml とは別ファイルで管理する。
+# Qodana は on-pull-request.yml / on-main-merge.yml とは別ファイルで管理する。
 # 理由: Qodana は Docker コンテナ (jetbrains/qodana-jvm-android) を pull して
 # JetBrains IDE エンジンを丸ごと起動するため、Gradle タスクを直接実行する
 # 他のジョブとは性質が異なる（実行時間・専用シークレット・Cloud へのアップロードなど）。
