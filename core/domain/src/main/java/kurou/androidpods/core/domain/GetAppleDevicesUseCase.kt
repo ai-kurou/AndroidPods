@@ -10,11 +10,7 @@ class GetAppleDevicesUseCase @Inject constructor(
 ) {
     fun observe(): Flow<Map<String, AppleDevice>> =
         combine(repository.observeDevices(), rssiThresholdRepository.observe()) { devices, threshold ->
-            if (threshold == RssiThreshold.ALL) {
-                devices
-            } else {
-                devices.filter { (_, device) -> device.rssi >= threshold.minRssi }
-            }
+            devices.filter { (_, device) -> device.rssi >= threshold.minRssi }
         }
 
     fun startScan() = repository.startScan()

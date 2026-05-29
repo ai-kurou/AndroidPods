@@ -71,6 +71,21 @@ class GetAppleDevicesUseCaseTest {
         }
 
     @Test
+    fun `閾値と等しいRSSIを持つデバイスは含まれる`() =
+        runTest {
+            val boundaryDevice = device(rssi = -75)
+            every { repository.observeDevices() } returns MutableStateFlow(mapOf("boundary" to boundaryDevice))
+            every { rssiThresholdRepository.observe() } returns MutableStateFlow(RssiThreshold.MEDIUM)
+
+            val result = useCase.observe().first()
+
+            assertEquals(mapOf("boundary" to boundaryDevice), result)
+            verify(exactly = 1) { repository.observeDevices() }
+            verify(exactly = 1) { rssiThresholdRepository.observe() }
+            confirmVerified(repository, rssiThresholdRepository)
+        }
+
+    @Test
     fun `startScanでrepositoryのstartScanが呼ばれる`() {
         useCase.startScan()
 
