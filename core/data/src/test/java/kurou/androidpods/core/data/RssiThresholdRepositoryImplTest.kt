@@ -36,11 +36,11 @@ class RssiThresholdRepositoryImplTest {
     }
 
     @Test
-    fun `デフォルト値はALL`() =
+    fun `デフォルト値はVERY_NEAR`() =
         runTest {
             val result = repository.observe().first()
 
-            assertEquals(RssiThreshold.ALL, result)
+            assertEquals(RssiThreshold.VERY_NEAR, result)
         }
 
     @Test
@@ -65,7 +65,7 @@ class RssiThresholdRepositoryImplTest {
 
             val result = repo.observe().first()
 
-            assertEquals(RssiThreshold.ALL, result)
+            assertEquals(RssiThreshold.VERY_NEAR, result)
         }
 
     @Test

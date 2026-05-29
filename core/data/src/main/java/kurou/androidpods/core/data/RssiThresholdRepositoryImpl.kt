@@ -31,7 +31,7 @@ internal class RssiThresholdRepositoryImpl @Inject constructor(
             .map { preferences ->
                 preferences[thresholdKey]
                     ?.let { try { RssiThreshold.valueOf(it) } catch (_: IllegalArgumentException) { null } }
-                    ?: RssiThreshold.ALL
+                    ?: RssiThreshold.VERY_NEAR
             }
 
     override suspend fun update(threshold: RssiThreshold) {
