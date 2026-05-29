@@ -55,7 +55,7 @@ class RssiThresholdRepositoryImplTest {
         }
 
     @Test
-    fun `IOExceptionが発生した場合はデフォルト値ALLを返す`() =
+    fun `IOExceptionが発生した場合はデフォルト値VERY_NEARを返す`() =
         runTest {
             val ioExceptionDataStore = object : DataStore<Preferences> {
                 override val data: Flow<Preferences> = flow { throw IOException("Test") }
