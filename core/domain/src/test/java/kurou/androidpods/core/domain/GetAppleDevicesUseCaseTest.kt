@@ -16,10 +16,21 @@ import org.junit.Test
 class GetAppleDevicesUseCaseTest {
     private lateinit var useCase: GetAppleDevicesUseCase
     private val repository = mockk<AppleDeviceRepository>(relaxUnitFun = true)
+    private val rssiThresholdRepository = mockk<RssiThresholdRepository>()
+
+    private fun device(rssi: Int) = AppleDevice(
+        address = "AA:BB:CC:DD:EE:FF",
+        modelName = "AirPods Pro",
+        modelCode = 0x2002,
+        rssi = rssi,
+        leftBattery = 80,
+        rightBattery = 75,
+        caseBattery = 90,
+    )
 
     @Before
     fun setUp() {
-        useCase = GetAppleDevicesUseCase(repository)
+        useCase = GetAppleDevicesUseCase(repository, rssiThresholdRepository)
     }
 
     @After
@@ -28,26 +39,35 @@ class GetAppleDevicesUseCaseTest {
     }
 
     @Test
-    fun `observeがrepositoryのobserveDevicesのFlowを返す`() =
+    fun `ALLの場合はRSSIに関わらず全デバイスを返す`() =
         runTest {
-            val device =
-                AppleDevice(
-                    address = "AA:BB:CC:DD:EE:FF",
-                    modelName = "AirPods Pro",
-                    modelCode = 0x2002,
-                    rssi = -60,
-                    leftBattery = 80,
-                    rightBattery = 75,
-                    caseBattery = 90,
-                )
-            val fakeFlow = MutableStateFlow(mapOf("AA:BB:CC:DD:EE:FF" to device))
-            every { repository.observeDevices() } returns fakeFlow
+            val devices = mapOf("key" to device(rssi = -90))
+            every { repository.observeDevices() } returns MutableStateFlow(devices)
+            every { rssiThresholdRepository.observe() } returns MutableStateFlow(RssiThreshold.ALL)
 
             val result = useCase.observe().first()
 
-            assertEquals(mapOf("AA:BB:CC:DD:EE:FF" to device), result)
+            assertEquals(devices, result)
             verify(exactly = 1) { repository.observeDevices() }
-            confirmVerified(repository)
+            verify(exactly = 1) { rssiThresholdRepository.observe() }
+            confirmVerified(repository, rssiThresholdRepository)
+        }
+
+    @Test
+    fun `閾値以上のRSSIを持つデバイスのみ返す`() =
+        runTest {
+            val nearDevice = device(rssi = -60)
+            val farDevice = device(rssi = -80).copy(modelCode = 0x2003)
+            val devices = mapOf("near" to nearDevice, "far" to farDevice)
+            every { repository.observeDevices() } returns MutableStateFlow(devices)
+            every { rssiThresholdRepository.observe() } returns MutableStateFlow(RssiThreshold.MEDIUM)
+
+            val result = useCase.observe().first()
+
+            assertEquals(mapOf("near" to nearDevice), result)
+            verify(exactly = 1) { repository.observeDevices() }
+            verify(exactly = 1) { rssiThresholdRepository.observe() }
+            confirmVerified(repository, rssiThresholdRepository)
         }
 
     @Test
