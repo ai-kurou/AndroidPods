@@ -239,10 +239,19 @@ private fun PageIndicator(
     }
 }
 
-@Preview(showBackground = true, name = "Portrait", widthDp = 400, heightDp = 700)
-@Preview(showBackground = true, name = "Landscape", widthDp = 700, heightDp = 400)
+@Preview(showBackground = true, widthDp = 400, heightDp = 700)
 @Composable
-private fun OnboardingContentPreview() {
+private fun OnboardingContentPreviewPortrait() {
+    OnboardingContent(
+        pagerState = rememberPagerState(pageCount = { PAGE_COUNT }),
+        onButtonClick = {},
+        onBackClick = {},
+    )
+}
+
+@Preview(showBackground = true, widthDp = 700, heightDp = 400)
+@Composable
+private fun OnboardingContentPreviewLandscape() {
     OnboardingContent(
         pagerState = rememberPagerState(pageCount = { PAGE_COUNT }),
         onButtonClick = {},

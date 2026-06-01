@@ -228,6 +228,19 @@ tasks.register("generateModuleGraphImages") {
     }
 }
 
+// ルートプロジェクトの集計レポートに対するフィルター設定
+// サブプロジェクトレベルのフィルターは各サブプロジェクトの個別レポートにのみ適用され、
+// 集計レポートには引き継がれないため、ここでも同じフィルターを設定する（kotlinx-kover#736）。
+extensions.configure<kotlinx.kover.gradle.plugin.dsl.KoverProjectExtension> {
+    reports {
+        filters {
+            excludes {
+                annotatedBy("androidx.compose.ui.tooling.preview.Preview")
+            }
+        }
+    }
+}
+
 dependencies {
     kover(project(":app"))
     kover(project(":core:domain"))
