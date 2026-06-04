@@ -2,3 +2,6 @@ language: ja
 reviews:
   auto_review:
     enabled: false
+  finishing_touches:
+    unit_tests:
+      enabled: false
