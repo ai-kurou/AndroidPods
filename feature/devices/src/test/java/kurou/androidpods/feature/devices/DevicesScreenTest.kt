@@ -54,12 +54,13 @@ class DevicesScreenTest {
 
     private fun assertIsDisplayedWithBack(size: WindowSizeClass) {
         every { useCase() } returns flowOf(devices)
+        val viewModel = DevicesViewModel(useCase)
 
         composeTestRule.setContent {
             DevicesScreen(
                 onBack = onBack,
                 windowSizeClass = size,
-                viewModel = DevicesViewModel(useCase),
+                viewModel = viewModel,
             )
         }
 
