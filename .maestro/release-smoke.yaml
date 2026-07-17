@@ -1,0 +1,4 @@
+appId: kurou.androidpods
+---
+- launchApp:
+    clearState: true
