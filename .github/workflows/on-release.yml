@@ -8,10 +8,17 @@ on:
         required: true
 
 jobs:
+  maestro-release-smoke:
+    uses: ./.github/workflows/maestro-release-smoke.yml
+    secrets: inherit
+
   release:
+    needs: maestro-release-smoke
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # リリース作成 + main へのpushに必要
+      contents: write
+    env:
+      VERSION_NAME: ${{ github.event.inputs.version }}
 
     steps:
       - uses: actions/checkout@v4
@@ -27,10 +34,8 @@ jobs:
           distribution: temurin
           cache: gradle
 
-      - name: Set version
-        run: |
-          echo "VERSION_NAME=${{ github.event.inputs.version }}" >> $GITHUB_ENV
-          echo "VERSION_CODE=$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
+      - name: Set version code
+        run: echo "VERSION_CODE=$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
 
       - name: Update versionName and versionCode
         run: |

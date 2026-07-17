@@ -2,6 +2,17 @@ name: Maestro Release Smoke
 
 on:
   workflow_dispatch:
+    inputs:
+      ref:
+        description: 'テスト対象のブランチ、タグ、またはSHA'
+        required: false
+        default: main
+  workflow_call:
+    inputs:
+      ref:
+        required: false
+        type: string
+        default: main
 
 jobs:
   signed-release-smoke-test:
@@ -11,6 +22,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
 
       - name: Set up JDK
         uses: actions/setup-java@v4
