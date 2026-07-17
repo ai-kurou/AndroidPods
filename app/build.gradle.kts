@@ -88,6 +88,7 @@ dependencies {
     // AndroidX
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.work.runtime.ktx)
 
     // Unit Test
     testImplementation(libs.junit)
