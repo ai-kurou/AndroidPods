@@ -40,6 +40,4 @@ dependencies {
     testImplementation(libs.hilt.android.testing)
     kspTest(libs.hilt.android.compiler)
 
-    // Instrumented Test
-    androidTestImplementation(libs.androidx.test.runner)
 }
