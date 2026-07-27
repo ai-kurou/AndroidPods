@@ -157,29 +157,3 @@ jobs:
           api-level: 36
           arch: x86_64
           script: ./gradlew :app:connectedDebugAndroidTest
-
-  qodana:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    permissions:
-      contents: read
-      pull-requests: write
-      checks: write
-
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0  # a full history is required for analysis
-          persist-credentials: false
-
-      - name: 'Qodana Scan'
-        # NOTE: continue-on-error: true はすべてのエラー（認証失敗・ネットワーク障害・コード品質違反を含む）を
-        # 無音で飲み込むため、このジョブはCIゲートとして機能しない。
-        # AGP 9.2.1 が Qodana でサポートされたら continue-on-error を削除すること。
-        # 対応状況は JetBrains YouTrack で "Qodana AGP 9.2" を検索して確認する。
-        continue-on-error: true
-        uses: JetBrains/qodana-action@4861e015da555e86a72b862892aba6c2b93e6891 # v2026.1.3
-        with:
-          pr-mode: false
-        env:
-          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_693445069 }}
