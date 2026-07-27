@@ -63,10 +63,6 @@ android {
 }
 
 dependencies {
-    // Firebase
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.crashlytics)
-
     // プロジェクトモジュール
     implementation(project(":core:domain"))
     implementation(project(":core:data"))

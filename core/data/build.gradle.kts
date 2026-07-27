@@ -49,6 +49,4 @@ dependencies {
     testImplementation(libs.androidx.test.core)
     testImplementation(libs.mockk)
 
-    // Instrumented Test
-    androidTestImplementation(libs.androidx.test.runner)
 }
